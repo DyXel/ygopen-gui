@@ -11,10 +11,10 @@
 #include <list>
 #include <type_traits>
 
-#include "enums/location.hpp"
-#include "enums/position.hpp"
-#include "generated/core_data.pb.h"
-#include "generated/core_msg.pb.h"
+#include "../common/enums/location.hpp"
+#include "../common/enums/position.hpp"
+#include "core_data.pb.h"
+#include "core_msg.pb.h"
 
 namespace YGOpen
 {
