@@ -50,7 +50,7 @@ int GameInstance::Init(/*int argc, char argv**/)
 	glClear(GL_COLOR_BUFFER_BIT);
 	SDL_GL_SwapWindow(window);
 	cfgs = std::make_shared<Configs>();
-	state = std::make_shared<State::Loading>(cfgs);
+	state = std::make_shared<State::Loading>(*this, cfgs);
 	return 0;
 }
 
@@ -83,6 +83,12 @@ void GameInstance::PropagateEvent(const SDL_Event& e)
 void GameInstance::TickOnce()
 {
 	state->Tick();
+	SDL_GL_SwapWindow(window);
+}
+
+void GameInstance::SetState(std::shared_ptr<State::IState> newState)
+{
+	state = newState;
 }
 
 

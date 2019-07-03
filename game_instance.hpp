@@ -21,7 +21,7 @@ public:
 	bool IsExiting() const;
 	void PropagateEvent(const SDL_Event& e);
 	void TickOnce();
-// 	void SetState(std::shared_ptr<State::IState> state);
+	void SetState(std::shared_ptr<State::IState> newState);
 private:
 	bool exiting{false};
 	SDL_Window* window{nullptr};

@@ -7,6 +7,7 @@
 
 namespace YGOpen
 {
+class GameInstance;
 class Configs;
 namespace State
 {
@@ -16,15 +17,15 @@ using LoadJob = std::packaged_task<bool()>;
 class Loading : public IState
 {
 public:
-	Loading(std::shared_ptr<Configs> cfgs/*, GUITexturesManager& */);
-	~Loading();
+	Loading(GameInstance& gi, std::shared_ptr<Configs> cfgs);
+	virtual ~Loading();
 	void OnEvent(const SDL_Event& e) override;
 	void Tick() override;
 private:
 	std::queue<LoadJob> pendingJobs;
 	std::queue<LoadJob>::size_type totalJobs;
 	std::future<bool> lastJob;
-// 	GameInstance* gi;
+	GameInstance& gi;
 };
 
 } // State

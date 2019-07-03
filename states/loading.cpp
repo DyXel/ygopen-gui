@@ -1,5 +1,7 @@
 #include "loading.hpp"
 #include "../configs.hpp"
+#include "../game_instance.hpp"
+#include "menu.hpp"
 
 #include <string>
 #include <fstream>
@@ -13,7 +15,7 @@ namespace YGOpen
 namespace State
 {
 
-Loading::Loading(std::shared_ptr<Configs> cfgs)
+Loading::Loading(GameInstance& gi, std::shared_ptr<Configs> cfgs) : gi(gi)
 {
 	SDL_Log("State::Loading constructor");
 	pendingJobs.emplace([cfgs]() -> bool
@@ -64,7 +66,7 @@ void Loading::Tick()
 	if(pendingJobs.empty() && lastJob.valid() &&
 	   lastJob.wait_for(0ms) == std::future_status::ready)
 	{
-// 		SDL_Log("All loading jobs finished!");
+		gi.SetState(std::make_shared<State::Menu>());
 	}
 	else if(!pendingJobs.empty())
 	{
