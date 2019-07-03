@@ -4,14 +4,18 @@
 
 namespace YGOpen
 {
+namespace State
+{
 
-class GameState
+
+class IState
 {
 public:
 	virtual void OnEvent(const SDL_Event& e) = 0;
 	virtual void Tick() = 0;
 };
 
-}
+} // State
+} // YGOpen
 
 #endif // __GAME_STATE_HPP__	

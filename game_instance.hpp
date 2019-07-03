@@ -3,10 +3,14 @@
 #include <memory>
 #include <SDL.h>
 #include <SDL_opengles2.h>
+#include "configs.hpp"
 
 namespace YGOpen
 {
-class GameState;
+namespace State
+{
+class IState;
+}
 
 class GameInstance
 {
@@ -17,12 +21,14 @@ public:
 	bool IsExiting() const;
 	void PropagateEvent(const SDL_Event& e);
 	void TickOnce();
-	void SetState(std::shared_ptr<GameState> state);
+// 	void SetState(std::shared_ptr<State::IState> state);
 private:
 	bool exiting{false};
 	SDL_Window* window{nullptr};
 	SDL_GLContext glCtx{nullptr};
-	std::shared_ptr<GameState> state;
+	
+	std::shared_ptr<Configs> cfgs;
+	std::shared_ptr<State::IState> state;
 
 	void LogGLString(const char* nameStr, const GLenum name);
 };

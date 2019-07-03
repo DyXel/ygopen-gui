@@ -3,11 +3,18 @@
 namespace YGOpen
 {
 
-Configs DefaultConfigs()
+static const nlohmann::json DEFAULT_GLOBAL_CONFIG_JSON =
 {
-	Configs c{};
-	c.global = nlohmann::json{};
-	return c;
+	{"lang", "en"},
+	{"online", true},
+	{"fullscreen", false},
+	{"enableMusic", true},
+	{"enableSfx", true}
+};
+
+nlohmann::json DefaultGlobalConfig()
+{
+	return DEFAULT_GLOBAL_CONFIG_JSON;
 }
 
 }

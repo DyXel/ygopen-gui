@@ -11,7 +11,7 @@ struct Configs
 	nlohmann::json global;
 };
 
-Configs DefaultConfigs();
+nlohmann::json DefaultGlobalConfig();
 
 }
 

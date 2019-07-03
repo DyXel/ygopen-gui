@@ -1,13 +1,11 @@
+#include <static_configs.hpp>
 #include "game_instance.hpp"
-#include "game_state.hpp"
+#include "state.hpp"
+#include "states/loading.hpp"
 
 namespace YGOpen
 {
 #define LOG_GL_STRING(n) LogGLString(#n, n)
-
-static const char* DEFAULT_WINDOW_TITLE = "YGOpen";
-static const int DEFAULT_WINDOW_WIDTH = 1280;
-static const int DEFAULT_WINDOW_HEIGHT = 720;
 
 GameInstance::GameInstance()
 {
@@ -16,11 +14,12 @@ GameInstance::GameInstance()
 
 GameInstance::~GameInstance()
 {
-	SDL_Log("GameInstance destructor");
+	state.reset();
 	if(window != nullptr)
 		SDL_DestroyWindow(window);
 	if(glCtx != nullptr)
 		SDL_GL_DeleteContext(glCtx);
+	SDL_Log("GameInstance destructor");
 }
 
 int GameInstance::Init(/*int argc, char argv**/)
@@ -50,6 +49,8 @@ int GameInstance::Init(/*int argc, char argv**/)
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 	SDL_GL_SwapWindow(window);
+	cfgs = std::make_shared<Configs>();
+	state = std::make_shared<State::Loading>(cfgs);
 	return 0;
 }
 

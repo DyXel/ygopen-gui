@@ -1,5 +1,6 @@
 target_sources(${PROJECT_EXECUTABLE} PRIVATE
                ${CMAKE_CURRENT_SOURCE_DIR}/configs.cpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/states/loading.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/game_instance.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
 
