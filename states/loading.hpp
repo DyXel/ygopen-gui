@@ -21,6 +21,7 @@ public:
 	virtual ~Loading();
 	void OnEvent(const SDL_Event& e) override;
 	void Tick() override;
+	void Draw() override;
 private:
 	std::queue<LoadJob> pendingJobs;
 	std::queue<LoadJob>::size_type totalJobs;

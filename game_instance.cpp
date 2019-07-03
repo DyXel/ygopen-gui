@@ -83,6 +83,11 @@ void GameInstance::PropagateEvent(const SDL_Event& e)
 void GameInstance::TickOnce()
 {
 	state->Tick();
+}
+
+void GameInstance::DrawOnce()
+{
+	state->Draw();
 	SDL_GL_SwapWindow(window);
 }
 

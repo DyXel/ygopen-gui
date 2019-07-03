@@ -14,6 +14,7 @@ public:
 	virtual ~Menu();
 	void OnEvent(const SDL_Event& e) override;
 	void Tick() override;
+	void Draw() override;
 };
 
 } // State

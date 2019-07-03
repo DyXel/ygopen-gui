@@ -13,6 +13,7 @@ class IState
 public:
 	virtual void OnEvent(const SDL_Event& e) = 0;
 	virtual void Tick() = 0;
+	virtual void Draw() = 0;
 };
 
 } // State

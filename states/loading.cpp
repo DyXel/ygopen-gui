@@ -82,5 +82,10 @@ void Loading::Tick()
 	}
 }
 
+void Loading::Draw()
+{
+
+}
+
 } // State
 } // YGOpen

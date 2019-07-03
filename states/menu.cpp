@@ -23,6 +23,11 @@ void Menu::OnEvent([[maybe_unused]] const SDL_Event& e)
 
 void Menu::Tick()
 {
+
+}
+
+void Menu::Draw()
+{
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 }

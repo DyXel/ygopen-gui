@@ -21,6 +21,7 @@ public:
 	bool IsExiting() const;
 	void PropagateEvent(const SDL_Event& e);
 	void TickOnce();
+	void DrawOnce();
 	void SetState(std::shared_ptr<State::IState> newState);
 private:
 	bool exiting{false};

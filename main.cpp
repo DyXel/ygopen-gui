@@ -1,8 +1,8 @@
 #include <memory>
 #include "game_instance.hpp"
 
-std::unique_ptr<YGOpen::GameInstance> gi;
-static void quit(int rc);
+static std::unique_ptr<YGOpen::GameInstance> gi;
+[[noreturn]] static void quit(int rc);
 
 int main()
 {
@@ -24,7 +24,7 @@ int main()
 	if(gi->Init() != 0)
 	{
 		SDL_LogCritical(SDL_LOG_CATEGORY_ERROR,
-		                "Unable init main game instance");
+		                "Unable to initialize main game instance");
 		quit(1);
 	}
 	SDL_Event e;
@@ -33,9 +33,9 @@ int main()
 		while(SDL_PollEvent(&e))
 			gi->PropagateEvent(e);
 		gi->TickOnce();
+		gi->DrawOnce();
 	}
 	quit(0);
-	return 0;
 }
 
 static void quit(int rc)
