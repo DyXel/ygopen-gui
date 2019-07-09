@@ -30,7 +30,7 @@ Shader::Shader(const GLenum type, std::string_view source)
 		glGetShaderiv(ref, GL_INFO_LOG_LENGTH, &logLength);
 		auto logText = new char[logLength];
 		glGetShaderInfoLog(ref, logLength, NULL, logText);
-		SDL_LogError(SDL_LOG_CATEGORY_VIDEO,
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
 		             "Could not compile shader: %s", logText);
 		delete[] logText;
 		return;
@@ -85,7 +85,7 @@ bool Program::Link()
 		glGetProgramiv(ref, GL_INFO_LOG_LENGTH, &logLength);
 		auto logText = new char[logLength];
 		glGetProgramInfoLog(ref, logLength, NULL, logText);
-		SDL_LogError(SDL_LOG_CATEGORY_VIDEO,
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
 		             "Could not link program: %s", logText);
 		delete[] logText;
 		return false;

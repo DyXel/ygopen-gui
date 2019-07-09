@@ -30,15 +30,15 @@ int GameInstance::Init(/*int argc, char argv**/)
 	if(window == NULL)
 	{
 		window = nullptr;
-		SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Unable to create SDL Window: %s",
-		             SDL_GetError());
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+		             "Unable to create SDL Window: %s", SDL_GetError());
 		return -1;
 	}
 	glCtx = SDL_GL_CreateContext(window);
 	if(glCtx == NULL)
 	{
 		glCtx = nullptr;
-		SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
 		             "Unable to create OpenGL context: %s", SDL_GetError());
 		return -1;
 	}
@@ -50,7 +50,7 @@ int GameInstance::Init(/*int argc, char argv**/)
 	glClear(GL_COLOR_BUFFER_BIT);
 	if(SDL_GL_SetSwapInterval(-1) == -1)
 	{
-		SDL_LogWarn(SDL_LOG_CATEGORY_VIDEO,
+		SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
 		            "Unable to set adaptive vsync: %s", SDL_GetError());
 		// TODO: either make all of this a option or fallback to vsync
 	}
@@ -65,7 +65,7 @@ void GameInstance::LogGLString(const char* nameStr, const GLenum name)
 	const GLubyte* ret = glGetString(name);
 	if (ret == 0)
 	{
-		SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
 		             "Unable to get OpenGL string: %s (0x%X)", nameStr, name);
 	}
 	else

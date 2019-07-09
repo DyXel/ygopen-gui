@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
 {
 	if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
 	{
-		SDL_LogCritical(SDL_LOG_CATEGORY_ERROR,
+		SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
 		                "Unable to initialize SDL: %s\n", SDL_GetError());
 		quit(1);
 	}
@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 	gi = std::make_unique<YGOpen::GameInstance>();
 	if(gi->Init() != 0)
 	{
-		SDL_LogCritical(SDL_LOG_CATEGORY_ERROR,
+		SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
 		                "Unable to initialize main game instance");
 		quit(1);
 	}
