@@ -1,6 +1,14 @@
 #ifndef MENU_HPP
 #define MENU_HPP
+#include <memory>
 #include "../state.hpp"
+#include "../drawing/gl_common_include.h"
+
+namespace OGL
+{
+class Program;
+class Mesh;
+}
 
 namespace YGOpen
 {
@@ -15,6 +23,10 @@ public:
 	void OnEvent(const SDL_Event& e) override;
 	void Tick() override;
 	void Draw() override;
+private:
+	std::shared_ptr<OGL::Program> program;
+	std::shared_ptr<OGL::Mesh> circle;
+	std::size_t vertexCount;
 };
 
 } // State

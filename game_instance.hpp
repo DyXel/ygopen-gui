@@ -2,8 +2,8 @@
 #define __GAME_INSTANCE_HPP__
 #include <memory>
 #include <SDL.h>
-#include <SDL_opengles2.h>
 #include "configs.hpp"
+#include "drawing/gl_common_include.h"
 
 namespace YGOpen
 {
