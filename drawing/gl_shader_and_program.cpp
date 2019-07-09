@@ -20,16 +20,16 @@ Shader::Shader(const GLenum type, std::string_view source)
 	if(ref == 0)
 		return; // TODO: add log info
 	const char* src[] = {source.data()};
-	glShaderSource(ref, 1, src, NULL);
-	glCompileShader(ref);
+	GL_CHECK(glShaderSource(ref, 1, src, NULL));
+	GL_CHECK(glCompileShader(ref));
 	GLint success;
-	glGetShaderiv(ref, GL_COMPILE_STATUS, &success);
+	GL_CHECK(glGetShaderiv(ref, GL_COMPILE_STATUS, &success));
 	if(success == GL_FALSE)
 	{
 		GLint logLength;
-		glGetShaderiv(ref, GL_INFO_LOG_LENGTH, &logLength);
+		GL_CHECK(glGetShaderiv(ref, GL_INFO_LOG_LENGTH, &logLength));
 		auto logText = new char[logLength];
-		glGetShaderInfoLog(ref, logLength, NULL, logText);
+		GL_CHECK(glGetShaderInfoLog(ref, logLength, NULL, logText));
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
 		             "Could not compile shader: %s", logText);
 		delete[] logText;
@@ -45,7 +45,7 @@ Shader::Shader(const GLenum type, std::string_view source)
 Shader::~Shader()
 {
 	// NOTE: From reference: A value of 0 for shader will be silently ignored.
-	glDeleteShader(ref);
+	GL_CHECK(glDeleteShader(ref));
 }
 
 GLuint Shader::GetGLRef() const
@@ -70,21 +70,21 @@ Program::~Program()
 
 Program& Program::Attach(const Shader& shader)
 {
-	glAttachShader(ref, shader.GetGLRef());
+	GL_CHECK(glAttachShader(ref, shader.GetGLRef()));
 	return *this;
 }
 
 bool Program::Link()
 {
-	glLinkProgram(ref);
+	GL_CHECK(glLinkProgram(ref));
 	GLint success;
-	glGetProgramiv(ref, GL_LINK_STATUS, &success);
+	GL_CHECK(glGetProgramiv(ref, GL_LINK_STATUS, &success));
 	if(success == GL_FALSE)
 	{
 		GLint logLength;
-		glGetProgramiv(ref, GL_INFO_LOG_LENGTH, &logLength);
+		GL_CHECK(glGetProgramiv(ref, GL_INFO_LOG_LENGTH, &logLength));
 		auto logText = new char[logLength];
-		glGetProgramInfoLog(ref, logLength, NULL, logText);
+		GL_CHECK(glGetProgramInfoLog(ref, logLength, NULL, logText));
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
 		             "Could not link program: %s", logText);
 		delete[] logText;

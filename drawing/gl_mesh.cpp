@@ -9,34 +9,34 @@ static const std::size_t TCTCTC = sizeof(Mesh::TexCoordType::value_type) * Mesh:
 
 Mesh::Mesh()
 {
-	glGenBuffers(GLAttrLoc::ATTR_COUNT, vbo);
+	GL_CHECK(glGenBuffers(GLAttrLoc::ATTR_COUNT, vbo));
 }
 
 Mesh::~Mesh()
 {
-	glDeleteBuffers(GLAttrLoc::ATTR_COUNT, vbo);
+	GL_CHECK(glDeleteBuffers(GLAttrLoc::ATTR_COUNT, vbo));
 }
 
 Mesh& Mesh::SetVerticesBuffer(const VerticesContainer& vc)
 {
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[GLAttrLoc::VERTPOS]);
-	glBufferData(GL_ARRAY_BUFFER, vc.size() * VVV, vc.data(), GL_STATIC_DRAW);
+	GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo[GLAttrLoc::VERTPOS]));
+	GL_CHECK(glBufferData(GL_ARRAY_BUFFER, vc.size() * VVV, vc.data(), GL_STATIC_DRAW));
 	usedVBOs[GLAttrLoc::VERTPOS] = true;
 	return *this;
 }
 
 Mesh& Mesh::SetColorsBuffer(const ColorsContainer& cc)
 {
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[GLAttrLoc::COLOR]);
-	glBufferData(GL_ARRAY_BUFFER, cc.size() * CCC, cc.data(), GL_STATIC_DRAW);
+	GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo[GLAttrLoc::COLOR]));
+	GL_CHECK(glBufferData(GL_ARRAY_BUFFER, cc.size() * CCC, cc.data(), GL_STATIC_DRAW));
 	usedVBOs[GLAttrLoc::COLOR] = true;
 	return *this;
 }
 
 Mesh& Mesh::SetTexCoordBuffer(const TexCoordsContainer& tcc)
 {
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[GLAttrLoc::TEXCOORD]);
-	glBufferData(GL_ARRAY_BUFFER, tcc.size() * TCTCTC, tcc.data(), GL_STATIC_DRAW);
+	GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vbo[GLAttrLoc::TEXCOORD]));
+	GL_CHECK(glBufferData(GL_ARRAY_BUFFER, tcc.size() * TCTCTC, tcc.data(), GL_STATIC_DRAW));
 	usedVBOs[GLAttrLoc::TEXCOORD] = true;
 	return *this;
 }

@@ -46,8 +46,8 @@ int GameInstance::Init(/*int argc, char argv**/)
 	LOG_GL_STRING(GL_SHADING_LANGUAGE_VERSION);
 	LOG_GL_STRING(GL_VERSION);
 // 	LOG_GL_STRING(GL_EXTENSIONS); // Too spammy
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
+	GL_CHECK(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
+	GL_CHECK(glClear(GL_COLOR_BUFFER_BIT));
 	if(SDL_GL_SetSwapInterval(-1) == -1)
 	{
 		SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
@@ -94,7 +94,7 @@ void GameInstance::PropagateEvent(const SDL_Event& e)
 	{
 		int w, h;
 		SDL_GL_GetDrawableSize(window, &w, &h);
-		glViewport(0, 0, w, h); // probably save the size somewhere
+		GL_CHECK(glViewport(0, 0, w, h)); // probably save the size somewhere
 		DrawOnce();
 	}
 	state->OnEvent(e);
