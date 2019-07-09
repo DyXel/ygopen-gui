@@ -55,8 +55,7 @@ int GameInstance::Init(/*int argc, char argv**/)
 		// TODO: either make all of this a option or fallback to vsync
 	}
 	SDL_GL_SwapWindow(window);
-	data = std::make_shared<CommonData>();
-	data->gi = this;
+	data = std::make_shared<CommonData>(*this);
 	state = std::make_shared<State::Loading>(data);
 	return 0;
 }
