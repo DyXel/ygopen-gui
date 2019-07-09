@@ -4,7 +4,7 @@
 static std::unique_ptr<YGOpen::GameInstance> gi;
 [[noreturn]] static void quit(int rc);
 
-int main()
+int main(int argc, char *argv[])
 {
 	if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
 	{
