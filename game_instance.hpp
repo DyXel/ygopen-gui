@@ -27,7 +27,7 @@ private:
 	bool exiting{false};
 	SDL_Window* window{nullptr};
 	SDL_GLContext glCtx{nullptr};
-	
+
 	std::shared_ptr<Configs> cfgs;
 	std::shared_ptr<State::IState> state;
 

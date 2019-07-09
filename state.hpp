@@ -7,7 +7,6 @@ namespace YGOpen
 namespace State
 {
 
-
 class IState
 {
 public:
@@ -19,4 +18,4 @@ public:
 } // State
 } // YGOpen
 
-#endif // __GAME_STATE_HPP__	
+#endif // __GAME_STATE_HPP__
