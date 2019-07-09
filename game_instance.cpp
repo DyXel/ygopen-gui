@@ -26,7 +26,8 @@ int GameInstance::Init(/*int argc, char argv**/)
 {
 	window = SDL_CreateWindow(DEFAULT_WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED,
 	                          SDL_WINDOWPOS_UNDEFINED, DEFAULT_WINDOW_WIDTH,
-	                          DEFAULT_WINDOW_HEIGHT, SDL_WINDOW_OPENGL);
+	                          DEFAULT_WINDOW_HEIGHT, SDL_WINDOW_OPENGL |
+	                          SDL_WINDOW_RESIZABLE);
 	if(window == NULL)
 	{
 		window = nullptr;
@@ -77,6 +78,20 @@ void GameInstance::PropagateEvent(const SDL_Event& e)
 {
 	if(e.type == SDL_QUIT)
 		exiting = true;
+	
+	// If the event is a window resize/size change event and the changed window
+	// is the one managed by this game instance then change the OpenGL viewport
+	// to match the new size, and also do a forced draw.
+	if(e.type == SDL_WINDOWEVENT &&
+	   (e.window.event == SDL_WINDOWEVENT_RESIZED ||
+	   e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) &&
+	   e.window.windowID == SDL_GetWindowID(window))
+	{
+		int w, h;
+		SDL_GL_GetDrawableSize(window, &w, &h);
+		glViewport(0, 0, w, h); // probably save the size somewhere
+		DrawOnce();
+	}
 	state->OnEvent(e);
 }
 
