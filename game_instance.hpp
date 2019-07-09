@@ -17,6 +17,12 @@ class GameInstance
 public:
 	GameInstance();
 	~GameInstance();
+	
+	GameInstance(const GameInstance&) = delete;
+	GameInstance(GameInstance&&) = delete;
+	GameInstance& operator=(const GameInstance&) = delete;
+	GameInstance& operator=(GameInstance&&) = delete;
+	
 	int Init(/*int argc, char argv**/);
 	bool IsExiting() const;
 	void PropagateEvent(const SDL_Event& e);
