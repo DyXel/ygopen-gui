@@ -1,6 +1,5 @@
 #include "game_instance.hpp"
-#include "configs.hpp"
-#include "state.hpp"
+#include "common_data.hpp"
 #include "states/loading.hpp"
 
 namespace YGOpen
@@ -56,8 +55,9 @@ int GameInstance::Init(/*int argc, char argv**/)
 		// TODO: either make all of this a option or fallback to vsync
 	}
 	SDL_GL_SwapWindow(window);
-	cfgs = std::make_shared<Configs>();
-	state = std::make_shared<State::Loading>(*this, cfgs);
+	data = std::make_shared<CommonData>();
+	data->gi = this;
+	state = std::make_shared<State::Loading>(data);
 	return 0;
 }
 

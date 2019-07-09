@@ -1,7 +1,6 @@
 #include "loading.hpp"
 #include "menu.hpp"
-#include "../configs.hpp"
-#include "../game_instance.hpp"
+#include "../common_data.hpp"
 
 #include <string>
 #include <fstream>
@@ -15,21 +14,22 @@ namespace YGOpen
 namespace State
 {
 
-Loading::Loading(GameInstance& gi, std::shared_ptr<Configs> cfgs) : gi(gi)
+Loading::Loading(const std::shared_ptr<CommonData>& ptrData) : data(ptrData)
 {
 	SDL_Log("State::Loading constructor");
-	pendingJobs.emplace([cfgs]() -> bool
+	pendingJobs.emplace([this]() -> bool
 	{
+		data->cfgs = std::make_unique<Configs>();
 		std::string path = fmt::format("{}{}", CONFIG_PATH,
 		                               GLOBAL_CONFIG_FILENAME);
-		cfgs->global = DefaultGlobalConfig();
+		data->cfgs->global = DefaultGlobalConfig();
 		try
 		{
 			SDL_Log("Loading global config file: %s", path.c_str());
 			std::ifstream f(path);
 			nlohmann::json j;
 			f >> j;
-			cfgs->global.merge_patch(j);
+			data->cfgs->global.merge_patch(j);
 		}
 		catch(std::exception& e)
 		{
@@ -37,8 +37,8 @@ Loading::Loading(GameInstance& gi, std::shared_ptr<Configs> cfgs) : gi(gi)
 			             "Could not apply user settings: %s", e.what());
 		}
 		std::ofstream f(path);
-		f << cfgs->global.dump(1, '\t', false,
-		                       nlohmann::json::error_handler_t::replace);
+		f << data->cfgs->global.dump(1, '\t', false,
+		                             nlohmann::json::error_handler_t::replace);
 		return true;
 	});
 	
@@ -66,7 +66,7 @@ void Loading::Tick()
 	if(pendingJobs.empty() && lastJob.valid() &&
 	   lastJob.wait_for(0ms) == std::future_status::ready)
 	{
-		gi.SetState(std::make_shared<State::Menu>());
+		data->gi->SetState(std::make_shared<State::Menu>());
 	}
 	else if(!pendingJobs.empty())
 	{

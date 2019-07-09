@@ -7,26 +7,24 @@
 
 namespace YGOpen
 {
-class GameInstance;
-class Configs;
+struct CommonData;
 namespace State
 {
-
-using LoadJob = std::packaged_task<bool()>;
 
 class Loading : public IState
 {
 public:
-	Loading(GameInstance& gi, std::shared_ptr<Configs> cfgs);
+	Loading(const std::shared_ptr<CommonData>& ptrData);
 	virtual ~Loading();
 	void OnEvent(const SDL_Event& e) override;
 	void Tick() override;
 	void Draw() override;
 private:
+	using LoadJob = std::packaged_task<bool()>;
 	std::queue<LoadJob> pendingJobs;
 	std::queue<LoadJob>::size_type totalJobs;
 	std::future<bool> lastJob;
-	GameInstance& gi;
+	std::shared_ptr<CommonData> data;
 };
 
 } // State
