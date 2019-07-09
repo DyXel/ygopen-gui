@@ -1,5 +1,5 @@
-#include <static_configs.hpp>
 #include "game_instance.hpp"
+#include "configs.hpp"
 #include "state.hpp"
 #include "states/loading.hpp"
 

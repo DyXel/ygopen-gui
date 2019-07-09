@@ -1,7 +1,7 @@
 #include "loading.hpp"
+#include "menu.hpp"
 #include "../configs.hpp"
 #include "../game_instance.hpp"
-#include "menu.hpp"
 
 #include <string>
 #include <fstream>
