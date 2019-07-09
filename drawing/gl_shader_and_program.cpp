@@ -36,10 +36,6 @@ Shader::Shader(const GLenum type, std::string_view source)
 		return;
 	}
 	compiled = true;
-	
-	// Set attribute names
-	for(int i = 0; i < ATTR_COUNT; i++)
-		glBindAttribLocation(ref, i, attrNames[i]);
 }
 
 Shader::~Shader()
@@ -76,6 +72,10 @@ Program& Program::Attach(const Shader& shader)
 
 bool Program::Link()
 {
+	// Bind attribute names to their indexes
+	for(int i = 0; i < ATTR_COUNT; i++)
+		GL_CHECK(glBindAttribLocation(ref, i, attrNames[i]));
+	// Link program
 	GL_CHECK(glLinkProgram(ref));
 	GLint success;
 	GL_CHECK(glGetProgramiv(ref, GL_LINK_STATUS, &success));
