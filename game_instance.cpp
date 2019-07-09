@@ -49,6 +49,12 @@ int GameInstance::Init(/*int argc, char argv**/)
 // 	LOG_GL_STRING(GL_EXTENSIONS); // Too spammy
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
+	if(SDL_GL_SetSwapInterval(-1) == -1)
+	{
+		SDL_LogWarn(SDL_LOG_CATEGORY_VIDEO,
+		            "Unable to set adaptive vsync: %s", SDL_GetError());
+		// TODO: either make all of this a option or fallback to vsync
+	}
 	SDL_GL_SwapWindow(window);
 	cfgs = std::make_shared<Configs>();
 	state = std::make_shared<State::Loading>(*this, cfgs);
