@@ -21,16 +21,16 @@
 #define GL_CHECK(x) \
 	do \
 	{ \
-	x; \
-	{ \
-		GLenum glError = glGetError(); \
-		if(glError != GL_NO_ERROR) \
+		x; \
 		{ \
-			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, \
-			             "glGetError() == 0x%.4x at %s:%i\n", \
-			             glError, __FILE__, __LINE__); \
+			GLenum glError = glGetError(); \
+			if(glError != GL_NO_ERROR) \
+			{ \
+				SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, \
+				             "glGetError() == 0x%.4x at %s:%i\n", \
+				             glError, __FILE__, __LINE__); \
+			} \
 		} \
-	} \
 	}while(0)
 #else
 #define GL_CHECK(x) x
