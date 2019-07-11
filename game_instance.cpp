@@ -42,12 +42,14 @@ int GameInstance::Init(/*int argc, char argv**/)
 		             "Unable to create OpenGL context: %s", SDL_GetError());
 		return -1;
 	}
+	SDL_GL_MakeCurrent(window, glCtx);
+	GLLoadContext();
 	LOG_GL_STRING(GL_RENDERER);
 	LOG_GL_STRING(GL_SHADING_LANGUAGE_VERSION);
 	LOG_GL_STRING(GL_VERSION);
-// 	LOG_GL_STRING(GL_EXTENSIONS); // Too spammy
-	GL_CHECK(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
-	GL_CHECK(glClear(GL_COLOR_BUFFER_BIT));
+	// 	LOG_GL_STRING(GL_EXTENSIONS); // Too spammy
+	GL_CHECK(ctx.glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
+	GL_CHECK(ctx.glClear(GL_COLOR_BUFFER_BIT));
 	if(SDL_GL_SetSwapInterval(-1) == -1)
 	{
 		SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
@@ -62,7 +64,7 @@ int GameInstance::Init(/*int argc, char argv**/)
 
 void GameInstance::LogGLString(const char* nameStr, const GLenum name)
 {
-	const GLubyte* ret = glGetString(name);
+	const GLubyte* ret = ctx.glGetString(name);
 	if (ret == 0)
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
@@ -94,7 +96,7 @@ void GameInstance::PropagateEvent(const SDL_Event& e)
 	{
 		int w, h;
 		SDL_GL_GetDrawableSize(window, &w, &h);
-		GL_CHECK(glViewport(0, 0, w, h)); // probably save the size somewhere
+		GL_CHECK(ctx.glViewport(0, 0, w, h)); // probably save the size somewhere
 		DrawOnce();
 	}
 	state->OnEvent(e);

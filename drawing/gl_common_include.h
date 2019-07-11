@@ -16,22 +16,24 @@
 #define GL_USED_PROFILE SDL_GL_CONTEXT_PROFILE_CORE
 #endif
 
+#include "gl_context.hpp"
+
 #if defined(DEBUGGING)
 #include <SDL_log.h>
 #define GL_CHECK(x) \
-	do \
+do \
+{ \
+	x; \
 	{ \
-		x; \
+		GLenum glError = ctx.glGetError(); \
+		if(glError != GL_NO_ERROR) \
 		{ \
-			GLenum glError = glGetError(); \
-			if(glError != GL_NO_ERROR) \
-			{ \
-				SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, \
-				             "glGetError() == 0x%.4x at %s:%i\n", \
-				             glError, __FILE__, __LINE__); \
-			} \
+			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, \
+			"glGetError() == 0x%.4x at %s:%i\n", \
+			glError, __FILE__, __LINE__); \
 		} \
-	}while(0)
+	} \
+}while(0)
 #else
 #define GL_CHECK(x) x
 #endif
