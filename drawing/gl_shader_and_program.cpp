@@ -16,20 +16,20 @@ static const char* attrNames[ATTR_COUNT] =
 Shader::Shader(const GLenum type, std::string_view source)
 	: type(type)
 {
-	ref = ctx.glCreateShader(type);
+	ref = glCreateShader(type);
 	if(ref == 0)
 		return; // TODO: add log info
 	const char* src[] = {source.data()};
-	GL_CHECK(ctx.glShaderSource(ref, 1, src, NULL));
-	GL_CHECK(ctx.glCompileShader(ref));
+	GL_CHECK(glShaderSource(ref, 1, src, NULL));
+	GL_CHECK(glCompileShader(ref));
 	GLint success;
-	GL_CHECK(ctx.glGetShaderiv(ref, GL_COMPILE_STATUS, &success));
+	GL_CHECK(glGetShaderiv(ref, GL_COMPILE_STATUS, &success));
 	if(success == GL_FALSE)
 	{
 		GLint logLength;
-		GL_CHECK(ctx.glGetShaderiv(ref, GL_INFO_LOG_LENGTH, &logLength));
+		GL_CHECK(glGetShaderiv(ref, GL_INFO_LOG_LENGTH, &logLength));
 		auto logText = new char[logLength];
-		GL_CHECK(ctx.glGetShaderInfoLog(ref, logLength, NULL, logText));
+		GL_CHECK(glGetShaderInfoLog(ref, logLength, NULL, logText));
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
 		             "Could not compile shader: %s", logText);
 		delete[] logText;
@@ -41,7 +41,7 @@ Shader::Shader(const GLenum type, std::string_view source)
 Shader::~Shader()
 {
 	// NOTE: From reference: A value of 0 for shader will be silently ignored.
-	GL_CHECK(ctx.glDeleteShader(ref));
+	GL_CHECK(glDeleteShader(ref));
 }
 
 GLuint Shader::GetGLRef() const
@@ -53,7 +53,7 @@ GLuint Shader::GetGLRef() const
 
 Program::Program()
 {
-	ref = ctx.glCreateProgram();
+	ref = glCreateProgram();
 	if(ref == 0)
 		return; // TODO: add log info
 }
@@ -61,12 +61,12 @@ Program::Program()
 Program::~Program()
 {
 	// NOTE: From reference: A value of 0 for program will be silently ignored.
-	ctx.glDeleteProgram(ref);
+	glDeleteProgram(ref);
 }
 
 Program& Program::Attach(const Shader& shader)
 {
-	GL_CHECK(ctx.glAttachShader(ref, shader.GetGLRef()));
+	GL_CHECK(glAttachShader(ref, shader.GetGLRef()));
 	return *this;
 }
 
@@ -74,17 +74,17 @@ bool Program::Link()
 {
 	// Bind attribute names to their indexes
 	for(int i = 0; i < ATTR_COUNT; i++)
-		GL_CHECK(ctx.glBindAttribLocation(ref, i, attrNames[i]));
+		GL_CHECK(glBindAttribLocation(ref, i, attrNames[i]));
 	// Link program
-	GL_CHECK(ctx.glLinkProgram(ref));
+	GL_CHECK(glLinkProgram(ref));
 	GLint success;
-	GL_CHECK(ctx.glGetProgramiv(ref, GL_LINK_STATUS, &success));
+	GL_CHECK(glGetProgramiv(ref, GL_LINK_STATUS, &success));
 	if(success == GL_FALSE)
 	{
 		GLint logLength;
-		GL_CHECK(ctx.glGetProgramiv(ref, GL_INFO_LOG_LENGTH, &logLength));
+		GL_CHECK(glGetProgramiv(ref, GL_INFO_LOG_LENGTH, &logLength));
 		auto logText = new char[logLength];
-		GL_CHECK(ctx.glGetProgramInfoLog(ref, logLength, NULL, logText));
+		GL_CHECK(glGetProgramInfoLog(ref, logLength, NULL, logText));
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
 		             "Could not link program: %s", logText);
 		delete[] logText;
@@ -95,7 +95,7 @@ bool Program::Link()
 
 void Program::Use()
 {
-	ctx.glUseProgram(ref);
+	glUseProgram(ref);
 }
 
 GLuint Program::GetGLRef() const
