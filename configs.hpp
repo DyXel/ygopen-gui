@@ -13,6 +13,6 @@ struct Configs
 
 nlohmann::json DefaultGlobalConfig();
 
-}
+} // YGOpen
 
 #endif // __CONFIGS_HPP__

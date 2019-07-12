@@ -17,4 +17,4 @@ nlohmann::json DefaultGlobalConfig()
 	return DEFAULT_GLOBAL_CONFIG_JSON;
 }
 
-}
+} // YGOpen
