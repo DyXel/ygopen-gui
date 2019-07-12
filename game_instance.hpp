@@ -2,7 +2,6 @@
 #define __GAME_INSTANCE_HPP__
 #include <memory>
 #include <SDL.h>
-#include "drawing/gl_common_include.h"
 
 namespace YGOpen
 {
@@ -32,12 +31,9 @@ public:
 private:
 	bool exiting{false};
 	SDL_Window* window{nullptr};
-	SDL_GLContext glCtx{nullptr};
 
 	std::shared_ptr<CommonData> data;
 	std::shared_ptr<State::IState> state;
-
-	void LogGLString(const char* nameStr, const GLenum name);
 };
 
 } // YGOpen

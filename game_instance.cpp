@@ -1,10 +1,10 @@
 #include "game_instance.hpp"
 #include "common_data.hpp"
 #include "states/loading.hpp"
+#include "drawing/api.hpp"
 
 namespace YGOpen
 {
-#define LOG_GL_STRING(n) LogGLString(#n, n)
 
 GameInstance::GameInstance()
 {
@@ -16,8 +16,7 @@ GameInstance::~GameInstance()
 	state.reset();
 	if(window != nullptr)
 		SDL_DestroyWindow(window);
-	if(glCtx != nullptr)
-		SDL_GL_DeleteContext(glCtx);
+	Drawing::API::UnloadBackend();
 	SDL_Log("GameInstance destructor");
 }
 
@@ -34,44 +33,24 @@ int GameInstance::Init(/*int argc, char argv**/)
 		             "Unable to create SDL Window: %s", SDL_GetError());
 		return -1;
 	}
-	glCtx = SDL_GL_CreateContext(window);
-	if(glCtx == NULL)
+	if(!Drawing::API::LoadBackend(window, Drawing::OPENGL_CORE))
 	{
-		glCtx = nullptr;
-		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
-		             "Unable to create OpenGL context: %s", SDL_GetError());
+		SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
+		                "Unable to load selected backend");
 		return -1;
 	}
-	LOG_GL_STRING(GL_RENDERER);
-	LOG_GL_STRING(GL_SHADING_LANGUAGE_VERSION);
-	LOG_GL_STRING(GL_VERSION);
-// 	LOG_GL_STRING(GL_EXTENSIONS); // Too spammy
-	GL_CHECK(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
-	GL_CHECK(glClear(GL_COLOR_BUFFER_BIT));
-	if(SDL_GL_SetSwapInterval(-1) == -1)
-	{
-		SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
-		            "Unable to set adaptive vsync: %s", SDL_GetError());
-		// TODO: either make all of this a option or fallback to vsync
-	}
-	SDL_GL_SwapWindow(window);
+	Drawing::API::Clear();
+// TODO: move this to the API
+// 	if(SDL_GL_SetSwapInterval(-1) == -1)
+// 	{
+// 		SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
+// 		            "Unable to set adaptive vsync: %s", SDL_GetError());
+// 		// TODO: either make all of this a option or fallback to vsync
+// 	}
+	Drawing::API::Present();
 	data = std::make_shared<CommonData>(*this);
 	state = std::make_shared<State::Loading>(data);
 	return 0;
-}
-
-void GameInstance::LogGLString(const char* nameStr, const GLenum name)
-{
-	const GLubyte* ret = glGetString(name);
-	if (ret == 0)
-	{
-		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
-		             "Unable to get OpenGL string: %s (0x%X)", nameStr, name);
-	}
-	else
-	{
-		SDL_Log("OpenGL: %s (0x%X): %s", nameStr, name, ret);
-	}
 }
 
 bool GameInstance::IsExiting() const
@@ -85,17 +64,15 @@ void GameInstance::PropagateEvent(const SDL_Event& e)
 		exiting = true;
 	
 	// If the event is a window resize/size change event and the changed window
-	// is the one managed by this game instance then change the OpenGL viewport
-	// to match the new size, and also do a forced draw.
+	// is the one managed by this game instance then change the viewport/extent
+	// to match the new size, also, save the new size.
 	if(e.type == SDL_WINDOWEVENT &&
 	   (e.window.event == SDL_WINDOWEVENT_RESIZED ||
 	   e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) &&
 	   e.window.windowID == SDL_GetWindowID(window))
 	{
-		int w, h;
-		SDL_GL_GetDrawableSize(window, &w, &h);
-		GL_CHECK(glViewport(0, 0, w, h)); // probably save the size somewhere
-		DrawOnce();
+		int w, h; // probably save the size somewhere instead
+		Drawing::API::UpdateDrawableSize(&w, &h);
 	}
 	state->OnEvent(e);
 }
@@ -108,7 +85,7 @@ void GameInstance::TickOnce()
 void GameInstance::DrawOnce()
 {
 	state->Draw();
-	SDL_GL_SwapWindow(window);
+	Drawing::API::Present();
 }
 
 void GameInstance::SetState(std::shared_ptr<State::IState> newState)
