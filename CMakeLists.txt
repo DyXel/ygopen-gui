@@ -6,13 +6,14 @@ target_sources(${PROJECT_EXECUTABLE} PRIVATE
                ${CMAKE_CURRENT_SOURCE_DIR}/game_instance.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/game_instance.hpp
                ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/state.hpp
                ${CMAKE_CURRENT_SOURCE_DIR}/drawing/api.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/drawing/api.hpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_common_include.h
                ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_core_funcs.h
                ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_es2_funcs.h
                ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_include_defines.h
                ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_include.cpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_include.hpp
                ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_mesh.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_mesh.hpp
                ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_shader_and_program.cpp
