@@ -79,9 +79,3 @@ SDL_PROC(void, glDeleteBuffers, (GLsizei, const GLuint *))
 SDL_PROC(void, glBindBuffer, (GLenum, GLuint))
 SDL_PROC(void, glBufferData, (GLenum, GLsizeiptr, const GLvoid *, GLenum))
 SDL_PROC(void, glBufferSubData, (GLenum, GLintptr, GLsizeiptr, const GLvoid *))
-
-// OpenGL Core functions
-SDL_PROC(void, glBindVertexArray, (GLuint array))
-SDL_PROC(void, glDeleteVertexArrays, (GLsizei n, const GLuint *arrays))
-SDL_PROC(void, glGenVertexArrays, (GLsizei n, GLuint *arrays))
-
