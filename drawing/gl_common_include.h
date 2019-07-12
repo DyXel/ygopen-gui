@@ -38,12 +38,6 @@ do \
 #define GL_CHECK(x) x
 #endif
 
-// TODO: move these to cmake
-#define GLM_FORCE_CXX17
-#define GLM_FORCE_INLINE
-#define GLM_FORCE_SIZE_T_LENGTH
-#define GLM_FORCE_INTRINSICS
-
 namespace OGL
 {
 
