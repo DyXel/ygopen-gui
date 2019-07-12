@@ -1,7 +1,6 @@
 #include "game_instance.hpp"
 #include "common_data.hpp"
 #include "states/loading.hpp"
-#include "drawing/api.hpp"
 
 namespace YGOpen
 {
@@ -20,7 +19,7 @@ GameInstance::~GameInstance()
 	SDL_Log("GameInstance destructor");
 }
 
-int GameInstance::Init(/*int argc, char argv**/)
+int GameInstance::Init(Drawing::Backend backend)
 {
 	window = SDL_CreateWindow(DEFAULT_WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED,
 	                          SDL_WINDOWPOS_UNDEFINED, DEFAULT_WINDOW_WIDTH,
@@ -33,7 +32,7 @@ int GameInstance::Init(/*int argc, char argv**/)
 		             "Unable to create SDL Window: %s", SDL_GetError());
 		return -1;
 	}
-	if(!Drawing::API::LoadBackend(window, Drawing::OPENGL_CORE))
+	if(!Drawing::API::LoadBackend(window, backend))
 	{
 		SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
 		                "Unable to load selected backend");

@@ -2,6 +2,7 @@
 #define __GAME_INSTANCE_HPP__
 #include <memory>
 #include <SDL.h>
+#include "drawing/api.hpp"
 
 namespace YGOpen
 {
@@ -22,7 +23,7 @@ public:
 	GameInstance& operator=(const GameInstance&) = delete;
 	GameInstance& operator=(GameInstance&&) = delete;
 	
-	int Init(/*int argc, char argv**/);
+	int Init(Drawing::Backend backend);
 	bool IsExiting() const;
 	void PropagateEvent(const SDL_Event& e);
 	void TickOnce();

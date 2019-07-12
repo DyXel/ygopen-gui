@@ -5,7 +5,7 @@
 static std::unique_ptr<YGOpen::GameInstance> gi;
 [[noreturn]] static void quit(int rc);
 
-#ifdef __ANDROID__
+#if defined(__ANDROID__)
 static const Drawing::Backend DEFAULT_BACKEND = Drawing::OPENGL_ES;
 #else
 static const Drawing::Backend DEFAULT_BACKEND = Drawing::OPENGL_CORE;
@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
 	// TODO: select backend from commandline and fallback
 	Drawing::API::PreloadBackend(DEFAULT_BACKEND);
 	gi = std::make_unique<YGOpen::GameInstance>();
-	if(gi->Init() != 0)
+	if(gi->Init(DEFAULT_BACKEND) != 0)
 	{
 		SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
 		                "Unable to initialize main game instance");
