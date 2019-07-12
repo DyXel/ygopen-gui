@@ -3,7 +3,7 @@
 #include <vector>
 #include <array>
 
-#include "gl_common_include.h"
+#include "gl_include.hpp"
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>

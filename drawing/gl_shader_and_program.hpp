@@ -2,7 +2,7 @@
 #define GL_SHADER_AND_PROGRAM_HPP
 #include <string_view>
 
-#include "gl_common_include.h"
+#include "gl_include.hpp"
 
 namespace OGL
 {
