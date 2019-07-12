@@ -65,18 +65,18 @@ void Menu::Tick()
 
 void Menu::Draw()
 {
-	ctx.glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-	ctx.glClear(GL_COLOR_BUFFER_BIT);
+	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
 	
 	GLuint vaoId = 0;
-	ctx.glGenVertexArrays(1, &vaoId);
-	ctx.glBindVertexArray(vaoId);
+	glGenVertexArrays(1, &vaoId);
+	glBindVertexArray(vaoId);
 	
 	program->Use();
 	circle->BindBuffers();
-	ctx.glDrawArrays(GL_TRIANGLE_FAN, 0, vertexCount);
+	glDrawArrays(GL_TRIANGLE_FAN, 0, vertexCount);
 	
-	ctx.glDeleteVertexArrays(1, &vaoId);
+	glDeleteVertexArrays(1, &vaoId);
 }
 
 } // State

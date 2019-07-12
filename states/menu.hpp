@@ -2,7 +2,6 @@
 #define MENU_HPP
 #include <memory>
 #include "../state.hpp"
-#include "../drawing/gl_common_include.h"
 
 namespace OGL
 {
