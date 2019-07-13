@@ -17,6 +17,8 @@ static Backend activeBackend = NOT_LOADED;
 static SDL_Window* window = nullptr;
 static SDL_GLContext glCtx = nullptr;
 
+// GLCore stuff
+
 // GLES stuff
 static const GLchar* VERTEX_SHADER_SRC =
 "#version 100\n"
@@ -37,7 +39,23 @@ static const GLchar* FRAGMENT_SHADER_SRC =
 
 static std::shared_ptr<Detail::GLES::Program> glesPrimProg;
 
-void LogGLString(const char* nameStr, const GLenum name)
+// Basic GL stuff
+
+inline bool GLCreateContext(SDL_Window* w)
+{
+	glCtx = SDL_GL_CreateContext(w);
+	if(glCtx == NULL)
+	{
+		glCtx = nullptr;
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+		             "Unable to create OpenGL context: %s",
+		SDL_GetError());
+		return false;
+	}
+	return true;
+}
+
+inline void LogGLString(const char* nameStr, const GLenum name)
 {
 	const GLubyte* ret = glGetString(name);
 	if (ret == 0)
@@ -51,6 +69,60 @@ void LogGLString(const char* nameStr, const GLenum name)
 	}
 }
 #define LOG_GL_STRING(n) LogGLString(#n, n)
+
+inline void GLLogStrings()
+{
+	LOG_GL_STRING(GL_VENDOR);
+	LOG_GL_STRING(GL_RENDERER);
+	LOG_GL_STRING(GL_SHADING_LANGUAGE_VERSION);
+	LOG_GL_STRING(GL_VERSION);
+}
+
+#define SDL_PROC(ret,f,params) \
+	do \
+	{ \
+		f = reinterpret_cast<decltype(f)>(SDL_GL_GetProcAddress(#f)); \
+		if (!f) \
+		{ \
+			SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, \
+			                "Couldn't load GL function %s: %s", \
+			                #f, SDL_GetError()); \
+			return false; \
+		} \
+	}while(0);
+
+// Load functions (called from LoadBackend)
+
+inline bool LoadGLCore(SDL_Window* w)
+{
+	if(!GLCreateContext(w))
+		return false;
+#ifndef USE_PROTOTYPES_GL
+#include "gl_es2_funcs.h"
+#include "gl_core_funcs.h"
+#endif
+	GLLogStrings();
+	return true;
+}
+
+inline bool LoadGLES(SDL_Window* w)
+{
+	if(!GLCreateContext(w))
+		return false;
+#ifndef USE_PROTOTYPES_GL
+#include "gl_es2_funcs.h"
+#endif
+	GLLogStrings();
+	glesPrimProg = std::make_shared<Detail::GLES::Program>();
+	{
+		Detail::GLES::Shader vs(GL_VERTEX_SHADER, VERTEX_SHADER_SRC);
+		Detail::GLES::Shader fs(GL_FRAGMENT_SHADER, FRAGMENT_SHADER_SRC);
+		glesPrimProg->Attach(vs).Attach(fs).Link();
+	}
+	return true;
+}
+
+#undef SDL_PROC
 
 bool PreloadBackend(Backend backend)
 {
@@ -113,78 +185,11 @@ bool LoadBackend(SDL_Window* w, Backend backend)
 	{
 		case OPENGL_CORE:
 		{
-			glCtx = SDL_GL_CreateContext(w);
-			if(glCtx == NULL)
-			{
-				glCtx = nullptr;
-				SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
-				             "Unable to create OpenGL context: %s",
-				             SDL_GetError());
-				return false;
-			}
-#ifndef USE_PROTOTYPES_GL
-#define SDL_PROC(ret,f,params) \
-			do \
-			{ \
-				f = reinterpret_cast<decltype(f)>(SDL_GL_GetProcAddress(#f)); \
-				if (!f) \
-				{ \
-					SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, \
-					                "Couldn't load GL function %s: %s", \
-					                #f, SDL_GetError()); \
-					return false; \
-				} \
-			}while(0);
-#include "gl_es2_funcs.h"
-#include "gl_core_funcs.h"
-#undef SDL_PROC
-#endif
-			LOG_GL_STRING(GL_VENDOR);
-			LOG_GL_STRING(GL_RENDERER);
-			LOG_GL_STRING(GL_SHADING_LANGUAGE_VERSION);
-			LOG_GL_STRING(GL_VERSION);
-			// 	LOG_GL_STRING(GL_EXTENSIONS); // Too spammy
-			break;
+			return LoadGLCore(w);
 		}
 		case OPENGL_ES:
 		{
-			glCtx = SDL_GL_CreateContext(w);
-			if(glCtx == NULL)
-			{
-				glCtx = nullptr;
-				SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
-				             "Unable to create OpenGL context: %s",
-				 SDL_GetError());
-				return false;
-			}
-#ifndef USE_PROTOTYPES_GL
-#define SDL_PROC(ret,f,params) \
-			do \
-			{ \
-				f = reinterpret_cast<decltype(f)>(SDL_GL_GetProcAddress(#f)); \
-				if (!f) \
-				{ \
-					SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, \
-					                "Couldn't load GL function %s: %s", \
-					                #f, SDL_GetError()); \
-					return false; \
-				} \
-			}while(0);
-#include "gl_es2_funcs.h"
-#undef SDL_PROC
-#endif
-			LOG_GL_STRING(GL_VENDOR);
-			LOG_GL_STRING(GL_RENDERER);
-			LOG_GL_STRING(GL_SHADING_LANGUAGE_VERSION);
-			LOG_GL_STRING(GL_VERSION);
-			// 	LOG_GL_STRING(GL_EXTENSIONS); // Too spammy
-			glesPrimProg = std::make_shared<Detail::GLES::Program>();
-			{
-				Detail::GLES::Shader vs(GL_VERTEX_SHADER, VERTEX_SHADER_SRC);
-				Detail::GLES::Shader fs(GL_FRAGMENT_SHADER, FRAGMENT_SHADER_SRC);
-				glesPrimProg->Attach(vs).Attach(fs).Link();
-			}
-			break;
+			return LoadGLES(w);
 		}
 		default:
 		{
@@ -195,7 +200,6 @@ bool LoadBackend(SDL_Window* w, Backend backend)
 	}
 	activeBackend = backend;
 	window = w;
-	return true;
 }
 
 void UnloadBackend()
@@ -273,10 +277,18 @@ void UpdateDrawableSize(int* w, int* h)
 Primitive NewPrimitive()
 {
 	SDL_assert(activeBackend);
-	/*if(activeBackend == OPENGL_CORE)
-		return std::make_shared<Detail::GLCorePrimitive>();
-	else */if(activeBackend == OPENGL_ES)
-		return std::make_shared<Detail::GLES::Primitive>(*glesPrimProg);
+	switch(activeBackend)
+	{
+		case OPENGL_CORE:
+		{
+// 			return std::make_shared<Detail::GLCorePrimitive>();
+		}
+		case OPENGL_ES:
+		{
+			return std::make_shared<Detail::GLES::Primitive>(*glesPrimProg);
+		}
+		case NOT_LOADED: break;
+	}
 }
 
 } // API
