@@ -187,11 +187,15 @@ bool LoadBackend(SDL_Window* window, Backend backend)
 	{
 		case OPENGL_CORE:
 		{
-			return LoadGLCore(w);
+			if(!LoadGLCore(window))
+				return false;
+			break;
 		}
 		case OPENGL_ES:
 		{
-			return LoadGLES(w);
+			if(!LoadGLES(window))
+				return false;
+			break;
 		}
 		default:
 		{
