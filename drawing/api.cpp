@@ -4,7 +4,7 @@
 #include "primitive.hpp"
 #include "gl_include.hpp"
 #include "gl_es/primitive.hpp"
-#include "gl_es/shader_and_program.hpp"
+#include "gl_shared/shader_and_program.hpp"
 
 namespace Drawing
 {
@@ -14,7 +14,7 @@ namespace API
 
 static Backend preloadedBackend = NOT_LOADED;
 static Backend activeBackend = NOT_LOADED;
-static SDL_Window* window = nullptr;
+static SDL_Window* sdlWindow = nullptr;
 static SDL_GLContext glCtx = nullptr;
 
 // GLCore stuff
@@ -37,13 +37,13 @@ static const GLchar* FRAGMENT_SHADER_SRC =
 "   gl_FragColor = fsColor;\n"
 "}\n";
 
-static std::shared_ptr<Detail::GLES::Program> glesPrimProg;
+static std::shared_ptr<Detail::GLShared::Program> glesPrimProg;
 
 // Basic GL stuff
 
-inline bool GLCreateContext(SDL_Window* w)
+inline bool GLCreateContext(SDL_Window* window)
 {
-	glCtx = SDL_GL_CreateContext(w);
+	glCtx = SDL_GL_CreateContext(window);
 	if(glCtx == NULL)
 	{
 		glCtx = nullptr;
@@ -93,9 +93,9 @@ inline void GLLogStrings()
 
 // Load functions (called from LoadBackend)
 
-inline bool LoadGLCore(SDL_Window* w)
+inline bool LoadGLCore(SDL_Window* window)
 {
-	if(!GLCreateContext(w))
+	if(!GLCreateContext(window))
 		return false;
 #ifndef USE_PROTOTYPES_GL
 #include "gl_es2_funcs.h"
@@ -105,19 +105,21 @@ inline bool LoadGLCore(SDL_Window* w)
 	return true;
 }
 
-inline bool LoadGLES(SDL_Window* w)
+inline bool LoadGLES(SDL_Window* window)
 {
-	if(!GLCreateContext(w))
+	if(!GLCreateContext(window))
 		return false;
 #ifndef USE_PROTOTYPES_GL
 #include "gl_es2_funcs.h"
 #endif
 	GLLogStrings();
-	glesPrimProg = std::make_shared<Detail::GLES::Program>();
+	glesPrimProg = std::make_shared<Detail::GLShared::Program>();
 	{
-		Detail::GLES::Shader vs(GL_VERTEX_SHADER, VERTEX_SHADER_SRC);
-		Detail::GLES::Shader fs(GL_FRAGMENT_SHADER, FRAGMENT_SHADER_SRC);
-		glesPrimProg->Attach(vs).Attach(fs).Link();
+		Detail::GLShared::Shader vs(GL_VERTEX_SHADER, VERTEX_SHADER_SRC);
+		Detail::GLShared::Shader fs(GL_FRAGMENT_SHADER, FRAGMENT_SHADER_SRC);
+		glesPrimProg->Attach(vs);
+		glesPrimProg->Attach(fs);
+		glesPrimProg->Link();
 	}
 	return true;
 }
@@ -165,7 +167,7 @@ bool PreloadBackend(Backend backend)
 	return true;
 }
 
-bool LoadBackend(SDL_Window* w, Backend backend)
+bool LoadBackend(SDL_Window* window, Backend backend)
 {
 	SDL_assert(w);
 	if(preloadedBackend != backend)
@@ -199,7 +201,7 @@ bool LoadBackend(SDL_Window* w, Backend backend)
 		}
 	}
 	activeBackend = backend;
-	window = w;
+	sdlWindow = window;
 	return true;
 }
 
@@ -252,7 +254,7 @@ void Present()
 		case OPENGL_CORE:
 		case OPENGL_ES:
 		{
-			SDL_GL_SwapWindow(window);
+			SDL_GL_SwapWindow(sdlWindow);
 			break;
 		}
 		case NOT_LOADED: break;
@@ -267,7 +269,7 @@ void UpdateDrawableSize(int* w, int* h)
 		case OPENGL_CORE:
 		case OPENGL_ES:
 		{
-			SDL_GL_GetDrawableSize(window, w, h);
+			SDL_GL_GetDrawableSize(sdlWindow, w, h);
 			glViewport(0, 0, *w, *h);
 			break;
 		}
