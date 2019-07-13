@@ -132,15 +132,4 @@ do \
 #define GL_CHECK(x) x
 #endif
 
-namespace OGL
-{
-	enum GLAttrLoc
-	{
-		VERTPOS = 0, // Vertice positions
-		COLOR, // Color array
-		TEXCOORD, // Texture coordinates
-		ATTR_COUNT // Total number of attributes
-	};
-} // OGL
-
 #endif // GL_INCLUDE_HPP
