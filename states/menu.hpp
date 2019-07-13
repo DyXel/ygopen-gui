@@ -2,6 +2,8 @@
 #define MENU_HPP
 #include <memory>
 #include "../state.hpp"
+#include "../drawing/api.hpp"
+#include "../drawing/primitive.hpp"
 
 namespace OGL
 {
@@ -23,6 +25,7 @@ public:
 	void Tick() override;
 	void Draw() override;
 private:
+	Drawing::Primitive triangle;
 };
 
 } // State

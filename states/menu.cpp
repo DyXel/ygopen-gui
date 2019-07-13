@@ -1,4 +1,5 @@
 #include "menu.hpp"
+#include "../drawing/types.hpp"
 
 namespace YGOpen
 {
@@ -7,14 +8,22 @@ namespace State
 
 Menu::Menu()
 {
-	Drawing::Vertices vertices;
-	Drawing::Colors colors;
-	const float full = 2.0f * M_PI;
-	for(float i = 0.0f; i < full; i += full / 100.0f)
+	triangle = Drawing::API::NewPrimitive();
+	const Drawing::Vertices vertices =
 	{
-		vertices.push_back({std::sin(i), std::cos(i), 0.0f});
-		colors.push_back({1.0f, 0.0f, 0.0f, 1.0f});
-	}
+		{ 0.0f,  0.5f,  0.0f},
+		{-0.5f, -0.5f,  0.0f},
+		{ 0.5f, -0.5f,  0.0f},
+	};
+	const Drawing::Colors colors =
+	{
+		{1.0f, 0.0f, 0.0f, 1.0f},
+		{0.0f, 1.0f, 0.0f, 1.0f},
+		{0.0f, 0.0f, 1.0f, 1.0f},
+	};
+	
+	triangle->SetVertices(vertices);
+	triangle->SetColors(colors);
 }
 
 Menu::~Menu()
@@ -34,6 +43,8 @@ void Menu::Tick()
 
 void Menu::Draw()
 {
+	Drawing::API::Clear();
+	triangle->Draw();
 }
 
 } // State
