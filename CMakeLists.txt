@@ -19,8 +19,10 @@ target_sources(${PROJECT_EXECUTABLE} PRIVATE
                ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_es/primitive.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_es/primitive.hpp
                ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_shared/common.hpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_shared/shader_and_program.cpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_shared/shader_and_program.hpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_shared/program.cpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_shared/program.hpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_shared/shader.cpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_shared/shader.hpp
                ${CMAKE_CURRENT_SOURCE_DIR}/states/loading.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/states/loading.hpp
                ${CMAKE_CURRENT_SOURCE_DIR}/states/menu.cpp

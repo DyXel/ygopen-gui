@@ -1,5 +1,5 @@
-#ifndef DRAWING_GL_SHARED_SHADER_AND_PROGRAM_HPP
-#define DRAWING_GL_SHARED_SHADER_AND_PROGRAM_HPP
+#ifndef DRAWING_GL_SHARED_SHADER_HPP
+#define DRAWING_GL_SHARED_SHADER_HPP
 #include <string_view>
 #include "../gl_include.hpp"
 
@@ -24,22 +24,7 @@ private:
 	bool compiled{false};
 	GLuint ref{0};
 	GLenum type;
-// 	std::string source;
-};
-
-class Program
-{
-public:
-	Program();
-	~Program();
-	
-	void Attach(const Shader& shader);
-	bool Link() const;
-	void Use() const;
-	
-	GLuint GetGLRef() const;
-private:
-	GLuint ref{0};
+	// 	std::string source;
 };
 
 } // GLShared
@@ -48,4 +33,4 @@ private:
 
 } // Drawing
 
-#endif // DRAWING_GL_SHARED_SHADER_AND_PROGRAM_HPP
+#endif // DRAWING_GL_SHARED_SHADER_HPP

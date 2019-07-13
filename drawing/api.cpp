@@ -4,7 +4,8 @@
 #include "primitive.hpp"
 #include "gl_include.hpp"
 #include "gl_es/primitive.hpp"
-#include "gl_shared/shader_and_program.hpp"
+#include "gl_shared/program.hpp"
+#include "gl_shared/shader.hpp"
 
 namespace Drawing
 {
