@@ -17,7 +17,7 @@ Program::Program()
 {
 	ref = glCreateProgram();
 	if(ref == 0)
-		return; // TODO: add log info
+		return;
 }
 
 Program::~Program()

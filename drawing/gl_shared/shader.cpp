@@ -14,7 +14,7 @@ Shader::Shader(const GLenum type, std::string_view source) : type(type)
 {
 	ref = glCreateShader(type);
 	if(ref == 0)
-		return; // TODO: add log info
+		return;
 	const char* src[] = {source.data()};
 	glShaderSource(ref, 1, src, NULL);
 	glCompileShader(ref);
