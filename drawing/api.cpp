@@ -35,7 +35,7 @@ static const GLchar* FRAGMENT_SHADER_SRC =
 "   gl_FragColor = fsColor;\n"
 "}\n";
 
-static std::shared_ptr<Detail::Program> glesProgram;
+static std::shared_ptr<Detail::GLES::Program> glesPrimProg;
 
 void LogGLString(const char* nameStr, const GLenum name)
 {
@@ -178,11 +178,11 @@ bool LoadBackend(SDL_Window* w, Backend backend)
 			LOG_GL_STRING(GL_SHADING_LANGUAGE_VERSION);
 			LOG_GL_STRING(GL_VERSION);
 			// 	LOG_GL_STRING(GL_EXTENSIONS); // Too spammy
-			glesProgram = std::make_shared<Detail::Program>();
+			glesPrimProg = std::make_shared<Detail::GLES::Program>();
 			{
-				Detail::Shader vs(GL_VERTEX_SHADER, VERTEX_SHADER_SRC);
-				Detail::Shader fs(GL_FRAGMENT_SHADER, FRAGMENT_SHADER_SRC);
-				glesProgram->Attach(vs).Attach(fs).Link();
+				Detail::GLES::Shader vs(GL_VERTEX_SHADER, VERTEX_SHADER_SRC);
+				Detail::GLES::Shader fs(GL_FRAGMENT_SHADER, FRAGMENT_SHADER_SRC);
+				glesPrimProg->Attach(vs).Attach(fs).Link();
 			}
 			break;
 		}
@@ -209,7 +209,7 @@ void UnloadBackend()
 		}
 		case OPENGL_ES:
 		{
-			glesProgram.reset();
+			glesPrimProg.reset();
 			SDL_GL_DeleteContext(glCtx);
 			break;
 		}
@@ -276,7 +276,7 @@ Primitive NewPrimitive()
 	/*if(activeBackend == OPENGL_CORE)
 		return std::make_shared<Detail::GLCorePrimitive>();
 	else */if(activeBackend == OPENGL_ES)
-		return std::make_shared<Detail::GLESPrimitive>(*glesProgram);
+		return std::make_shared<Detail::GLES::Primitive>(*glesPrimProg);
 }
 
 } // API

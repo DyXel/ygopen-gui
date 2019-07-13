@@ -9,6 +9,9 @@ namespace Drawing
 namespace Detail
 {
 
+namespace GLES
+{
+
 class Shader
 {
 public:
@@ -38,6 +41,8 @@ public:
 private:
 	GLuint ref{0};
 };
+
+} // GLES
 
 } // Detail
 

@@ -13,11 +13,14 @@ namespace Drawing
 namespace Detail
 {
 
-class GLESPrimitive : public IPrimitive
+namespace GLES
+{
+
+class Primitive : public IPrimitive
 {
 public:
-	GLESPrimitive(const Program& program);
-	virtual ~GLESPrimitive();
+	Primitive(const Program& program);
+	virtual ~Primitive();
 	
 	void SetVertices(const Vertices& vertices);
 	void SetColors(const Colors& colors);
@@ -35,6 +38,8 @@ private:
 	
 	void TryEnableVBO(PrimitiveAttrLoc attrLoc);
 };
+
+} // GLES
 
 } // Detail
 

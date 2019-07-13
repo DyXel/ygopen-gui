@@ -9,6 +9,9 @@ namespace Drawing
 namespace Detail
 {
 
+namespace GLES
+{
+
 // Shader IMPLEMENTATION
 
 Shader::Shader(const GLenum type, std::string_view source)
@@ -105,6 +108,8 @@ GLuint Program::GetGLRef() const
 {
 	return ref;
 }
+
+} // GLES
 
 } // Detail
 

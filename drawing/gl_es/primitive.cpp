@@ -6,25 +6,28 @@ namespace Drawing
 namespace Detail
 {
 
+namespace GLES
+{
+
 static const std::size_t ATTR_LENGTHS[ATTR_COUNT] =
 {
 	Vertex::length(),
 	Color::length()
 };
 
-GLESPrimitive::GLESPrimitive(const Program& program) : program(program)
+Primitive::Primitive(const Program& program) : program(program)
 {
 	glGenBuffers(ATTR_COUNT, vbo.data());
 	usedVbo.fill(false);
 	vboSize.fill(0);
 }
 
-GLESPrimitive::~GLESPrimitive()
+Primitive::~Primitive()
 {
 	glDeleteBuffers(ATTR_COUNT, vbo.data());
 }
 
-void GLESPrimitive::SetVertices(const Vertices& vertices)
+void Primitive::SetVertices(const Vertices& vertices)
 {
 	vboSize[ATTR_VERTICES] = vertices.size();
 	const std::size_t numBytes = vboSize[ATTR_VERTICES] * VERTEX_SIZE;
@@ -33,7 +36,7 @@ void GLESPrimitive::SetVertices(const Vertices& vertices)
 	usedVbo[ATTR_VERTICES] = true;
 }
 
-void GLESPrimitive::SetColors(const Colors& colors)
+void Primitive::SetColors(const Colors& colors)
 {
 	vboSize[ATTR_COLORS] = colors.size();
 	const std::size_t numBytes = vboSize[ATTR_COLORS] * COLOR_SIZE;
@@ -42,7 +45,7 @@ void GLESPrimitive::SetColors(const Colors& colors)
 	usedVbo[ATTR_COLORS] = true;
 }
 
-void GLESPrimitive::Draw()
+void Primitive::Draw()
 {
 	program.Use();
 	TryEnableVBO(ATTR_VERTICES);
@@ -50,7 +53,7 @@ void GLESPrimitive::Draw()
 	glDrawArrays(GL_TRIANGLE_FAN, 0, vboSize[ATTR_VERTICES]);
 }
 
-void GLESPrimitive::TryEnableVBO(PrimitiveAttrLoc attrLoc)
+void Primitive::TryEnableVBO(PrimitiveAttrLoc attrLoc)
 {
 	if(!usedVbo[attrLoc])
 		return;
@@ -59,6 +62,8 @@ void GLESPrimitive::TryEnableVBO(PrimitiveAttrLoc attrLoc)
 	                      GL_FALSE, 0, (GLvoid*)0);
 	glEnableVertexAttribArray(attrLoc);
 }
+
+} // GLES
 
 } // Detail
 
