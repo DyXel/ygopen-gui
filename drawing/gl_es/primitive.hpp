@@ -4,8 +4,7 @@
 #include "../gl_include.hpp"
 #include "../primitive.hpp"
 #include "../types.hpp"
-#include "common.hpp"
-#include "shader_and_program.hpp"
+#include "../gl_shared/common.hpp"
 
 namespace Drawing
 {
@@ -13,13 +12,18 @@ namespace Drawing
 namespace Detail
 {
 
+namespace GLShared
+{
+class Program;
+} // GLShared
+
 namespace GLES
 {
 
 class Primitive : public IPrimitive
 {
 public:
-	Primitive(const Program& program);
+	Primitive(const GLShared::Program& program);
 	virtual ~Primitive();
 	
 	void SetVertices(const Vertices& vertices);
@@ -29,9 +33,9 @@ public:
 	void Draw();
 	
 	// Extended public functions
-	void SetProgram(const Program& program);
+	void SetProgram(const GLShared::Program& program);
 private:
-	const Program& program;
+	const GLShared::Program& program;
 	std::array<GLuint, ATTR_COUNT> vbo;
 	std::array<bool, ATTR_COUNT> usedVbo;
 	std::array<std::size_t, ATTR_COUNT> vboSize;

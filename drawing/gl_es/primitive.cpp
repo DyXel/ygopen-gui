@@ -1,4 +1,5 @@
 #include "primitive.hpp"
+#include "../gl_shared/shader_and_program.hpp"
 
 namespace Drawing
 {
@@ -15,7 +16,7 @@ static const std::size_t ATTR_LENGTHS[ATTR_COUNT] =
 	Color::length()
 };
 
-Primitive::Primitive(const Program& program) : program(program)
+Primitive::Primitive(const GLShared::Program& program) : program(program)
 {
 	glGenBuffers(ATTR_COUNT, vbo.data());
 	usedVbo.fill(false);
