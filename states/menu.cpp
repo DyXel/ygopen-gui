@@ -1,6 +1,4 @@
 #include "menu.hpp"
-#include "../drawing/gl_mesh.hpp"
-#include "../drawing/gl_shader_and_program.hpp"
 
 namespace YGOpen
 {
