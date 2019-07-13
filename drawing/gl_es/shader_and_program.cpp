@@ -21,16 +21,16 @@ Shader::Shader(const GLenum type, std::string_view source)
 	if(ref == 0)
 		return; // TODO: add log info
 	const char* src[] = {source.data()};
-	GL_CHECK(glShaderSource(ref, 1, src, NULL));
-	GL_CHECK(glCompileShader(ref));
+	glShaderSource(ref, 1, src, NULL);
+	glCompileShader(ref);
 	GLint success;
-	GL_CHECK(glGetShaderiv(ref, GL_COMPILE_STATUS, &success));
+	glGetShaderiv(ref, GL_COMPILE_STATUS, &success);
 	if(success == GL_FALSE)
 	{
 		GLint logLength;
-		GL_CHECK(glGetShaderiv(ref, GL_INFO_LOG_LENGTH, &logLength));
+		glGetShaderiv(ref, GL_INFO_LOG_LENGTH, &logLength);
 		auto logText = new char[logLength];
-		GL_CHECK(glGetShaderInfoLog(ref, logLength, NULL, logText));
+		glGetShaderInfoLog(ref, logLength, NULL, logText);
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
 		             "Could not compile shader: %s", logText);
 		delete[] logText;
@@ -42,7 +42,7 @@ Shader::Shader(const GLenum type, std::string_view source)
 Shader::~Shader()
 {
 	// NOTE: From reference: A value of 0 for shader will be silently ignored.
-	GL_CHECK(glDeleteShader(ref));
+	glDeleteShader(ref);
 }
 
 GLuint Shader::GetGLRef() const
@@ -67,7 +67,7 @@ Program::~Program()
 
 Program& Program::Attach(const Shader& shader)
 {
-	GL_CHECK(glAttachShader(ref, shader.GetGLRef()));
+	glAttachShader(ref, shader.GetGLRef());
 	return *this;
 }
 
@@ -80,17 +80,17 @@ bool Program::Link() const
 		"color", // COLOR
 	};
 	for(int i = 0; i < ATTR_COUNT; i++)
-		GL_CHECK(glBindAttribLocation(ref, i, ATTR_NAMES[i]));
+		glBindAttribLocation(ref, i, ATTR_NAMES[i]);
 	// Link program
-	GL_CHECK(glLinkProgram(ref));
+	glLinkProgram(ref);
 	GLint success;
-	GL_CHECK(glGetProgramiv(ref, GL_LINK_STATUS, &success));
+	glGetProgramiv(ref, GL_LINK_STATUS, &success);
 	if(success == GL_FALSE)
 	{
 		GLint logLength;
-		GL_CHECK(glGetProgramiv(ref, GL_INFO_LOG_LENGTH, &logLength));
+		glGetProgramiv(ref, GL_INFO_LOG_LENGTH, &logLength);
 		auto logText = new char[logLength];
-		GL_CHECK(glGetProgramInfoLog(ref, logLength, NULL, logText));
+		glGetProgramInfoLog(ref, logLength, NULL, logText);
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
 		             "Could not link program: %s", logText);
 		delete[] logText;

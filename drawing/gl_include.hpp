@@ -110,26 +110,4 @@
 #endif // _DONT_DEFINE_POINTERS_GL
 #endif // USE_PROTOTYPES_GL
 
-// TODO: move this stuff to a "gl_detail.hpp" or
-// cpp files which uses them (gl_mesh.cpp) file
-#if defined(DEBUGGING)
-#include <SDL_log.h>
-#define GL_CHECK(x) \
-do \
-{ \
-	x; \
-	{ \
-		GLenum glError = glGetError(); \
-		if(glError != GL_NO_ERROR) \
-		{ \
-			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, \
-			"glGetError() == 0x%.4x at %s:%i\n", \
-			glError, __FILE__, __LINE__); \
-		} \
-	} \
-}while(0)
-#else
-#define GL_CHECK(x) x
-#endif
-
 #endif // GL_INCLUDE_HPP
