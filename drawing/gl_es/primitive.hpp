@@ -40,7 +40,7 @@ private:
 	std::array<bool, ATTR_COUNT> usedVbo;
 	std::array<std::size_t, ATTR_COUNT> vboSize;
 	
-	void TryEnableVBO(PrimitiveAttrLoc attrLoc);
+	void TryEnableVBO(AttrLocation attrLoc);
 };
 
 } // GLES

@@ -7,10 +7,12 @@ namespace Drawing
 namespace Detail
 {
 
-enum PrimitiveAttrLoc
+enum AttrLocation
 {
 	ATTR_VERTICES = 0, // Vertices positions
 	ATTR_COLORS, // Color array
+	ATTR_INDICES, // Indices
+	ATTR_TEXCOORDS, // Texture coordinates
 	ATTR_COUNT // Total number of attributes
 };
 

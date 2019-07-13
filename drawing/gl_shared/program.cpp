@@ -36,8 +36,10 @@ bool Program::Link() const
 	// Bind attribute names to their indexes
 	static const char* ATTR_NAMES[ATTR_COUNT] =
 	{
-		"pos", // VERTPOS
-		"color", // COLOR
+		"pos",
+		"color",
+		"index",
+		"texCoord"
 	};
 	for(int i = 0; i < ATTR_COUNT; i++)
 		glBindAttribLocation(ref, i, ATTR_NAMES[i]);

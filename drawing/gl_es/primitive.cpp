@@ -54,7 +54,7 @@ void Primitive::Draw()
 	glDrawArrays(GL_TRIANGLE_FAN, 0, vboSize[ATTR_VERTICES]);
 }
 
-void Primitive::TryEnableVBO(PrimitiveAttrLoc attrLoc)
+void Primitive::TryEnableVBO(AttrLocation attrLoc)
 {
 	if(!usedVbo[attrLoc])
 		return;
