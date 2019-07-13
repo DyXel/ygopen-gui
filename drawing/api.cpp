@@ -169,7 +169,7 @@ bool PreloadBackend(Backend backend)
 
 bool LoadBackend(SDL_Window* window, Backend backend)
 {
-	SDL_assert(w);
+	SDL_assert(window);
 	if(preloadedBackend != backend)
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
