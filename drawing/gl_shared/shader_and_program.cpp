@@ -9,7 +9,7 @@ namespace Drawing
 namespace Detail
 {
 
-namespace GLES
+namespace GLShared
 {
 
 // Shader IMPLEMENTATION
@@ -65,10 +65,9 @@ Program::~Program()
 	glDeleteProgram(ref);
 }
 
-Program& Program::Attach(const Shader& shader)
+void Program::Attach(const Shader& shader)
 {
 	glAttachShader(ref, shader.GetGLRef());
-	return *this;
 }
 
 bool Program::Link() const
@@ -109,7 +108,7 @@ GLuint Program::GetGLRef() const
 	return ref;
 }
 
-} // GLES
+} // GLShared
 
 } // Detail
 

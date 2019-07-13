@@ -1,5 +1,5 @@
-#ifndef DRAWING_GL_ES_SHADER_AND_PROGRAM_HPP
-#define DRAWING_GL_ES_SHADER_AND_PROGRAM_HPP
+#ifndef DRAWING_GL_SHARED_SHADER_AND_PROGRAM_HPP
+#define DRAWING_GL_SHARED_SHADER_AND_PROGRAM_HPP
 #include <string_view>
 #include "../gl_include.hpp"
 
@@ -9,7 +9,7 @@ namespace Drawing
 namespace Detail
 {
 
-namespace GLES
+namespace GLShared
 {
 
 class Shader
@@ -33,7 +33,7 @@ public:
 	Program();
 	~Program();
 	
-	Program& Attach(const Shader& shader);
+	void Attach(const Shader& shader);
 	bool Link() const;
 	void Use() const;
 	
@@ -42,10 +42,10 @@ private:
 	GLuint ref{0};
 };
 
-} // GLES
+} // GLShared
 
 } // Detail
 
 } // Drawing
 
-#endif // DRAWING_GL_ES_SHADER_AND_PROGRAM_HPP
+#endif // DRAWING_GL_SHARED_SHADER_AND_PROGRAM_HPP
