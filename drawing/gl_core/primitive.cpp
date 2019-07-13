@@ -18,50 +18,44 @@ static const std::size_t ATTR_LENGTHS[ATTR_COUNT] =
 
 Primitive::Primitive(const GLShared::Program& program) : program(program)
 {
+	glGenVertexArrays(1, &vao);
 	glGenBuffers(ATTR_COUNT, vbo.data());
-	usedVbo.fill(false);
-	vboSize.fill(0);
 }
 
 Primitive::~Primitive()
 {
 	glDeleteBuffers(ATTR_COUNT, vbo.data());
+	glDeleteVertexArrays(1, &vao);
 }
 
 void Primitive::SetVertices(const Vertices& vertices)
 {
-	vboSize[ATTR_VERTICES] = vertices.size();
-	const std::size_t numBytes = vboSize[ATTR_VERTICES] * VERTEX_SIZE;
+	vertexCount = vertices.size();
+	const std::size_t numBytes = vertexCount * VERTEX_SIZE;
+	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[ATTR_VERTICES]);
 	glBufferData(GL_ARRAY_BUFFER, numBytes, vertices.data(), GL_STATIC_DRAW);
-	usedVbo[ATTR_VERTICES] = true;
+	glVertexAttribPointer(ATTR_VERTICES, VERTEX_LENGTH, GL_FLOAT,
+	                      GL_FALSE, 0, (GLvoid*)0);
+	glEnableVertexAttribArray(ATTR_VERTICES);
 }
 
 void Primitive::SetColors(const Colors& colors)
 {
-	vboSize[ATTR_COLORS] = colors.size();
-	const std::size_t numBytes = vboSize[ATTR_COLORS] * COLOR_SIZE;
+	const std::size_t numBytes = colors.size() * COLOR_SIZE;
+	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[ATTR_COLORS]);
 	glBufferData(GL_ARRAY_BUFFER, numBytes, colors.data(), GL_STATIC_DRAW);
-	usedVbo[ATTR_COLORS] = true;
+	glVertexAttribPointer(ATTR_COLORS, COLOR_LENGTH, GL_FLOAT,
+	                      GL_FALSE, 0, (GLvoid*)0);
+	glEnableVertexAttribArray(ATTR_COLORS);
 }
 
 void Primitive::Draw()
 {
 	program.Use();
-	TryEnableVBO(ATTR_VERTICES);
-	TryEnableVBO(ATTR_COLORS);
-	glDrawArrays(GL_TRIANGLE_FAN, 0, vboSize[ATTR_VERTICES]);
-}
-
-void Primitive::TryEnableVBO(AttrLocation attrLoc)
-{
-	if(!usedVbo[attrLoc])
-		return;
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[attrLoc]);
-	glVertexAttribPointer(attrLoc, ATTR_LENGTHS[attrLoc], GL_FLOAT,
-	                      GL_FALSE, 0, (GLvoid*)0);
-	glEnableVertexAttribArray(attrLoc);
+	glBindVertexArray(vao);
+	glDrawArrays(GL_TRIANGLE_FAN, 0, vertexCount);
 }
 
 } // GLCore

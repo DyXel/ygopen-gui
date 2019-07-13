@@ -36,11 +36,9 @@ public:
 	void SetProgram(const GLShared::Program& program);
 private:
 	const GLShared::Program& program;
+	GLuint vao;
 	std::array<GLuint, ATTR_COUNT> vbo;
-	std::array<bool, ATTR_COUNT> usedVbo;
-	std::array<std::size_t, ATTR_COUNT> vboSize;
-	
-	void TryEnableVBO(AttrLocation attrLoc);
+	std::size_t vertexCount;
 };
 
 } // GLCore

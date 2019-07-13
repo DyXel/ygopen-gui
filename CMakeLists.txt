@@ -16,6 +16,8 @@ target_sources(${PROJECT_EXECUTABLE} PRIVATE
                ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_include.hpp
                ${CMAKE_CURRENT_SOURCE_DIR}/drawing/primitive.hpp
                ${CMAKE_CURRENT_SOURCE_DIR}/drawing/types.hpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_core/primitive.cpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_core/primitive.hpp
                ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_es/primitive.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_es/primitive.hpp
                ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_shared/common.hpp

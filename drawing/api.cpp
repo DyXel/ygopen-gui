@@ -3,6 +3,7 @@
 #include "api.hpp"
 #include "primitive.hpp"
 #include "gl_include.hpp"
+#include "gl_core/primitive.hpp"
 #include "gl_es/primitive.hpp"
 #include "gl_shared/program.hpp"
 #include "gl_shared/shader.hpp"
@@ -21,7 +22,9 @@ static SDL_GLContext glCtx = nullptr;
 // GLCore stuff
 
 // GLES stuff
-static const GLchar* VERTEX_SHADER_SRC =
+
+// Basic GL stuff
+static const GLchar* PRIMITIVE_VERTEX_SHADER_SRC =
 "#version 100\n"
 "attribute vec3 pos;\n"
 "attribute vec4 color;\n"
@@ -30,17 +33,29 @@ static const GLchar* VERTEX_SHADER_SRC =
 "   gl_Position = vec4(pos, 1.0);\n"
 "   fsColor = color;\n"
 "}\n";
-static const GLchar* FRAGMENT_SHADER_SRC =
+static const GLchar* PRIMITIVE_FRAGMENT_SHADER_SRC =
 "#version 100\n"
 "precision mediump float;\n"
 "varying vec4 fsColor;\n"
 "void main() {\n"
 "   gl_FragColor = fsColor;\n"
 "}\n";
+static std::shared_ptr<Detail::GLShared::Program> glPrimProg;
 
-static std::shared_ptr<Detail::GLShared::Program> glesPrimProg;
-
-// Basic GL stuff
+inline void LoadGLPrimProg()
+{
+	// Load default Primitive Shaders and Program
+	glPrimProg = std::make_shared<Detail::GLShared::Program>();
+	{
+		Detail::GLShared::Shader vs(GL_VERTEX_SHADER,
+		                            PRIMITIVE_VERTEX_SHADER_SRC);
+		Detail::GLShared::Shader fs(GL_FRAGMENT_SHADER,
+		                            PRIMITIVE_FRAGMENT_SHADER_SRC);
+		glPrimProg->Attach(vs);
+		glPrimProg->Attach(fs);
+		glPrimProg->Link();
+	}
+}
 
 inline bool GLCreateContext(SDL_Window* window)
 {
@@ -103,6 +118,7 @@ inline bool LoadGLCore(SDL_Window* window)
 #include "gl_core_funcs.h"
 #endif
 	GLLogStrings();
+	LoadGLPrimProg();
 	return true;
 }
 
@@ -114,14 +130,7 @@ inline bool LoadGLES(SDL_Window* window)
 #include "gl_es2_funcs.h"
 #endif
 	GLLogStrings();
-	glesPrimProg = std::make_shared<Detail::GLShared::Program>();
-	{
-		Detail::GLShared::Shader vs(GL_VERTEX_SHADER, VERTEX_SHADER_SRC);
-		Detail::GLShared::Shader fs(GL_FRAGMENT_SHADER, FRAGMENT_SHADER_SRC);
-		glesPrimProg->Attach(vs);
-		glesPrimProg->Attach(fs);
-		glesPrimProg->Link();
-	}
+	LoadGLPrimProg();
 	return true;
 }
 
@@ -216,12 +225,13 @@ void UnloadBackend()
 	{
 		case OPENGL_CORE:
 		{
+			glPrimProg.reset();
 			SDL_GL_DeleteContext(glCtx);
 			break;
 		}
 		case OPENGL_ES:
 		{
-			glesPrimProg.reset();
+			glPrimProg.reset();
 			SDL_GL_DeleteContext(glCtx);
 			break;
 		}
@@ -289,11 +299,11 @@ Primitive NewPrimitive()
 	{
 		case OPENGL_CORE:
 		{
-// 			return std::make_shared<Detail::GLCorePrimitive>();
+			return std::make_shared<Detail::GLCore::Primitive>(*glPrimProg);
 		}
 		case OPENGL_ES:
 		{
-			return std::make_shared<Detail::GLES::Primitive>(*glesPrimProg);
+			return std::make_shared<Detail::GLES::Primitive>(*glPrimProg);
 		}
 		case NOT_LOADED: break;
 	}
