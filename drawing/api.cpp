@@ -1,7 +1,7 @@
-#include "api.hpp"
-#include "gl_include.hpp"
 #include <SDL.h>
 #include <SDL_assert.h>
+#include "api.hpp"
+#include "gl_include.hpp"
 
 namespace Drawing
 {
@@ -174,9 +174,13 @@ void UnloadBackend()
 	switch(activeBackend)
 	{
 		case OPENGL_CORE:
+		{
+			SDL_GL_DeleteContext(glCtx);
+			break;
+		}
 		case OPENGL_ES:
 		{
-			
+			SDL_GL_DeleteContext(glCtx);
 			break;
 		}
 		case NOT_LOADED:
