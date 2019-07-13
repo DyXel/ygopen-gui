@@ -1,7 +1,10 @@
 #include <SDL.h>
 #include <SDL_assert.h>
 #include "api.hpp"
+#include "primitive.hpp"
 #include "gl_include.hpp"
+#include "gl_es/primitive.hpp"
+#include "gl_es/shader_and_program.hpp"
 
 namespace Drawing
 {
@@ -13,6 +16,26 @@ static Backend preloadedBackend = NOT_LOADED;
 static Backend activeBackend = NOT_LOADED;
 static SDL_Window* window = nullptr;
 static SDL_GLContext glCtx = nullptr;
+
+// GLES stuff
+static const GLchar* VERTEX_SHADER_SRC =
+"#version 100\n"
+"attribute vec3 pos;\n"
+"attribute vec4 color;\n"
+"varying vec4 fsColor;\n"
+"void main() {\n"
+"   gl_Position = vec4(pos, 1.0);\n"
+"   fsColor = color;\n"
+"}\n";
+static const GLchar* FRAGMENT_SHADER_SRC =
+"#version 100\n"
+"precision mediump float;\n"
+"varying vec4 fsColor;\n"
+"void main() {\n"
+"   gl_FragColor = fsColor;\n"
+"}\n";
+
+static std::shared_ptr<Detail::Program> glesProgram;
 
 void LogGLString(const char* nameStr, const GLenum name)
 {
@@ -155,6 +178,12 @@ bool LoadBackend(SDL_Window* w, Backend backend)
 			LOG_GL_STRING(GL_SHADING_LANGUAGE_VERSION);
 			LOG_GL_STRING(GL_VERSION);
 			// 	LOG_GL_STRING(GL_EXTENSIONS); // Too spammy
+			glesProgram = std::make_shared<Detail::Program>();
+			{
+				Detail::Shader vs(GL_VERTEX_SHADER, VERTEX_SHADER_SRC);
+				Detail::Shader fs(GL_FRAGMENT_SHADER, FRAGMENT_SHADER_SRC);
+				glesProgram->Attach(vs).Attach(fs).Link();
+			}
 			break;
 		}
 		default:
@@ -180,6 +209,7 @@ void UnloadBackend()
 		}
 		case OPENGL_ES:
 		{
+			glesProgram.reset();
 			SDL_GL_DeleteContext(glCtx);
 			break;
 		}
@@ -238,6 +268,15 @@ void UpdateDrawableSize(int* w, int* h)
 		}
 		case NOT_LOADED: break;
 	}
+}
+
+Primitive NewPrimitive()
+{
+	SDL_assert(activeBackend);
+	/*if(activeBackend == OPENGL_CORE)
+		return std::make_shared<Detail::GLCorePrimitive>();
+	else */if(activeBackend == OPENGL_ES)
+		return std::make_shared<Detail::GLESPrimitive>(*glesProgram);
 }
 
 } // API
