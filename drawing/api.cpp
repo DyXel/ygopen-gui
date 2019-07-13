@@ -200,6 +200,7 @@ bool LoadBackend(SDL_Window* w, Backend backend)
 	}
 	activeBackend = backend;
 	window = w;
+	return true;
 }
 
 void UnloadBackend()
