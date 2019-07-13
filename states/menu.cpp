@@ -7,8 +7,6 @@ namespace State
 
 Menu::Menu()
 {
-	
-	// Create circle
 	Drawing::Vertices vertices;
 	Drawing::Colors colors;
 	const float full = 2.0f * M_PI;
@@ -36,8 +34,6 @@ void Menu::Tick()
 
 void Menu::Draw()
 {
-	
-	
 }
 
 } // State
