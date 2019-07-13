@@ -14,10 +14,6 @@ target_sources(${PROJECT_EXECUTABLE} PRIVATE
                ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_include_defines.h
                ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_include.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_include.hpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_mesh.cpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_mesh.hpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_shader_and_program.cpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_shader_and_program.hpp
                ${CMAKE_CURRENT_SOURCE_DIR}/states/loading.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/states/loading.hpp
                ${CMAKE_CURRENT_SOURCE_DIR}/states/menu.cpp

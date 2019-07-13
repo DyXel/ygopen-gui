@@ -23,9 +23,6 @@ public:
 	void Tick() override;
 	void Draw() override;
 private:
-	std::shared_ptr<OGL::Program> program;
-	std::shared_ptr<OGL::Mesh> circle;
-	std::size_t vertexCount;
 };
 
 } // State

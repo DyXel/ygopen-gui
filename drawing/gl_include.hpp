@@ -134,7 +134,6 @@ do \
 
 namespace OGL
 {
-	
 	enum GLAttrLoc
 	{
 		VERTPOS = 0, // Vertice positions
@@ -142,7 +141,6 @@ namespace OGL
 		TEXCOORD, // Texture coordinates
 		ATTR_COUNT // Total number of attributes
 	};
-	
 } // OGL
 
 #endif // GL_INCLUDE_HPP

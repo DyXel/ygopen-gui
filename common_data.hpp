@@ -13,7 +13,7 @@ namespace YGOpen
 struct CommonData
 {
 	CommonData(GameInstance& gi) : gi(gi) {};
-	GameInstance& gi; // Owning game instance
+	GameInstance& gi; // Owner of this data
 	// Sync stuff
 	
 	// OpenGL stuff
