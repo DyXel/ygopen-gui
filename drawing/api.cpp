@@ -3,6 +3,7 @@
 #include "api.hpp"
 #include "primitive.hpp"
 #include "gl_include.hpp"
+#include "dummy/primitive.hpp"
 #include "gl_core/primitive.hpp"
 #include "gl_es/primitive.hpp"
 #include "gl_shared/program.hpp"
@@ -307,6 +308,7 @@ Primitive NewPrimitive()
 		}
 		case NOT_LOADED: break;
 	}
+	return std::make_shared<Detail::Dummy::Primitive>();
 }
 
 } // API
