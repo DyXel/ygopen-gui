@@ -45,6 +45,7 @@ void Menu::Draw()
 {
 	Drawing::API::Clear();
 	triangle->Draw();
+	Drawing::API::Present();
 }
 
 } // State

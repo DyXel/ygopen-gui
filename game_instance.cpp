@@ -84,7 +84,6 @@ void GameInstance::TickOnce()
 void GameInstance::DrawOnce()
 {
 	state->Draw();
-	Drawing::API::Present();
 }
 
 void GameInstance::SetState(std::shared_ptr<State::IState> newState)

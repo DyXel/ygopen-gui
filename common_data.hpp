@@ -7,8 +7,8 @@
 namespace YGOpen
 {
 // Data which is shared across the same GameInstance and its states,
-// Which should include: live configuration, OpenGL data (shaders, meshes, etc),
-// synchronization primitives.. Basically everything that should be shared
+// Which should include: live configuration, textures, synchronization
+// primitives.. Basically everything that should be shared
 // between states and the main GameInstance.
 struct CommonData
 {
