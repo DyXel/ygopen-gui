@@ -1,5 +1,5 @@
-#ifndef DRAWING_GL_ES_DETAIL_HPP
-#define DRAWING_GL_ES_DETAIL_HPP
+#ifndef DRAWING_GL_SHARED_COMMON_HPP
+#define DRAWING_GL_SHARED_COMMON_HPP
 
 namespace Drawing
 {
@@ -20,4 +20,4 @@ enum AttrLocation
 
 } // Drawing
 
-#endif // DRAWING_GL_ES_DETAIL_HPP
+#endif // DRAWING_GL_SHARED_COMMON_HPP
