@@ -1,4 +1,6 @@
 #include <memory>
+#include <SDL.h>
+#include <SDL_image.h>
 #include "game_instance.hpp"
 #include "drawing/api.hpp"
 
@@ -18,6 +20,16 @@ int main(/*int argc, char *argv[]*/)
 		SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
 		                "Unable to initialize SDL: %s\n", SDL_GetError());
 		quit(1);
+	}
+	{
+		static constexpr auto IMG_INIT_FLAGS = IMG_INIT_PNG;
+		if((IMG_Init(IMG_INIT_FLAGS) & IMG_INIT_FLAGS) != IMG_INIT_FLAGS)
+		{
+			SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
+			                "Unable to initialize SDL_image: %s",
+			                IMG_GetError());
+			quit(1);
+		}
 	}
 	// TODO: select backend from commandline and fallback
 	Drawing::API::PreloadBackend(DEFAULT_BACKEND);
@@ -42,6 +54,7 @@ int main(/*int argc, char *argv[]*/)
 static void quit(int rc)
 {
 	gi.reset();
+	IMG_Quit();
 	SDL_Quit();
 	exit(rc);
 }
