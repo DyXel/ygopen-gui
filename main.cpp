@@ -6,9 +6,9 @@ static std::unique_ptr<YGOpen::GameInstance> gi;
 [[noreturn]] static void quit(int rc);
 
 #if defined(__ANDROID__)
-static const Drawing::Backend DEFAULT_BACKEND = Drawing::OPENGL_ES;
+static constexpr Drawing::Backend DEFAULT_BACKEND = Drawing::OPENGL_ES;
 #else
-static const Drawing::Backend DEFAULT_BACKEND = Drawing::OPENGL_CORE;
+static constexpr Drawing::Backend DEFAULT_BACKEND = Drawing::OPENGL_CORE;
 #endif
 
 int main(int argc, char *argv[])
