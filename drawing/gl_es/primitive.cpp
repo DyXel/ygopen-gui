@@ -10,10 +10,10 @@ namespace Detail
 namespace GLES
 {
 
-static const std::size_t ATTR_LENGTHS[GLShared::ATTR_COUNT] =
+static constexpr std::size_t ATTR_LENGTHS[GLShared::ATTR_COUNT] =
 {
-	Vertex::length(),
-	Color::length()
+	VERTEX_LENGTH,
+	COLOR_LENGTH
 };
 
 Primitive::Primitive(const GLShared::Program& program) : program(program)
