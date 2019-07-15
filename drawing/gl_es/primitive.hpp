@@ -26,9 +26,9 @@ public:
 	Primitive(const GLShared::Program& program);
 	virtual ~Primitive();
 	
-	void SetDrawMode(const PrimitiveDrawMode& pdm);
-	void SetVertices(const Vertices& vertices);
-	void SetColors(const Colors& colors);
+	void SetDrawMode(const PrimitiveDrawMode& pdm) override;
+	void SetVertices(const Vertices& vertices) override;
+	void SetColors(const Colors& colors) override;
 // 	void SetTransform();
 	
 	void Draw();
