@@ -38,11 +38,11 @@ public:
 private:
 	const GLShared::Program& program;
 	GLenum mode{GL_TRIANGLES};
-	std::array<GLuint, ATTR_COUNT> vbo;
-	std::array<bool, ATTR_COUNT> usedVbo;
-	std::array<std::size_t, ATTR_COUNT> vboSize;
+	std::array<GLuint, GLShared::ATTR_COUNT> vbo;
+	std::array<bool, GLShared::ATTR_COUNT> usedVbo;
+	std::array<std::size_t, GLShared::ATTR_COUNT> vboSize;
 	
-	void TryEnableVBO(AttrLocation attrLoc);
+	void TryEnableVBO(const GLShared::AttrLocation& attrLoc);
 };
 
 } // GLES

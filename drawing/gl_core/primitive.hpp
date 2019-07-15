@@ -39,7 +39,7 @@ private:
 	const GLShared::Program& program;
 	GLenum mode{GL_TRIANGLES};
 	GLuint vao;
-	std::array<GLuint, ATTR_COUNT> vbo;
+	std::array<GLuint, GLShared::ATTR_COUNT> vbo;
 	std::size_t vertexCount;
 };
 

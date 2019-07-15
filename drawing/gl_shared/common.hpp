@@ -9,6 +9,9 @@ namespace Drawing
 namespace Detail
 {
 
+namespace GLShared
+{
+
 enum AttrLocation
 {
 	ATTR_VERTICES = 0, // Vertices positions
@@ -37,6 +40,8 @@ constexpr GLenum GLDrawModeFromPDM(const PrimitiveDrawMode& pdm)
 	else
 		return static_cast<GLenum>(0); // Should be unreachable
 }
+
+} // GLShared
 
 } // Detail
 
