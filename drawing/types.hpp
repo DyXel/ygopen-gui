@@ -21,9 +21,8 @@ constexpr std::size_t COLOR_LENGTH = 4;
 constexpr std::size_t COLOR_SIZE = sizeof(Color);
 
 // Index
-using Index = glm::vec2;
-using Indeces = std::vector<Index>;
-constexpr std::size_t INDEX_LENGTH = 2;
+using Index = short;
+using Indices = std::vector<Index>;
 constexpr std::size_t INDEX_SIZE = sizeof(Index);
 
 // Texture Coordinate
