@@ -10,12 +10,6 @@ namespace Detail
 namespace GLCore
 {
 
-static const std::size_t ATTR_LENGTHS[GLShared::ATTR_COUNT] =
-{
-	Vertex::length(),
-	Color::length()
-};
-
 Primitive::Primitive(const GLShared::Program& program) : program(program)
 {
 	glGenVertexArrays(1, &vao);
