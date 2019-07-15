@@ -24,7 +24,7 @@ int GameInstance::Init(Drawing::Backend backend)
 	window = SDL_CreateWindow(DEFAULT_WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED,
 	                          SDL_WINDOWPOS_UNDEFINED, DEFAULT_WINDOW_WIDTH,
 	                          DEFAULT_WINDOW_HEIGHT, SDL_WINDOW_OPENGL |
-	                          SDL_WINDOW_RESIZABLE);
+	                          SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN);
 	if(window == NULL)
 	{
 		window = nullptr;
@@ -47,6 +47,7 @@ int GameInstance::Init(Drawing::Backend backend)
 // 		// TODO: either make all of this a option or fallback to vsync
 // 	}
 	Drawing::API::Present();
+	SDL_ShowWindow(window);
 	data = std::make_shared<CommonData>(*this);
 	state = std::make_shared<State::Loading>(data);
 	return 0;
