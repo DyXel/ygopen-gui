@@ -37,10 +37,10 @@ public:
 	void SetProgram(const GLShared::Program& program);
 private:
 	const GLShared::Program& program;
-	GLenum mode{GL_TRIANGLES};
 	std::array<GLuint, GLShared::ATTR_COUNT> vbo;
 	std::array<bool, GLShared::ATTR_COUNT> usedVbo;
-	std::array<std::size_t, GLShared::ATTR_COUNT> vboSize;
+	GLenum mode{GL_TRIANGLES};
+	std::size_t drawCount{0};
 	
 	void TryEnableVBO(const GLShared::AttrLocation& attrLoc);
 };

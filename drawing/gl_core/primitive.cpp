@@ -29,8 +29,8 @@ void Primitive::SetDrawMode(const PrimitiveDrawMode& pdm)
 
 void Primitive::SetVertices(const Vertices& vertices)
 {
-	vertexCount = vertices.size();
-	const std::size_t numBytes = vertexCount * VERTEX_SIZE;
+	drawCount = vertices.size();
+	const std::size_t numBytes = drawCount * VERTEX_SIZE;
 	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[GLShared::ATTR_VERTICES]);
 	glBufferData(GL_ARRAY_BUFFER, numBytes, vertices.data(), GL_STATIC_DRAW);
@@ -54,7 +54,7 @@ void Primitive::Draw()
 {
 	program.Use();
 	glBindVertexArray(vao);
-	glDrawArrays(mode, 0, vertexCount);
+	glDrawArrays(mode, 0, drawCount);
 }
 
 } // GLCore

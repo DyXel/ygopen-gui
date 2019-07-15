@@ -37,10 +37,10 @@ public:
 	void SetProgram(const GLShared::Program& program);
 private:
 	const GLShared::Program& program;
-	GLenum mode{GL_TRIANGLES};
 	GLuint vao;
 	std::array<GLuint, GLShared::ATTR_COUNT> vbo;
-	std::size_t vertexCount;
+	GLenum mode{GL_TRIANGLES};
+	std::size_t drawCount{0};
 };
 
 } // GLCore
