@@ -11,7 +11,7 @@ static constexpr Drawing::Backend DEFAULT_BACKEND = Drawing::OPENGL_ES;
 static constexpr Drawing::Backend DEFAULT_BACKEND = Drawing::OPENGL_CORE;
 #endif
 
-int main(int argc, char *argv[])
+int main(/*int argc, char *argv[]*/)
 {
 	if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
 	{
