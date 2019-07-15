@@ -28,6 +28,11 @@ Primitive::~Primitive()
 	glDeleteBuffers(ATTR_COUNT, vbo.data());
 }
 
+void Primitive::SetDrawMode(const PrimitiveDrawMode& pdm)
+{
+	mode = GLDrawModeFromPDM(pdm);
+}
+
 void Primitive::SetVertices(const Vertices& vertices)
 {
 	vboSize[ATTR_VERTICES] = vertices.size();
@@ -51,7 +56,7 @@ void Primitive::Draw()
 	program.Use();
 	TryEnableVBO(ATTR_VERTICES);
 	TryEnableVBO(ATTR_COLORS);
-	glDrawArrays(GL_TRIANGLE_FAN, 0, vboSize[ATTR_VERTICES]);
+	glDrawArrays(mode, 0, vboSize[ATTR_VERTICES]);
 }
 
 void Primitive::TryEnableVBO(AttrLocation attrLoc)

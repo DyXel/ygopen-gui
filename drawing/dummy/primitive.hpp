@@ -19,6 +19,7 @@ public:
 	Primitive();
 	virtual ~Primitive();
 	
+	void SetDrawMode(const PrimitiveDrawMode& pdm);
 	void SetVertices(const Vertices& vertices);
 	void SetColors(const Colors& colors);
 // 	void SetTransform();

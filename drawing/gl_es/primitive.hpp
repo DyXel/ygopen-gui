@@ -26,6 +26,7 @@ public:
 	Primitive(const GLShared::Program& program);
 	virtual ~Primitive();
 	
+	void SetDrawMode(const PrimitiveDrawMode& pdm);
 	void SetVertices(const Vertices& vertices);
 	void SetColors(const Colors& colors);
 // 	void SetTransform();
@@ -36,6 +37,7 @@ public:
 	void SetProgram(const GLShared::Program& program);
 private:
 	const GLShared::Program& program;
+	GLenum mode{GL_TRIANGLES};
 	std::array<GLuint, ATTR_COUNT> vbo;
 	std::array<bool, ATTR_COUNT> usedVbo;
 	std::array<std::size_t, ATTR_COUNT> vboSize;

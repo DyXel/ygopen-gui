@@ -22,6 +22,7 @@ Menu::Menu()
 		{0.0f, 0.0f, 1.0f, 1.0f},
 	};
 	
+	triangle->SetDrawMode(Drawing::PDM_LINE_LOOP);
 	triangle->SetVertices(vertices);
 	triangle->SetColors(colors);
 }

@@ -28,6 +28,11 @@ Primitive::~Primitive()
 	glDeleteVertexArrays(1, &vao);
 }
 
+void Primitive::SetDrawMode(const PrimitiveDrawMode& pdm)
+{
+	mode = GLDrawModeFromPDM(pdm);
+}
+
 void Primitive::SetVertices(const Vertices& vertices)
 {
 	vertexCount = vertices.size();
@@ -55,7 +60,7 @@ void Primitive::Draw()
 {
 	program.Use();
 	glBindVertexArray(vao);
-	glDrawArrays(GL_TRIANGLE_FAN, 0, vertexCount);
+	glDrawArrays(mode, 0, vertexCount);
 }
 
 } // GLCore
