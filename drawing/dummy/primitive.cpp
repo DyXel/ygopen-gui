@@ -15,7 +15,7 @@ Primitive::Primitive()
 Primitive::~Primitive()
 {}
 
-void Primitive::SetDrawMode(const PrimitiveDrawMode& pdm)
+void Primitive::SetDrawMode([[maybe_unused]] const PrimitiveDrawMode& pdm)
 {}
 
 void Primitive::SetVertices([[maybe_unused]] const Vertices& vertices)
