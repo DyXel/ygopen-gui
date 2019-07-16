@@ -5,6 +5,8 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 
+#include <glm/mat4x4.hpp>
+
 namespace Drawing
 {
 
@@ -30,6 +32,10 @@ constexpr std::size_t TEXCOORD_SIZE = sizeof(TexCoord);
 using Index = short;
 using Indices = std::vector<Index>;
 constexpr std::size_t INDEX_SIZE = sizeof(Index);
+
+// Matrix
+using Matrix = glm::mat4;
+constexpr std::size_t MATRIX_SIZE = sizeof(Matrix);
 
 // Primitive drawing modes
 enum PrimitiveDrawMode

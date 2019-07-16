@@ -1,6 +1,8 @@
 #ifndef DRAWING_GL_SHARED_PROGRAM_HPP
 #define DRAWING_GL_SHARED_PROGRAM_HPP
+#include <array>
 #include "../gl_include.hpp"
+#include "../types.hpp"
 
 namespace Drawing
 {
@@ -20,12 +22,16 @@ public:
 	~Program();
 	
 	void Attach(const Shader& shader);
-	bool Link() const;
+	bool Link();
 	void Use() const;
+	
+	void SetModelMatrix(const Matrix& mat) const;
 	
 	GLuint GetGLRef() const;
 private:
 	GLuint ref{0};
+	enum {UNI_MODEL_MAT, UNI_COUNT};
+	std::array<GLint, UNI_COUNT> uni;
 };
 
 } // GLShared

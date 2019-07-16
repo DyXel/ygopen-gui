@@ -27,6 +27,9 @@ void Primitive::SetColors([[maybe_unused]] const Colors& colors)
 void Primitive::SetIndices([[maybe_unused]] const Indices& indices)
 {}
 
+void Primitive::SetMatrix([[maybe_unused]] const Matrix& matrix)
+{}
+
 void Primitive::Draw()
 {}
 

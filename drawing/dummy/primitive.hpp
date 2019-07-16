@@ -23,7 +23,8 @@ public:
 	void SetVertices(const Vertices& vertices) override;
 	void SetColors(const Colors& colors) override;
 	void SetIndices(const Indices& indices) override;
-// 	void SetTransform();
+	
+	void SetMatrix(const Matrix& matrix) override;
 	
 	void Draw() override;
 };

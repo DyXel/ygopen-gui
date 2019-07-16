@@ -26,21 +26,28 @@ static SDL_GLContext glCtx = nullptr;
 
 // Basic GL stuff
 static const GLchar* PRIMITIVE_VERTEX_SHADER_SRC =
-"#version 100\n"
-"attribute vec3 pos;\n"
-"attribute vec4 color;\n"
-"varying vec4 fsColor;\n"
-"void main() {\n"
-"   gl_Position = vec4(pos, 1.0);\n"
-"   fsColor = color;\n"
-"}\n";
+R"(
+#version 100
+attribute vec3 pos;
+attribute vec4 color;
+varying vec4 fsColor;
+uniform mat4 model;
+void main()
+{
+	gl_Position = vec4(pos, 1.0) * model;
+	fsColor = color;
+}
+)";
 static const GLchar* PRIMITIVE_FRAGMENT_SHADER_SRC =
-"#version 100\n"
-"precision mediump float;\n"
-"varying vec4 fsColor;\n"
-"void main() {\n"
-"   gl_FragColor = fsColor;\n"
-"}\n";
+R"(
+#version 100
+precision mediump float;
+varying vec4 fsColor;
+void main()
+{
+	gl_FragColor = fsColor;
+}
+)";
 static std::shared_ptr<Detail::GLShared::Program> glPrimProg;
 
 inline void LoadGLPrimProg()

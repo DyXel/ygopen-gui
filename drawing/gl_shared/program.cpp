@@ -4,6 +4,8 @@
 #include "common.hpp"
 #include "shader.hpp"
 
+#include <glm/gtc/type_ptr.hpp>
+
 namespace Drawing
 {
 
@@ -31,7 +33,7 @@ void Program::Attach(const Shader& shader)
 	glAttachShader(ref, shader.GetGLRef());
 }
 
-bool Program::Link() const
+bool Program::Link()
 {
 	// Bind attribute names to their indexes
 	static const char* ATTR_NAMES[ATTR_COUNT] =
@@ -58,12 +60,26 @@ bool Program::Link() const
 		delete[] logText;
 		return false;
 	}
+	// Get uniform locations (if it has them)
+	static const char* UNI_NAMES[UNI_COUNT] =
+	{
+		"model",
+	};
+	for(int i = 0; i < UNI_COUNT; i++)
+		uni[i] = glGetUniformLocation(ref, UNI_NAMES[i]);
 	return true;
 }
 
 void Program::Use() const
 {
 	glUseProgram(ref);
+}
+
+void Program::SetModelMatrix(const Matrix& mat) const
+{
+	if(uni[UNI_MODEL_MAT] == -1)
+		return;
+	glUniformMatrix4fv(uni[UNI_MODEL_MAT], 1, GL_FALSE, glm::value_ptr(mat));
 }
 
 GLuint Program::GetGLRef() const

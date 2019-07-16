@@ -71,6 +71,9 @@ void Primitive::Draw()
 		glDrawArrays(mode, 0, drawCount);
 }
 
+void Primitive::SetMatrix(const Matrix& matrix)
+{}
+
 void Primitive::TryEnableVBO(const GLShared::AttrLocation& attrLoc)
 {
 	if(!usedVbo[attrLoc])

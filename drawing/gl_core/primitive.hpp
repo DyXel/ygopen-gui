@@ -30,7 +30,8 @@ public:
 	void SetVertices(const Vertices& vertices) override;
 	void SetColors(const Colors& colors) override;
 	void SetIndices(const Indices& indices) override;
-// 	void SetTransform();
+	
+	void SetMatrix(const Matrix& matrix) override;
 	
 	void Draw() override;
 	
@@ -43,6 +44,7 @@ private:
 	std::array<GLuint, GLShared::ATTR_COUNT> vbo;
 	GLenum mode{GL_TRIANGLES};
 	std::size_t drawCount{0};
+	Matrix mat{1.0f};
 };
 
 } // GLCore

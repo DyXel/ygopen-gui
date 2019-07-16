@@ -15,7 +15,8 @@ public:
 	virtual void SetVertices(const Vertices& vertices) = 0;
 	virtual void SetColors(const Colors& colors) = 0;
 	virtual void SetIndices(const Indices& indices) = 0;
-// 	virtual void SetTransform() = 0;
+	
+	virtual void SetMatrix(const Matrix& matrix) = 0; // Normally Model Matrix
 	
 	virtual void Draw() = 0;
 };

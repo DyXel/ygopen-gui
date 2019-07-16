@@ -62,9 +62,15 @@ void Primitive::SetIndices(const Indices& indices)
 	drawByIndex = true;
 }
 
+void Primitive::SetMatrix(const Matrix& matrix)
+{
+	mat = matrix;
+}
+
 void Primitive::Draw()
 {
 	program.Use();
+	program.SetModelMatrix(mat);
 	glBindVertexArray(vao);
 	if(drawByIndex)
 		glDrawElements(mode, drawCount, GL_UNSIGNED_SHORT, (GLvoid*)0);
