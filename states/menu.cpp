@@ -11,20 +11,29 @@ Menu::Menu()
 	triangle = Drawing::API::NewPrimitive();
 	const Drawing::Vertices vertices =
 	{
-		{ 0.0f,  0.5f,  0.0f},
-		{-0.5f, -0.5f,  0.0f},
-		{ 0.5f, -0.5f,  0.0f},
+		{-1.0f,  1.0f,  0.0f},
+		{ 1.0f,  1.0f,  0.0f},
+		{-1.0f, -1.0f,  0.0f},
+		{ 1.0f, -1.0f,  0.0f},
+		{ 0.0f,  0.0f,  0.0f},
 	};
 	const Drawing::Colors colors =
 	{
 		{1.0f, 0.0f, 0.0f, 1.0f},
 		{0.0f, 1.0f, 0.0f, 1.0f},
 		{0.0f, 0.0f, 1.0f, 1.0f},
+		{1.0f, 0.0f, 1.0f, 1.0f},
+		{1.0f, 1.0f, 1.0f, 1.0f},
+	};
+	const Drawing::Indices indices =
+	{
+		0, 4, 2, 1, 3, 4
 	};
 	
-	triangle->SetDrawMode(Drawing::PDM_LINE_LOOP);
+	triangle->SetDrawMode(Drawing::PDM_TRIANGLES);
 	triangle->SetVertices(vertices);
 	triangle->SetColors(colors);
+	triangle->SetIndices(indices);
 }
 
 Menu::~Menu()
