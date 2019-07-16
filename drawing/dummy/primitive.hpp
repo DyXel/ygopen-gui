@@ -24,7 +24,7 @@ public:
 	void SetColors(const Colors& colors) override;
 // 	void SetTransform();
 	
-	void Draw();
+	void Draw() override;
 };
 
 } // Dummy
