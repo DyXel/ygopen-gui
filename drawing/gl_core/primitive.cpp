@@ -50,11 +50,26 @@ void Primitive::SetColors(const Colors& colors)
 	glEnableVertexAttribArray(GLShared::ATTR_COLORS);
 }
 
+void Primitive::SetIndices(const Indices& indices)
+{
+	drawCount = indices.size();
+	const std::size_t numBytes = indices.size() * INDEX_SIZE;
+	glBindVertexArray(vao);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[GLShared::ATTR_INDICES]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, numBytes, indices.data(),
+	             GL_STATIC_DRAW);
+	glEnableVertexAttribArray(GLShared::ATTR_INDICES);
+	drawByIndex = true;
+}
+
 void Primitive::Draw()
 {
 	program.Use();
 	glBindVertexArray(vao);
-	glDrawArrays(mode, 0, drawCount);
+	if(drawByIndex)
+		glDrawElements(mode, drawCount, GL_UNSIGNED_SHORT, (GLvoid*)0);
+	else
+		glDrawArrays(mode, 0, drawCount);
 }
 
 } // GLCore

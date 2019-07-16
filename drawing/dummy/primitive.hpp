@@ -22,6 +22,7 @@ public:
 	void SetDrawMode(const PrimitiveDrawMode& pdm) override;
 	void SetVertices(const Vertices& vertices) override;
 	void SetColors(const Colors& colors) override;
+	void SetIndices(const Indices& indices) override;
 // 	void SetTransform();
 	
 	void Draw() override;

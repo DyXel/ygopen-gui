@@ -29,6 +29,7 @@ public:
 	void SetDrawMode(const PrimitiveDrawMode& pdm) override;
 	void SetVertices(const Vertices& vertices) override;
 	void SetColors(const Colors& colors) override;
+	void SetIndices(const Indices& indices) override;
 // 	void SetTransform();
 	
 	void Draw() override;
@@ -37,6 +38,7 @@ public:
 	void SetProgram(const GLShared::Program& program);
 private:
 	const GLShared::Program& program;
+	bool drawByIndex{false};
 	GLuint vao;
 	std::array<GLuint, GLShared::ATTR_COUNT> vbo;
 	GLenum mode{GL_TRIANGLES};

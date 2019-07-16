@@ -20,16 +20,16 @@ using Colors = std::vector<Color>;
 constexpr std::size_t COLOR_LENGTH = 4;
 constexpr std::size_t COLOR_SIZE = sizeof(Color);
 
-// Index
-using Index = short;
-using Indices = std::vector<Index>;
-constexpr std::size_t INDEX_SIZE = sizeof(Index);
-
 // Texture Coordinate
 using TexCoord = glm::vec2;
 using TexCoords = std::vector<TexCoord>;
 constexpr std::size_t TEXCOORD_LENGTH = 2;
 constexpr std::size_t TEXCOORD_SIZE = sizeof(TexCoord);
+
+// Index
+using Index = short;
+using Indices = std::vector<Index>;
+constexpr std::size_t INDEX_SIZE = sizeof(Index);
 
 // Primitive drawing modes
 enum PrimitiveDrawMode

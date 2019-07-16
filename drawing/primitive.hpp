@@ -14,6 +14,7 @@ public:
 	virtual void SetDrawMode(const PrimitiveDrawMode& pdm) = 0;
 	virtual void SetVertices(const Vertices& vertices) = 0;
 	virtual void SetColors(const Colors& colors) = 0;
+	virtual void SetIndices(const Indices& indices) = 0;
 // 	virtual void SetTransform() = 0;
 	
 	virtual void Draw() = 0;

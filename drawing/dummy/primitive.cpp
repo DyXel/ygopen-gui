@@ -24,6 +24,9 @@ void Primitive::SetVertices([[maybe_unused]] const Vertices& vertices)
 void Primitive::SetColors([[maybe_unused]] const Colors& colors)
 {}
 
+void Primitive::SetIndices([[maybe_unused]] const Indices& indices)
+{}
+
 void Primitive::Draw()
 {}
 

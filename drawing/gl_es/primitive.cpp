@@ -49,12 +49,26 @@ void Primitive::SetColors(const Colors& colors)
 	usedVbo[GLShared::ATTR_COLORS] = true;
 }
 
+void Primitive::SetIndices(const Indices& indices)
+{
+	drawCount = indices.size();
+	const std::size_t numBytes = indices.size() * INDEX_SIZE;
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[GLShared::ATTR_INDICES]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, numBytes, indices.data(),
+	             GL_STATIC_DRAW);
+	usedVbo[GLShared::ATTR_INDICES] = true;
+}
+
 void Primitive::Draw()
 {
 	program.Use();
 	TryEnableVBO(GLShared::ATTR_VERTICES);
 	TryEnableVBO(GLShared::ATTR_COLORS);
-	glDrawArrays(mode, 0, drawCount);
+	TryEnableVBO(GLShared::ATTR_INDICES);
+	if(usedVbo[GLShared::ATTR_INDICES])
+		glDrawElements(mode, drawCount, GL_UNSIGNED_SHORT, (GLvoid*)0);
+	else
+		glDrawArrays(mode, 0, drawCount);
 }
 
 void Primitive::TryEnableVBO(const GLShared::AttrLocation& attrLoc)
