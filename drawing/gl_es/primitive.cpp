@@ -62,6 +62,7 @@ void Primitive::SetIndices(const Indices& indices)
 void Primitive::Draw()
 {
 	program.Use();
+	program.SetModelMatrix(mat);
 	TryEnableVBO(GLShared::ATTR_VERTICES);
 	TryEnableVBO(GLShared::ATTR_COLORS);
 	TryEnableVBO(GLShared::ATTR_INDICES);
@@ -72,7 +73,9 @@ void Primitive::Draw()
 }
 
 void Primitive::SetMatrix(const Matrix& matrix)
-{}
+{
+	mat = matrix;
+}
 
 void Primitive::TryEnableVBO(const GLShared::AttrLocation& attrLoc)
 {

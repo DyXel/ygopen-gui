@@ -43,6 +43,7 @@ private:
 	std::array<bool, GLShared::ATTR_COUNT> usedVbo;
 	GLenum mode{GL_TRIANGLES};
 	std::size_t drawCount{0};
+	Matrix mat{1.0f};
 	
 	void TryEnableVBO(const GLShared::AttrLocation& attrLoc);
 };
