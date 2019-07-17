@@ -32,7 +32,6 @@ public:
 private:
 	bool exiting{false};
 	SDL_Window* window{nullptr};
-
 	std::shared_ptr<CommonData> data;
 	std::shared_ptr<State::IState> state;
 };

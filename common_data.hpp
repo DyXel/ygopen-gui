@@ -14,12 +14,13 @@ struct CommonData
 {
 	CommonData(GameInstance& gi) : gi(gi) {};
 	GameInstance& gi; // Owner of this data
-	// Sync stuff
+	// Synchronization data
 	
-	// OpenGL stuff
+	// Video data
+	int canvasWidth{DEFAULT_WINDOW_WIDTH}; // Canvas width in pixels
+	int canvasHeight{DEFAULT_WINDOW_HEIGHT}; // Canvas height in pixels
 	
-	
-	// Miscellaneous stuff
+	// Miscellaneous data
 	std::unique_ptr<Configs> cfgs;
 	bool isRecording{false};
 	bool isPowerSaving{false};

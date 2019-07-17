@@ -21,6 +21,7 @@ GameInstance::~GameInstance()
 
 int GameInstance::Init(Drawing::Backend backend)
 {
+	data = std::make_shared<CommonData>(*this);
 	window = SDL_CreateWindow(DEFAULT_WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED,
 	                          SDL_WINDOWPOS_UNDEFINED, DEFAULT_WINDOW_WIDTH,
 	                          DEFAULT_WINDOW_HEIGHT, SDL_WINDOW_OPENGL |
@@ -46,9 +47,10 @@ int GameInstance::Init(Drawing::Backend backend)
 // 		            "Unable to set adaptive vsync: %s", SDL_GetError());
 // 		// TODO: either make all of this a option or fallback to vsync
 // 	}
+	Drawing::API::UpdateDrawableSize(&data->canvasWidth, &data->canvasHeight);
+	Drawing::API::Clear();
 	Drawing::API::Present();
 	SDL_ShowWindow(window);
-	data = std::make_shared<CommonData>(*this);
 	state = std::make_shared<State::Loading>(data);
 	return 0;
 }
@@ -71,8 +73,8 @@ void GameInstance::PropagateEvent(const SDL_Event& e)
 	   e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) &&
 	   e.window.windowID == SDL_GetWindowID(window))
 	{
-		int w, h; // probably save the size somewhere instead
-		Drawing::API::UpdateDrawableSize(&w, &h);
+		Drawing::API::UpdateDrawableSize(&data->canvasWidth,
+		                                 &data->canvasHeight);
 	}
 	state->OnEvent(e);
 }
