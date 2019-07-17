@@ -13,18 +13,20 @@ class Mesh;
 
 namespace YGOpen
 {
+struct CommonData;
 namespace State
 {
 
 class Menu : public IState
 {
 public:
-	Menu();
+	Menu(const std::shared_ptr<CommonData>& ptrData);
 	virtual ~Menu();
 	void OnEvent(const SDL_Event& e) override;
 	void Tick() override;
 	void Draw() override;
 private:
+	std::shared_ptr<CommonData> data;
 	Drawing::Primitive triangle;
 };
 

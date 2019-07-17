@@ -66,7 +66,7 @@ void Loading::Tick()
 	if(pendingJobs.empty() && lastJob.valid() &&
 	   lastJob.wait_for(0ms) == std::future_status::ready)
 	{
-		data->gi.SetState(std::make_shared<State::Menu>());
+		data->gi.SetState(std::make_shared<State::Menu>(data));
 	}
 	else if(!pendingJobs.empty())
 	{

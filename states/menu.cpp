@@ -1,5 +1,6 @@
 #include "menu.hpp"
 #include "../drawing/types.hpp"
+#include "../common_data.hpp"
 
 namespace YGOpen
 {
@@ -7,6 +8,7 @@ namespace State
 {
 
 Menu::Menu()
+Menu::Menu(const std::shared_ptr<CommonData>& ptrData) : data(ptrData)
 {
 	triangle = Drawing::API::NewPrimitive();
 	const Drawing::Vertices vertices =
