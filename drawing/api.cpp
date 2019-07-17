@@ -34,7 +34,7 @@ varying vec4 fsColor;
 uniform mat4 model;
 void main()
 {
-	gl_Position = vec4(pos, 1.0) * model;
+	gl_Position = model * vec4(pos, 1.0);
 	fsColor = color;
 }
 )";
