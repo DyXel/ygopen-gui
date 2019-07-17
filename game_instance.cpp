@@ -39,7 +39,34 @@ int GameInstance::Init(Drawing::Backend backend)
 		                "Unable to load selected backend");
 		return -1;
 	}
-	Drawing::API::Clear();
+	auto SetDPI = [this]() -> bool
+	{
+		// NOTE: not checking number of displays because we already were able
+		// to create a window which means we have at least 1 display available.
+		int displayIndex = SDL_GetWindowDisplayIndex(window);
+		if(displayIndex < 0)
+		{
+			SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
+			            "Unable to get display for current window: %s",
+			            SDL_GetError());
+			return false;
+		}
+		if(SDL_GetDisplayDPI(displayIndex, &data->dpi, NULL, NULL) < 0)
+		{
+			SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
+			            "Unable to get display DPI: %s",
+			            SDL_GetError());
+			return false;
+		}
+		return true;
+	};
+	if(!SetDPI())
+	{
+		SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
+		            "Unable to set display DPI. Using default.");
+		data->dpi = DEFAULT_DPI;
+	}
+	SDL_Log("Current DPI: %.2f", data->dpi);
 // TODO: move this to the API
 // 	if(SDL_GL_SetSwapInterval(-1) == -1)
 // 	{

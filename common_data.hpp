@@ -19,6 +19,7 @@ struct CommonData
 	// Video data
 	int canvasWidth{DEFAULT_WINDOW_WIDTH}; // Canvas width in pixels
 	int canvasHeight{DEFAULT_WINDOW_HEIGHT}; // Canvas height in pixels
+	float dpi; // DPI of the screen, may be overriden by user settings
 	
 	// Miscellaneous data
 	std::unique_ptr<Configs> cfgs;
