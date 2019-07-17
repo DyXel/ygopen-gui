@@ -7,7 +7,6 @@ namespace YGOpen
 namespace State
 {
 
-Menu::Menu()
 Menu::Menu(const std::shared_ptr<CommonData>& ptrData) : data(ptrData)
 {
 	triangle = Drawing::API::NewPrimitive();
