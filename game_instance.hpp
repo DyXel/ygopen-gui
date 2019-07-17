@@ -25,6 +25,7 @@ public:
 	
 	int Init(Drawing::Backend backend);
 	bool IsExiting() const;
+	void Exit();
 	void PropagateEvent(const SDL_Event& e);
 	void TickOnce();
 	void DrawOnce();

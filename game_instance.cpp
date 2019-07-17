@@ -87,6 +87,11 @@ bool GameInstance::IsExiting() const
 	return exiting;
 }
 
+void GameInstance::Exit()
+{
+	exiting = true;
+}
+
 void GameInstance::PropagateEvent(const SDL_Event& e)
 {
 	if(e.type == SDL_QUIT)
