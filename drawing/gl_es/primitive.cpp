@@ -29,10 +29,11 @@ void Primitive::SetDrawMode(const PrimitiveDrawMode& pdm)
 
 void Primitive::SetVertices(const Vertices& vertices)
 {
-	drawCount = vertices.size();
-	const std::size_t numBytes = drawCount * VERTEX_SIZE;
+	drawCount = static_cast<GLsizei>(vertices.size());
+	const std::size_t numBytes = vertices.size() * VERTEX_SIZE;
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[GLShared::ATTR_VERTICES]);
-	glBufferData(GL_ARRAY_BUFFER, numBytes, vertices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER,  static_cast<GLsizeiptr>(numBytes),
+	             vertices.data(), GL_STATIC_DRAW);
 	usedVbo[GLShared::ATTR_VERTICES] = true;
 }
 
@@ -40,17 +41,18 @@ void Primitive::SetColors(const Colors& colors)
 {
 	const std::size_t numBytes = colors.size() * COLOR_SIZE;
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[GLShared::ATTR_COLORS]);
-	glBufferData(GL_ARRAY_BUFFER, numBytes, colors.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER,  static_cast<GLsizeiptr>(numBytes),
+	             colors.data(), GL_STATIC_DRAW);
 	usedVbo[GLShared::ATTR_COLORS] = true;
 }
 
 void Primitive::SetIndices(const Indices& indices)
 {
-	drawCount = indices.size();
+	drawCount = static_cast<GLsizei>(indices.size());
 	const std::size_t numBytes = indices.size() * INDEX_SIZE;
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[GLShared::ATTR_INDICES]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, numBytes, indices.data(),
-	             GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER,  static_cast<GLsizeiptr>(numBytes),
+	             indices.data(), GL_STATIC_DRAW);
 	usedVbo[GLShared::ATTR_INDICES] = true;
 }
 
@@ -58,7 +60,8 @@ void Primitive::SetTexCoords(const TexCoords& texCoords)
 {
 	const std::size_t numBytes = texCoords.size() * TEXCOORD_SIZE;
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[GLShared::ATTR_TEXCOORDS]);
-	glBufferData(GL_ARRAY_BUFFER, numBytes, texCoords.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER,  static_cast<GLsizeiptr>(numBytes),
+	             texCoords.data(), GL_STATIC_DRAW);
 	usedVbo[GLShared::ATTR_TEXCOORDS] = true;
 }
 
@@ -80,7 +83,7 @@ void Primitive::Draw()
 	TryEnableVBO(GLShared::ATTR_TEXCOORDS);
 	TryEnableVBO(GLShared::ATTR_INDICES);
 	if(usedVbo[GLShared::ATTR_INDICES])
-		glDrawElements(mode, drawCount, GL_UNSIGNED_SHORT, (GLvoid*)0);
+		glDrawElements(mode, drawCount, GL_UNSIGNED_SHORT, nullptr);
 	else
 		glDrawArrays(mode, 0, drawCount);
 }
@@ -92,17 +95,17 @@ void Primitive::SetMatrix(const Matrix& matrix)
 
 void Primitive::TryEnableVBO(const GLShared::AttrLocation& attrLoc)
 {
-	static constexpr std::size_t ATTR_LENGTHS[GLShared::ATTR_COUNT] =
+	static constexpr GLint ATTR_LENGTHS[GLShared::ATTR_COUNT] =
 	{
-		VERTEX_LENGTH,
-		COLOR_LENGTH,
-		TEXCOORD_LENGTH
+		static_cast<GLint>(VERTEX_LENGTH),
+		static_cast<GLint>(COLOR_LENGTH),
+		static_cast<GLint>(TEXCOORD_LENGTH),
 	};
 	if(!usedVbo[attrLoc])
 		return;
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[attrLoc]);
 	glVertexAttribPointer(attrLoc, ATTR_LENGTHS[attrLoc], GL_FLOAT,
-	                      GL_FALSE, 0, (GLvoid*)0);
+	                      GL_FALSE, 0, nullptr);
 	glEnableVertexAttribArray(attrLoc);
 }
 

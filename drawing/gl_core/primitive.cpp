@@ -30,13 +30,14 @@ void Primitive::SetDrawMode(const PrimitiveDrawMode& pdm)
 
 void Primitive::SetVertices(const Vertices& vertices)
 {
-	drawCount = vertices.size();
-	const std::size_t numBytes = drawCount * VERTEX_SIZE;
+	drawCount = static_cast<GLsizei>(vertices.size());
+	const std::size_t numBytes = vertices.size() * VERTEX_SIZE;
 	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[GLShared::ATTR_VERTICES]);
-	glBufferData(GL_ARRAY_BUFFER, numBytes, vertices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(numBytes),
+	             vertices.data(), GL_STATIC_DRAW);
 	glVertexAttribPointer(GLShared::ATTR_VERTICES, VERTEX_LENGTH, GL_FLOAT,
-	                      GL_FALSE, 0, (GLvoid*)0);
+	                      GL_FALSE, 0, nullptr);
 	glEnableVertexAttribArray(GLShared::ATTR_VERTICES);
 }
 
@@ -45,20 +46,21 @@ void Primitive::SetColors(const Colors& colors)
 	const std::size_t numBytes = colors.size() * COLOR_SIZE;
 	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[GLShared::ATTR_COLORS]);
-	glBufferData(GL_ARRAY_BUFFER, numBytes, colors.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(numBytes),
+	             colors.data(), GL_STATIC_DRAW);
 	glVertexAttribPointer(GLShared::ATTR_COLORS, COLOR_LENGTH, GL_FLOAT,
-	                      GL_FALSE, 0, (GLvoid*)0);
+	                      GL_FALSE, 0, nullptr);
 	glEnableVertexAttribArray(GLShared::ATTR_COLORS);
 }
 
 void Primitive::SetIndices(const Indices& indices)
 {
-	drawCount = indices.size();
+	drawCount = static_cast<GLsizei>(indices.size());
 	const std::size_t numBytes = indices.size() * INDEX_SIZE;
 	glBindVertexArray(vao);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[GLShared::ATTR_INDICES]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, numBytes, indices.data(),
-	             GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizeiptr>(numBytes),
+	             indices.data(), GL_STATIC_DRAW);
 	glEnableVertexAttribArray(GLShared::ATTR_INDICES);
 	drawByIndex = true;
 }
@@ -73,9 +75,10 @@ void Primitive::SetTexCoords(const TexCoords& texCoords)
 	const std::size_t numBytes = texCoords.size() * TEXCOORD_SIZE;
 	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[GLShared::ATTR_TEXCOORDS]);
-	glBufferData(GL_ARRAY_BUFFER, numBytes, texCoords.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(numBytes),
+	             texCoords.data(), GL_STATIC_DRAW);
 	glVertexAttribPointer(GLShared::ATTR_TEXCOORDS, TEXCOORD_LENGTH, GL_FLOAT,
-	                      GL_FALSE, 0, (GLvoid*)0);
+	                      GL_FALSE, 0, nullptr);
 	glEnableVertexAttribArray(GLShared::ATTR_TEXCOORDS);
 }
 
@@ -94,7 +97,7 @@ void Primitive::Draw()
 	program.SetModelMatrix(mat);
 	glBindVertexArray(vao);
 	if(drawByIndex)
-		glDrawElements(mode, drawCount, GL_UNSIGNED_SHORT, (GLvoid*)0);
+		glDrawElements(mode, drawCount, GL_UNSIGNED_SHORT, nullptr);
 	else
 		glDrawArrays(mode, 0, drawCount);
 }

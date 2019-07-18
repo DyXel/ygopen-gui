@@ -48,7 +48,7 @@ private:
 	GLuint vao;
 	std::array<GLuint, GLShared::ATTR_COUNT> vbo;
 	GLenum mode{GL_TRIANGLES};
-	std::size_t drawCount{0};
+	GLsizei drawCount{0};
 	Matrix mat{1.0f};
 	std::shared_ptr<GLShared::Texture> tex;
 };

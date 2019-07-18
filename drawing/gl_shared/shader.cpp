@@ -16,7 +16,7 @@ Shader::Shader(const GLenum type, std::string_view source) : type(type)
 	if(ref == 0)
 		return;
 	const char* src[] = {source.data()};
-	glShaderSource(ref, 1, src, NULL);
+	glShaderSource(ref, 1, src, nullptr);
 	glCompileShader(ref);
 	GLint success;
 	glGetShaderiv(ref, GL_COMPILE_STATUS, &success);
@@ -24,8 +24,8 @@ Shader::Shader(const GLenum type, std::string_view source) : type(type)
 	{
 		GLint logLength;
 		glGetShaderiv(ref, GL_INFO_LOG_LENGTH, &logLength);
-		auto logText = new char[logLength];
-		glGetShaderInfoLog(ref, logLength, NULL, logText);
+		auto logText = new char[static_cast<std::size_t>(logLength)];
+		glGetShaderInfoLog(ref, logLength, nullptr, logText);
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
 		             "Could not compile shader: %s", logText);
 		delete[] logText;

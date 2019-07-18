@@ -77,9 +77,8 @@ inline void LoadGLPrimProg()
 inline bool GLCreateContext(SDL_Window* window)
 {
 	glCtx = SDL_GL_CreateContext(window);
-	if(glCtx == NULL)
+	if(glCtx == nullptr)
 	{
-		glCtx = nullptr;
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
 		             "Unable to create OpenGL context: %s",
 		SDL_GetError());
@@ -91,7 +90,7 @@ inline bool GLCreateContext(SDL_Window* window)
 inline void LogGLString(const char* nameStr, const GLenum name)
 {
 	const GLubyte* ret = glGetString(name);
-	if (ret == 0)
+	if (ret == nullptr)
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
 		             "Unable to get OpenGL string: %s (0x%X)", nameStr, name);

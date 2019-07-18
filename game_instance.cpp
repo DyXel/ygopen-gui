@@ -26,9 +26,8 @@ int GameInstance::Init(Drawing::Backend backend)
 	                          SDL_WINDOWPOS_UNDEFINED, DEFAULT_WINDOW_WIDTH,
 	                          DEFAULT_WINDOW_HEIGHT, SDL_WINDOW_OPENGL |
 	                          SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN);
-	if(window == NULL)
+	if(window == nullptr)
 	{
-		window = nullptr;
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
 		             "Unable to create SDL Window: %s", SDL_GetError());
 		return -1;
@@ -51,7 +50,7 @@ int GameInstance::Init(Drawing::Backend backend)
 			            SDL_GetError());
 			return false;
 		}
-		if(SDL_GetDisplayDPI(displayIndex, &data->dpi, NULL, NULL) < 0)
+	    if(SDL_GetDisplayDPI(displayIndex, &data->dpi, nullptr, nullptr) < 0)
 		{
 			SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
 			            "Unable to get display DPI: %s",
@@ -66,7 +65,7 @@ int GameInstance::Init(Drawing::Backend backend)
 		            "Unable to set display DPI. Using default.");
 		data->dpi = DEFAULT_DPI;
 	}
-	SDL_Log("Current DPI: %.2f", data->dpi);
+	SDL_Log("Current DPI: %.2f", static_cast<double>(data->dpi));
 // TODO: move this to the API
 // 	if(SDL_GL_SetSwapInterval(-1) == -1)
 // 	{

@@ -43,8 +43,8 @@ bool Program::Link()
 		"in_texCoord",
 		"in_index", // unused?
 	};
-	for(int i = 0; i < ATTR_COUNT; i++)
-		glBindAttribLocation(ref, i, ATTR_NAMES[i]);
+	for(std::size_t i = 0; i < ATTR_COUNT; i++)
+		glBindAttribLocation(ref, static_cast<GLuint>(i), ATTR_NAMES[i]);
 	// Link program
 	glLinkProgram(ref);
 	GLint success;
@@ -53,8 +53,8 @@ bool Program::Link()
 	{
 		GLint logLength;
 		glGetProgramiv(ref, GL_INFO_LOG_LENGTH, &logLength);
-		auto logText = new char[logLength];
-		glGetProgramInfoLog(ref, logLength, NULL, logText);
+		auto logText = new char[static_cast<std::size_t>(logLength)];
+		glGetProgramInfoLog(ref, logLength, nullptr, logText);
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
 		             "Could not link program: %s", logText);
 		delete[] logText;
@@ -65,7 +65,7 @@ bool Program::Link()
 	{
 		"in_model",
 	};
-	for(int i = 0; i < UNI_COUNT; i++)
+	for(std::size_t i = 0; i < UNI_COUNT; i++)
 		uni[i] = glGetUniformLocation(ref, UNI_NAMES[i]);
 	return true;
 }

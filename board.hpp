@@ -38,30 +38,30 @@ using TempPlace = std::tuple<uint32_t /*state*/,
 
 using Counter = std::tuple<uint32_t /*type*/, uint32_t /*count*/>;
 
-static inline bool IsPile(const uint32_t location)
+inline bool IsPile(const uint32_t location)
 {
 	return !((LocationMonsterZone | LocationSpellZone | LocationOverlay |
 	       LocationOnField | LocationFieldZone | LocationPendulumZone)
 	       & location);
 }
 
-static inline bool IsPile(const Place& place)
+inline bool IsPile(const Place& place)
 {
 	return IsPile(std::get<1>(place));
 }
 
-static Place PlaceFromProtobufPlace(const Core::Data::Place& p)
+Place PlaceFromProtobufPlace(const Core::Data::Place& p)
 {
 	return {p.controller(), p.location(), p.sequence(), -1};
 }
 
-static Place PlaceFromCardInfo(const Core::Data::CardInfo& cd)
+Place PlaceFromCardInfo(const Core::Data::CardInfo& cd)
 {
 	return {cd.controller(), cd.location(), cd.sequence(),
 	        (cd.location() & LocationOverlay) ? cd.overlay_sequence() : -1}; // TODO: handle at encoder level?
 }
 
-static Counter CounterFromProtobufCounter(const Core::Data::Counter& c)
+Counter CounterFromProtobufCounter(const Core::Data::Counter& c)
 {
 	return {c.type(), c.count()};
 }
@@ -221,7 +221,7 @@ protected:
 	//           for LocationSpellZone: (0, 1, 2, 3, 4, 5)
 	//           for LocationPendulumZone: (0, 1)
 	// NOTE: overlay_sequence is ALWAYS -1.
-	std::map<Place, Sequential<bool, false>> disabledZones = []() constexpr
+	std::map<Place, Sequential<bool, false>> disabledZones = []()
 	{
 		std::map<Place, Sequential<bool, false>> tempMap;
 		std::array<int, 3> locations = {LocationMonsterZone, LocationSpellZone,
@@ -774,7 +774,7 @@ if(advancing)
 	if(type == Core::Msg::LpChange::CHANGE_DAMAGE ||
 	   type == Core::Msg::LpChange::CHANGE_PAY)
 	{
-		int32_t deltaAmount = (int32_t)playerLP[player]() - amount;
+		auto deltaAmount = static_cast<int32_t>(playerLP[player]()) - amount;
 		if(deltaAmount < 0)
 			playerLP[player].AddOrNext(realtime, 0);
 		else
