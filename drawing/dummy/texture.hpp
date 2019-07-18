@@ -17,7 +17,7 @@ public:
 	Texture();
 	virtual ~Texture();
 	
-	void SetImage(std::size_t w, std::size_t h, void* data) override;
+	void SetImage(int w, int h, void* data) override;
 };
 
 } // Dummy

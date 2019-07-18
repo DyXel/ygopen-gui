@@ -22,7 +22,7 @@ Texture::~Texture()
 	glDeleteTextures(1, &ref);
 }
 
-void Texture::SetImage(std::size_t w, std::size_t h, void* data)
+void Texture::SetImage(int w, int h, void* data)
 {
 	static const GLint MIPS_COUNT = 0;
 	glTexImage2D(GL_TEXTURE_2D, MIPS_COUNT, GL_RGBA, w, h,

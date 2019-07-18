@@ -15,8 +15,7 @@ Texture::Texture()
 Texture::~Texture()
 {}
 
-void Texture::SetImage([[maybe_unused]] std::size_t w,
-                       [[maybe_unused]] std::size_t h,
+void Texture::SetImage([[maybe_unused]] int w, [[maybe_unused]] int h,
                        [[maybe_unused]] void* data)
 {}
 
