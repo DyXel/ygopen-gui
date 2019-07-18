@@ -62,6 +62,7 @@ SDL_PROC(void, glShaderSource, (GLuint, GLsizei, const GLchar* const*, const GLi
 #endif
 SDL_PROC(void, glTexImage2D, (GLenum, GLint, GLint, GLsizei, GLsizei, GLint, GLenum, GLenum, const void *))
 SDL_PROC(void, glTexParameteri, (GLenum, GLenum, GLint))
+SDL_PROC(void, glTexParameterf, (GLenum, GLenum, GLfloat))
 SDL_PROC(void, glTexSubImage2D, (GLenum, GLint, GLint, GLint, GLsizei, GLsizei, GLenum, GLenum, const GLvoid *))
 SDL_PROC(void, glUniform1i, (GLint, GLint))
 SDL_PROC(void, glUniform4f, (GLint, GLfloat, GLfloat, GLfloat, GLfloat))

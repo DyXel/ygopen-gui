@@ -38,10 +38,10 @@ bool Program::Link()
 	// Bind attribute names to their indexes
 	static const char* ATTR_NAMES[ATTR_COUNT] =
 	{
-		"pos",
-		"color",
-		"index",
-		"texCoord"
+		"in_pos",
+		"in_color",
+		"in_texCoord",
+		"in_index", // unused?
 	};
 	for(int i = 0; i < ATTR_COUNT; i++)
 		glBindAttribLocation(ref, i, ATTR_NAMES[i]);
@@ -63,7 +63,7 @@ bool Program::Link()
 	// Get uniform locations (if it has them)
 	static const char* UNI_NAMES[UNI_COUNT] =
 	{
-		"model",
+		"in_model",
 	};
 	for(int i = 0; i < UNI_COUNT; i++)
 		uni[i] = glGetUniformLocation(ref, UNI_NAMES[i]);

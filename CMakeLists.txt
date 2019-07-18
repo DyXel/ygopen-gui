@@ -15,9 +15,12 @@ target_sources(${PROJECT_EXECUTABLE} PRIVATE
                ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_include.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_include.hpp
                ${CMAKE_CURRENT_SOURCE_DIR}/drawing/primitive.hpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/texture.hpp
                ${CMAKE_CURRENT_SOURCE_DIR}/drawing/types.hpp
                ${CMAKE_CURRENT_SOURCE_DIR}/drawing/dummy/primitive.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/drawing/dummy/primitive.hpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/dummy/texture.cpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/dummy/texture.hpp
                ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_core/primitive.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_core/primitive.hpp
                ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_es/primitive.cpp
@@ -27,6 +30,8 @@ target_sources(${PROJECT_EXECUTABLE} PRIVATE
                ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_shared/program.hpp
                ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_shared/shader.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_shared/shader.hpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_shared/texture.cpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_shared/texture.hpp
                ${CMAKE_CURRENT_SOURCE_DIR}/states/loading.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/states/loading.hpp
                ${CMAKE_CURRENT_SOURCE_DIR}/states/menu.cpp

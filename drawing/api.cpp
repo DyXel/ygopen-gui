@@ -1,13 +1,14 @@
 #include <SDL.h>
 #include <SDL_assert.h>
 #include "api.hpp"
-#include "primitive.hpp"
 #include "gl_include.hpp"
 #include "dummy/primitive.hpp"
+#include "dummy/texture.hpp"
 #include "gl_core/primitive.hpp"
 #include "gl_es/primitive.hpp"
 #include "gl_shared/program.hpp"
 #include "gl_shared/shader.hpp"
+#include "gl_shared/texture.hpp"
 
 namespace Drawing
 {
@@ -26,28 +27,36 @@ static SDL_GLContext glCtx = nullptr;
 
 // Basic GL stuff
 static const GLchar* PRIMITIVE_VERTEX_SHADER_SRC =
-R"(
-#version 100
-attribute vec3 pos;
-attribute vec4 color;
-varying vec4 fsColor;
-uniform mat4 model;
+R"(#version 100
+
+attribute vec3 in_pos;
+attribute vec4 in_color;
+attribute vec2 in_texCoord;
+
+varying vec4 out_color;
+varying vec2 out_texCoord;
+
+uniform mat4 in_model;
+
 void main()
 {
-	gl_Position = model * vec4(pos, 1.0);
-	fsColor = color;
-}
-)";
+	gl_Position = in_model * vec4(in_pos, 1.0);
+	out_color = in_color;
+	out_texCoord = in_texCoord;
+})";
 static const GLchar* PRIMITIVE_FRAGMENT_SHADER_SRC =
-R"(
-#version 100
+R"(#version 100
 precision mediump float;
-varying vec4 fsColor;
+
+varying vec4 out_color; // input from vertex shader
+varying vec2 out_texCoord; // input from vertex shader
+
+uniform sampler2D tex;
+
 void main()
 {
-	gl_FragColor = fsColor;
-}
-)";
+	gl_FragColor = out_color + texture2D(tex, out_texCoord);
+})";
 static std::shared_ptr<Detail::GLShared::Program> glPrimProg;
 
 inline void LoadGLPrimProg()
@@ -316,6 +325,24 @@ Primitive NewPrimitive()
 		case NOT_LOADED: break;
 	}
 	return std::make_shared<Detail::Dummy::Primitive>();
+}
+
+Texture NewTexture()
+{
+	SDL_assert(activeBackend);
+	switch(activeBackend)
+	{
+		case OPENGL_CORE:
+		{
+			return std::make_shared<Detail::GLShared::Texture>();
+		}
+		case OPENGL_ES:
+		{
+			return std::make_shared<Detail::GLShared::Texture>();
+		}
+		case NOT_LOADED: break;
+	}
+	return std::make_shared<Detail::Dummy::Texture>();
 }
 
 } // API

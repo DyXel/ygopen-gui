@@ -18,6 +18,8 @@ public:
 	
 	virtual void SetMatrix(const Matrix& matrix) = 0; // Normally Model Matrix
 	
+	virtual void SetTexture(const Texture& texture) = 0;
+	
 	virtual void Draw() = 0;
 };
 

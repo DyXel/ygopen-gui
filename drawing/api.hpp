@@ -3,6 +3,8 @@
 #include <memory>
 #include <vector>
 
+#include "types.hpp"
+
 struct SDL_Window;
 
 // Its highly unlike we are ever going to use more than 1 context (window)
@@ -13,16 +15,6 @@ struct SDL_Window;
 // namespace to a class (maybe a drop-in replacement for SDL_Renderer).
 namespace Drawing
 {
-
-namespace Detail
-{
-class IPrimitive;
-}
-// Primitive: Draw object with no texture but vertices and colors instead
-// Texture: Holds a texture. You attach these to Sprites and Models
-// Sprite: 2D draw object. Offers easy way to manipulate its coords on screen
-// Model: 3D draw object. You probably need to apply transformations to these
-using Primitive = std::shared_ptr<class Detail::IPrimitive>;
 
 // Available Backends
 enum Backend
@@ -46,6 +38,7 @@ void UpdateDrawableSize(int* w, int* h);
 
 // Functions to get new drawing objects
 Primitive NewPrimitive();
+Texture NewTexture();
 
 } // API
 

@@ -1,5 +1,6 @@
 #include "primitive.hpp"
 #include "../gl_shared/program.hpp"
+#include "../gl_shared/texture.hpp"
 
 namespace Drawing
 {
@@ -67,9 +68,18 @@ void Primitive::SetMatrix(const Matrix& matrix)
 	mat = matrix;
 }
 
+void Primitive::SetTexture(const Drawing::Texture& texture)
+{
+	tex = std::dynamic_pointer_cast<GLShared::Texture>(texture);
+}
+
 void Primitive::Draw()
 {
 	program.Use();
+	if(tex.use_count() > 0)
+		tex->Bind();
+	else
+		glBindTexture(GL_TEXTURE_2D, 0);
 	program.SetModelMatrix(mat);
 	glBindVertexArray(vao);
 	if(drawByIndex)

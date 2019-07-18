@@ -1,6 +1,7 @@
 #ifndef DRAWING_GL_CORE_PRIMITIVE_HPP
 #define DRAWING_GL_CORE_PRIMITIVE_HPP
 #include <array>
+#include <memory>
 #include "../gl_include.hpp"
 #include "../primitive.hpp"
 #include "../types.hpp"
@@ -15,6 +16,7 @@ namespace Detail
 namespace GLShared
 {
 class Program;
+class Texture;
 } // GLShared
 
 namespace GLCore
@@ -33,6 +35,8 @@ public:
 	
 	void SetMatrix(const Matrix& matrix) override;
 	
+	void SetTexture(const Texture& texture) override;
+	
 	void Draw() override;
 	
 	// Extended public functions
@@ -45,6 +49,7 @@ private:
 	GLenum mode{GL_TRIANGLES};
 	std::size_t drawCount{0};
 	Matrix mat{1.0f};
+	std::shared_ptr<GLShared::Texture> tex;
 };
 
 } // GLCore

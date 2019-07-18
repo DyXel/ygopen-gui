@@ -1,4 +1,5 @@
 #include "primitive.hpp"
+#include "../texture.hpp"
 
 namespace Drawing
 {
@@ -28,6 +29,9 @@ void Primitive::SetIndices([[maybe_unused]] const Indices& indices)
 {}
 
 void Primitive::SetMatrix([[maybe_unused]] const Matrix& matrix)
+{}
+
+void Primitive::SetTexture([[maybe_unused]] const Texture& texture)
 {}
 
 void Primitive::Draw()

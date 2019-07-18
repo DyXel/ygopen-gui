@@ -1,5 +1,6 @@
 #ifndef DRAWING_TYPES_HPP
 #define DRAWING_TYPES_HPP
+#include <memory>
 #include <vector>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
@@ -48,6 +49,15 @@ enum PrimitiveDrawMode
 	PDM_TRIANGLE_FAN = 5, // Triangles, current connected to first and last
 	PDM_TRIANGLES = 6 // Triangles, each one taking a span of 3 vertices
 };
+
+namespace Detail
+{
+class IPrimitive;
+class ITexture;
+}
+
+using Primitive = std::shared_ptr<class Detail::IPrimitive>;
+using Texture = std::shared_ptr<class Detail::ITexture>;
 
 } // Drawing
 #endif // DRAWING_TYPES_HPP
