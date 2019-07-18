@@ -35,6 +35,7 @@ public:
 	
 	void SetMatrix(const Matrix& matrix) override;
 	
+	void SetTexCoords(const TexCoords& texCoords) override;
 	void SetTexture(const Texture& texture) override;
 	
 	void Draw() override;

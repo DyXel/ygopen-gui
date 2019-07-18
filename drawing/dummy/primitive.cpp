@@ -31,6 +31,9 @@ void Primitive::SetIndices([[maybe_unused]] const Indices& indices)
 void Primitive::SetMatrix([[maybe_unused]] const Matrix& matrix)
 {}
 
+void Primitive::SetTexCoords([[maybe_unused]] const TexCoords& texCoords)
+{}
+
 void Primitive::SetTexture([[maybe_unused]] const Texture& texture)
 {}
 

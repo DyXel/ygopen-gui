@@ -68,6 +68,17 @@ void Primitive::SetMatrix(const Matrix& matrix)
 	mat = matrix;
 }
 
+void Primitive::SetTexCoords(const TexCoords& texCoords)
+{
+	const std::size_t numBytes = texCoords.size() * TEXCOORD_SIZE;
+	glBindVertexArray(vao);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[GLShared::ATTR_TEXCOORDS]);
+	glBufferData(GL_ARRAY_BUFFER, numBytes, texCoords.data(), GL_STATIC_DRAW);
+	glVertexAttribPointer(GLShared::ATTR_TEXCOORDS, TEXCOORD_LENGTH, GL_FLOAT,
+	                      GL_FALSE, 0, (GLvoid*)0);
+	glEnableVertexAttribArray(GLShared::ATTR_TEXCOORDS);
+}
+
 void Primitive::SetTexture(const Drawing::Texture& texture)
 {
 	tex = std::dynamic_pointer_cast<GLShared::Texture>(texture);
