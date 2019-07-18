@@ -1,5 +1,5 @@
-#ifndef __GAME_STATE_HPP__
-#define __GAME_STATE_HPP__
+#ifndef GAME_STATE_HPP
+#define GAME_STATE_HPP
 #include <SDL.h>
 
 namespace YGOpen
@@ -18,4 +18,4 @@ public:
 } // State
 } // YGOpen
 
-#endif // __GAME_STATE_HPP__
+#endif // GAME_STATE_HPP

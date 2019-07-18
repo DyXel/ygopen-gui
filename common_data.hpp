@@ -12,7 +12,7 @@ namespace YGOpen
 // between states and the main GameInstance.
 struct CommonData
 {
-	CommonData(GameInstance& gi) : gi(gi) {};
+	CommonData(GameInstance& gi) : gi(gi) {}
 	GameInstance& gi; // Owner of this data
 	// Synchronization data
 	

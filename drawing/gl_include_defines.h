@@ -7,8 +7,8 @@
  * Profile: core
  * Extensions: ARB_ES2_compatibility
  */
-#ifndef _GALOGEN_HEADER_
-#define _GALOGEN_HEADER_
+#ifndef GALOGEN_HEADER
+#define GALOGEN_HEADER
 #if defined(__gl_h_) || defined(__GL_H__) || defined(__glext_h_) || defined(__GLEXT_H_) || defined(__gltypes_h_) || defined(__glcorearb_h_) || defined(__gl_glcorearb_h)
 #error Galogen-generated header included after a GL header.
 #endif
@@ -1020,4 +1020,4 @@ typedef int  GLint;
 #define GL_MAX_TRANSFORM_FEEDBACK_BUFFERS 0x8E70
 #define GL_INTERLEAVED_ATTRIBS 0x8C8C
 
-#endif /* _GALOGEN_HEADER_ */
+#endif /* GALOGEN_HEADER */

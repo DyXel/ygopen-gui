@@ -1,5 +1,5 @@
-#ifndef __CONFIGS_HPP__
-#define __CONFIGS_HPP__
+#ifndef CONFIGS_HPP
+#define CONFIGS_HPP
 #include <static_configs.hpp>
 #include <nlohmann/json.hpp>
 
@@ -15,4 +15,4 @@ nlohmann::json DefaultGlobalConfig();
 
 } // YGOpen
 
-#endif // __CONFIGS_HPP__
+#endif // CONFIGS_HPP

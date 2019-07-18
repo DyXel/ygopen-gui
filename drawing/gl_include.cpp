@@ -1,4 +1,4 @@
-#define _DONT_DEFINE_POINTERS_GL
+#define DONT_DEFINE_POINTERS_GL
 #include "gl_include.hpp"
 
 #ifndef USE_PROTOTYPES_GL

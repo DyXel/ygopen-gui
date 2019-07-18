@@ -101,13 +101,13 @@
 #include "gl_core_funcs.h"
 #undef SDL_PROC
 #else
-#ifndef _DONT_DEFINE_POINTERS_GL
+#ifndef DONT_DEFINE_POINTERS_GL
 // NOTE: actual functions located at gl_include.cpp
 #define SDL_PROC(ret,func,params) extern ret (APIENTRY *func) params;
 #include "gl_es2_funcs.h"
 #include "gl_core_funcs.h"
 #undef SDL_PROC
-#endif // _DONT_DEFINE_POINTERS_GL
+#endif // DONT_DEFINE_POINTERS_GL
 #endif // USE_PROTOTYPES_GL
 
 #endif // GL_INCLUDE_HPP

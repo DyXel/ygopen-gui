@@ -1,5 +1,5 @@
-#ifndef __LOADING_HPP__
-#define __LOADING_HPP__
+#ifndef LOADING_HPP
+#define LOADING_HPP
 #include <memory>
 #include <queue>
 #include <future>
@@ -30,4 +30,4 @@ private:
 } // State
 } // YGOpen
 
-#endif // __LOADING_HPP__
+#endif // LOADING_HPP

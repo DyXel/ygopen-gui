@@ -1,5 +1,5 @@
-#ifndef __GAME_INSTANCE_HPP__
-#define __GAME_INSTANCE_HPP__
+#ifndef GAME_INSTANCE_HPP
+#define GAME_INSTANCE_HPP
 #include <memory>
 #include <SDL.h>
 #include "drawing/api.hpp"
@@ -39,4 +39,4 @@ private:
 
 } // YGOpen
 
-#endif // __GAME_INSTANCE_HPP__
+#endif // GAME_INSTANCE_HPP

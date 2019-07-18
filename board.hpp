@@ -1,5 +1,5 @@
-#ifndef __BOARD_HPP__
-#define __BOARD_HPP__
+#ifndef BOARD_HPP
+#define BOARD_HPP
 
 #include <cstdint>
 #include <algorithm>
@@ -823,4 +823,4 @@ else
 
 } // YGOpen
 
-#endif // __BOARD_HPP__
+#endif // BOARD_HPP
