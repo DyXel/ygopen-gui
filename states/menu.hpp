@@ -3,7 +3,6 @@
 #include <memory>
 #include "../state.hpp"
 #include "../drawing/api.hpp"
-#include "../drawing/primitive.hpp"
 
 namespace OGL
 {
