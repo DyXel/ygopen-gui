@@ -21,7 +21,7 @@ Menu::Menu(const std::shared_ptr<CommonData>& ptrData) : data(ptrData)
 	{
 		SDL_Log("IMG_Load: %s\n", IMG_GetError());
 	}
-	if(image->format->format != SDL_PIXELFORMAT_RGBA32)
+	if(image && image->format->format != SDL_PIXELFORMAT_RGBA32)
 	{
 		SDL_Log("Changing image format");
 		SDL_Surface* temp = image;
@@ -33,7 +33,8 @@ Menu::Menu(const std::shared_ptr<CommonData>& ptrData) : data(ptrData)
 		SDL_FreeSurface(temp);
 	}
 	
-	texture->SetImage(image->w, image->h, image->pixels);
+	if(image)
+		texture->SetImage(image->w, image->h, image->pixels);
 	
 	SDL_FreeSurface(image);
 	
