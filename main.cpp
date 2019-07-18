@@ -5,7 +5,6 @@
 #include "drawing/api.hpp"
 
 static std::unique_ptr<YGOpen::GameInstance> gi;
-[[noreturn]] static void quit(int rc);
 
 #if defined(__ANDROID__)
 static constexpr Drawing::Backend DEFAULT_BACKEND = Drawing::OPENGL_ES;
@@ -15,11 +14,13 @@ static constexpr Drawing::Backend DEFAULT_BACKEND = Drawing::OPENGL_CORE;
 
 int main(/*int argc, char *argv[]*/)
 {
+	static int exitCode = 0;
 	if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
 	{
 		SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
 		                "Unable to initialize SDL: %s\n", SDL_GetError());
-		quit(1);
+		exitCode = 1;
+		goto quit;
 	}
 	{
 		static constexpr auto IMG_INIT_FLAGS = IMG_INIT_PNG;
@@ -28,7 +29,8 @@ int main(/*int argc, char *argv[]*/)
 			SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
 			                "Unable to initialize SDL_image: %s",
 			                IMG_GetError());
-			quit(1);
+			exitCode = 1;
+			goto quit;
 		}
 	}
 	// TODO: select backend from commandline and fallback
@@ -38,7 +40,8 @@ int main(/*int argc, char *argv[]*/)
 	{
 		SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
 		                "Unable to initialize main game instance");
-		quit(1);
+		exitCode = 1;
+		goto quit;
 	}
 	SDL_Event e;
 	while(!gi->IsExiting())
@@ -48,13 +51,9 @@ int main(/*int argc, char *argv[]*/)
 		gi->TickOnce();
 		gi->DrawOnce();
 	}
-	quit(0);
-}
-
-static void quit(int rc)
-{
+quit:
 	gi.reset();
 	IMG_Quit();
 	SDL_Quit();
-	exit(rc);
+	return exitCode;
 }
