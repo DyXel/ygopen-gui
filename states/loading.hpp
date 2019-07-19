@@ -7,18 +7,22 @@
 
 namespace YGOpen
 {
-struct CommonData;
+
+struct GameData;
+
 namespace State
 {
 
 class Loading : public IState
 {
 public:
-	Loading(const std::shared_ptr<CommonData>& ptrData);
+	Loading(GameData* ptrData);
 	virtual ~Loading();
 	void OnEvent(const SDL_Event& e) override;
 	void Tick() override;
 	void Draw() override;
+	
+	GameData* data; // Accessed by SDL_ThreadFunction
 private:
 	using LoadJob = std::packaged_task<bool()>;
 	std::queue<LoadJob> pendingJobs;

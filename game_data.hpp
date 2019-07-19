@@ -1,20 +1,26 @@
-#ifndef COMMON_DATA_HPP
-#define COMMON_DATA_HPP
+#ifndef GAME_DATA_HPP
+#define GAME_DATA_HPP
 #include <memory>
-#include "game_instance.hpp"
 #include "configs.hpp"
+
+struct SDL_mutex;
 
 namespace YGOpen
 {
+
+class GameInstance;
+
 // Data which is shared across the same GameInstance and its states,
 // Which should include: live configuration, textures, synchronization
 // primitives.. Basically everything that should be shared
 // between states and the main GameInstance.
-struct CommonData
+struct GameData
 {
-	CommonData(GameInstance& gi) : gi(gi) {}
-	GameInstance& gi; // Owner of this data
+	GameData(GameInstance& gi);
+	int Init();
+	GameInstance& instance; // Owner of this data
 	// Synchronization data
+	SDL_mutex* cfgMutex;
 	
 	// Video data
 	int canvasWidth{DEFAULT_WINDOW_WIDTH}; // Canvas width in pixels
@@ -23,10 +29,10 @@ struct CommonData
 	
 	// Miscellaneous data
 	std::unique_ptr<Configs> cfgs;
-	bool isRecording{false};
-	bool isPowerSaving{false};
+	bool recording{false};
+	bool powerSaving{false};
 };
 
 } // YGOpen
 
-#endif // COMMON_DATA_HPP
+#endif // GAME_DATA_HPP

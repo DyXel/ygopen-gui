@@ -1,6 +1,7 @@
 #include "loading.hpp"
 #include "menu.hpp"
-#include "../common_data.hpp"
+#include "../game_data.hpp"
+#include "../game_instance.hpp"
 
 #include <string>
 #include <fstream>
@@ -14,7 +15,7 @@ namespace YGOpen
 namespace State
 {
 
-Loading::Loading(const std::shared_ptr<CommonData>& ptrData) : data(ptrData)
+Loading::Loading(GameData* ptrData) : data(ptrData)
 {
 	SDL_Log("State::Loading constructor");
 	pendingJobs.emplace([this]() -> bool
@@ -84,7 +85,8 @@ void Loading::Tick()
 
 void Loading::Draw()
 {
-
+	Drawing::API::Clear();
+	Drawing::API::Present();
 }
 
 } // State

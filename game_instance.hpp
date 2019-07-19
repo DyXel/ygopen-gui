@@ -2,15 +2,18 @@
 #define GAME_INSTANCE_HPP
 #include <memory>
 #include <SDL.h>
+#include "game_data.hpp"
 #include "drawing/api.hpp"
 
 namespace YGOpen
 {
-struct CommonData;
+
 namespace State
 {
+
 class IState;
-}
+
+} // State
 
 class GameInstance
 {
@@ -31,9 +34,9 @@ public:
 	void DrawOnce();
 	void SetState(std::shared_ptr<State::IState> newState);
 private:
+	GameData data;
 	bool exiting{false};
 	SDL_Window* window{nullptr};
-	std::shared_ptr<CommonData> data;
 	std::shared_ptr<State::IState> state;
 };
 

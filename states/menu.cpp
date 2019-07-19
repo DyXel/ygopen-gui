@@ -2,7 +2,7 @@
 
 #include <SDL_image.h>
 
-#include "../common_data.hpp"
+#include "../game_data.hpp"
 
 #include "../drawing/primitive.hpp"
 #include "../drawing/texture.hpp"
@@ -10,10 +10,11 @@
 
 namespace YGOpen
 {
+
 namespace State
 {
 
-Menu::Menu(const std::shared_ptr<CommonData>& ptrData) : data(ptrData)
+Menu::Menu(GameData* ptrData) : data(ptrData)
 {
 	auto texture = Drawing::API::NewTexture();
 	SDL_Surface* image = IMG_Load("texture.png");
@@ -91,4 +92,5 @@ void Menu::Draw()
 }
 
 } // State
+
 } // YGOpen

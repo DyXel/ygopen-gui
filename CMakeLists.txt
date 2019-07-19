@@ -1,8 +1,9 @@
 target_sources(${PROJECT_EXECUTABLE} PRIVATE
                ${CMAKE_CURRENT_SOURCE_DIR}/board.hpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/common_data.hpp
                ${CMAKE_CURRENT_SOURCE_DIR}/configs.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/configs.hpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/game_data.cpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/game_data.hpp
                ${CMAKE_CURRENT_SOURCE_DIR}/game_instance.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/game_instance.hpp
                ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
