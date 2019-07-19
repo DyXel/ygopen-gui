@@ -12,11 +12,8 @@ static constexpr Drawing::Backend DEFAULT_BACKEND = Drawing::OPENGL_ES;
 static constexpr Drawing::Backend DEFAULT_BACKEND = Drawing::OPENGL_CORE;
 #endif
 
-int main(int argc, char *argv[])
+extern "C" int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 {
-	// https://stackoverflow.com/questions/6847360/error-lnk2019-unresolved-external-symbol-main-referenced-in-function-tmainc
-	(void)argc;
-	(void)argv;
 	static int exitCode = 0;
 	if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
 	{
