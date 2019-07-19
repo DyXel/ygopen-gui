@@ -1,0 +1,3 @@
+[submodule "lib/ocgcore-proto"]
+	path = lib/ocgcore-proto
+	url = https://github.com/DyXel/ocgcore-proto.git
