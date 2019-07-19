@@ -2,7 +2,7 @@
 #define LOADING_HPP
 #include <memory>
 #include <queue>
-#include <future>
+#include <SDL_thread.h>
 #include "../state.hpp"
 
 namespace YGOpen
@@ -24,14 +24,13 @@ public:
 	
 	GameData* data; // Accessed by SDL_ThreadFunction
 private:
-	using LoadJob = std::packaged_task<bool()>;
-	std::queue<LoadJob> pendingJobs;
-	std::queue<LoadJob>::size_type totalJobs;
-	std::future<bool> lastJob;
-	std::shared_ptr<CommonData> data;
+	bool cancelled{false};
+	std::queue<SDL_ThreadFunction> pendingJobs;
+	std::queue<SDL_ThreadFunction>::size_type totalJobs;
 };
 
 } // State
+
 } // YGOpen
 
 #endif // LOADING_HPP
