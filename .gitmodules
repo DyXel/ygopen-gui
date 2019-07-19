@@ -1,3 +1,6 @@
 [submodule "lib/ocgcore-proto"]
 	path = lib/ocgcore-proto
 	url = https://github.com/DyXel/ocgcore-proto.git
+[submodule "lib/ygopen"]
+	path = lib/ygopen
+	url = https://github.com/DyXel/ygopen.git
