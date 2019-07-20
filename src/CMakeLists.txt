@@ -1,46 +1,46 @@
-target_sources(${PROJECT_EXECUTABLE} PRIVATE
-               ${CMAKE_CURRENT_SOURCE_DIR}/board.hpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/configs.cpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/configs.hpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/game_data.cpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/game_data.hpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/game_instance.cpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/game_instance.hpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/state.hpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/api.cpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/api.hpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_core_funcs.h
-               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_es2_funcs.h
-               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_include_defines.h
-               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_include.cpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_include.hpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/primitive.hpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/texture.hpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/types.hpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/dummy/primitive.cpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/dummy/primitive.hpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/dummy/texture.cpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/dummy/texture.hpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_core/primitive.cpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_core/primitive.hpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_es/primitive.cpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_es/primitive.hpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_shared/common.hpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_shared/program.cpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_shared/program.hpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_shared/shader.cpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_shared/shader.hpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_shared/texture.cpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/drawing/gl_shared/texture.hpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/states/loading.cpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/states/loading.hpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/states/menu.cpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/states/menu.hpp
-               )
-
-target_include_directories(${PROJECT_EXECUTABLE} PRIVATE
-                           ${CMAKE_CURRENT_SOURCE_DIR})
+# Add source files
+set(CSR ${CMAKE_CURRENT_SOURCE_DIR})
+target_sources(ygopen-gui PRIVATE
+	${CSR}/board.hpp
+	${CSR}/configs.cpp
+	${CSR}/configs.hpp
+	${CSR}/game_data.cpp
+	${CSR}/game_data.hpp
+	${CSR}/game_instance.cpp
+	${CSR}/game_instance.hpp
+	${CSR}/main.cpp
+	${CSR}/state.hpp
+	${CSR}/drawing/api.cpp
+	${CSR}/drawing/api.hpp
+	${CSR}/drawing/gl_core_funcs.h
+	${CSR}/drawing/gl_es2_funcs.h
+	${CSR}/drawing/gl_include_defines.h
+	${CSR}/drawing/gl_include.cpp
+	${CSR}/drawing/gl_include.hpp
+	${CSR}/drawing/primitive.hpp
+	${CSR}/drawing/texture.hpp
+	${CSR}/drawing/types.hpp
+	${CSR}/drawing/dummy/primitive.cpp
+	${CSR}/drawing/dummy/primitive.hpp
+	${CSR}/drawing/dummy/texture.cpp
+	${CSR}/drawing/dummy/texture.hpp
+	${CSR}/drawing/gl_core/primitive.cpp
+	${CSR}/drawing/gl_core/primitive.hpp
+	${CSR}/drawing/gl_es/primitive.cpp
+	${CSR}/drawing/gl_es/primitive.hpp
+	${CSR}/drawing/gl_shared/common.hpp
+	${CSR}/drawing/gl_shared/program.cpp
+	${CSR}/drawing/gl_shared/program.hpp
+	${CSR}/drawing/gl_shared/shader.cpp
+	${CSR}/drawing/gl_shared/shader.hpp
+	${CSR}/drawing/gl_shared/texture.cpp
+	${CSR}/drawing/gl_shared/texture.hpp
+	${CSR}/states/loading.cpp
+	${CSR}/states/loading.hpp
+	${CSR}/states/menu.cpp
+	${CSR}/states/menu.hpp
+)
+unset(CSR)
 
 set(CONFIG_PATH "configs/")
 set(CARD_PICTURES_PATH "pics/")
@@ -51,6 +51,6 @@ set(GAME_SOUNDS_PATH "assets/sounds/")
 set(GLOBAL_CONFIG_FILENAME "global.json")
 
 configure_file(static_configs.hpp.in static_configs.hpp @ONLY)
-
-target_include_directories(${PROJECT_EXECUTABLE} PRIVATE
-                           ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(ygopen-gui PRIVATE
+	${CMAKE_CURRENT_BINARY_DIR}
+)
