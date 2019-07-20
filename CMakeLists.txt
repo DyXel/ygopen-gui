@@ -39,6 +39,7 @@ endif()
 find_package(glm REQUIRED)
 
 add_subdirectory(lib/ocgcore-proto)
+add_subdirectory(lib/ygopen)
 
 # Add include directories from dependencies to executable
 target_include_directories(ygopen-gui PRIVATE
@@ -59,6 +60,7 @@ target_link_libraries(ygopen-gui PRIVATE
 	nlohmann_json::nlohmann_json
 	fmt::fmt
 	ocgcore-proto
+	ygopen
 )
 
 # Add compiler definitions to executable
