@@ -86,3 +86,26 @@ target_compile_options(ygopen-gui PRIVATE
 
 # Source files
 add_subdirectory(src)
+
+if(MSVC)
+    # vcpkg x64-windows-static uses static CRT
+	set(CompilerFlags
+        CMAKE_CXX_FLAGS
+        CMAKE_CXX_FLAGS_DEBUG
+        CMAKE_CXX_FLAGS_RELEASE
+        CMAKE_C_FLAGS
+        CMAKE_C_FLAGS_DEBUG
+        CMAKE_C_FLAGS_RELEASE
+        )
+	foreach(CompilerFlag ${CompilerFlags})
+  		string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
+	endforeach()
+	# set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>") # CMake 3.15
+
+    # Required by SDL2_image
+    find_package(PNG REQUIRED)
+    find_package(ZLIB REQUIRED)
+    target_link_libraries(ygopen-gui PRIVATE 
+        ${PNG_LIBRARY}
+        ${ZLIB_LIBRARIES})
+endif()
