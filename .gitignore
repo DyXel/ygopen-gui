@@ -1,2 +1,6 @@
 build/
 lib/json/
+
+# Android build stuff
+android-project/.gradle
+android-project/app/.externalNativeBuild
