@@ -2,7 +2,13 @@
 # Uncomment this if you're using STL in your project
 # You can find more information here:
 # https://developer.android.com/ndk/guides/cpp-support
-# APP_STL := c++_shared
+APP_STL := c++_shared
+
+# Exceptions needed
+APP_CPPFLAGS := -fexceptions
+
+# RTTI
+# APP_CPPFLAGS := -frtti
 
 APP_ABI := armeabi-v7a arm64-v8a x86 x86_64
 
