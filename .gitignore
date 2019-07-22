@@ -4,3 +4,11 @@ lib/json/
 # Android build stuff
 android-project/.gradle
 android-project/app/.externalNativeBuild
+
+# Android dependencies
+android-project/app/jni/fmt
+android-project/app/jni/glm
+android-project/app/jni/nlohmann
+android-project/app/jni/protobuf
+android-project/app/jni/SDL
+android-project/app/jni/SDL2_image
