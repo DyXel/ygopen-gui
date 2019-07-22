@@ -1,4 +1,5 @@
 #include "configs.hpp"
+#include "SDL_platform.h"
 
 namespace YGOpen
 {
@@ -12,8 +13,13 @@ const char* GAME_SOUNDS_PATH = u8"assets/sounds/";
 const char* GLOBAL_CONFIG_FILENAME = u8"global.json";
 
 const char* DEFAULT_WINDOW_TITLE = u8"YGOpen";
+#ifndef __ANDROID__
 const int DEFAULT_WINDOW_WIDTH = 1280;
 const int DEFAULT_WINDOW_HEIGHT = 720;
+#else // let android figure it out
+const int DEFAULT_WINDOW_WIDTH = 0;
+const int DEFAULT_WINDOW_HEIGHT = 0;
+#endif
 const float DEFAULT_DPI = 96.0f;
 
 static const nlohmann::json DEFAULT_GLOBAL_CONFIG_JSON =
