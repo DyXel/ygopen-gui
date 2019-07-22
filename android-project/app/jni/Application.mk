@@ -1,7 +1,3 @@
-
-# Uncomment this if you're using STL in your project
-# You can find more information here:
-# https://developer.android.com/ndk/guides/cpp-support
 APP_STL := c++_shared
 
 # Exceptions needed
