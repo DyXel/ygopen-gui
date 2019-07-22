@@ -41,16 +41,3 @@ target_sources(ygopen-gui PRIVATE
 	${CSR}/states/menu.hpp
 )
 unset(CSR)
-
-set(CONFIG_PATH "configs/")
-set(CARD_PICTURES_PATH "pics/")
-set(CARD_DATABASES_PATH "dbs/")
-set(GAME_IMAGES_PATH "assets/textures/")
-set(GAME_SOUNDS_PATH "assets/sounds/")
-
-set(GLOBAL_CONFIG_FILENAME "global.json")
-
-configure_file(static_configs.hpp.in static_configs.hpp @ONLY)
-target_include_directories(ygopen-gui PRIVATE
-	${CMAKE_CURRENT_BINARY_DIR}
-)
