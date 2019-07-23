@@ -626,33 +626,33 @@ else
 
 HANDLE(SwapCards)
 {
-	const auto& swapCards = info.swap_cards();
-	const auto& card1Info = swapCards.card1();
-	const auto& card2Info = swapCards.card2();
-	const auto card1Place = PlaceFromCardInfo(card1Info);
-	const auto card2Place = PlaceFromCardInfo(card2Info);
-	C tmp;
-	if(IsPile(card1Place))
-	{
-		auto& pile = GetPile(card1Place);
-		tmp = std::move(pile[std::get<2>(card1Place)]);
-		pile.erase(pile.begin() + std::get<2>(card1Place));
-	}
-	else
-	{
-		tmp = std::move(fieldZones[card1Place]);
-		fieldZones.erase(card1Place);
-	}
-	MoveSingle(card2Place, card1Place);
-	if(IsPile(card2Place))
-	{
-		auto& pile = GetPile(card2Place);
-		pile.emplace(pile.begin() + std::get<2>(card2Place), std::move(tmp));
-	}
-	else
-	{
-		fieldZones[card2Place] = std::move(tmp);
-	}
+const auto& swapCards = info.swap_cards();
+const auto& card1Info = swapCards.card1();
+const auto& card2Info = swapCards.card2();
+const auto card1Place = PlaceFromCardInfo(card1Info);
+const auto card2Place = PlaceFromCardInfo(card2Info);
+C tmp;
+if(IsPile(card1Place))
+{
+	auto& pile = GetPile(card1Place);
+	tmp = std::move(pile[std::get<2>(card1Place)]);
+	pile.erase(pile.begin() + std::get<2>(card1Place));
+}
+else
+{
+	tmp = std::move(fieldZones[card1Place]);
+	fieldZones.erase(card1Place);
+}
+MoveSingle(card2Place, card1Place);
+if(IsPile(card2Place))
+{
+	auto& pile = GetPile(card2Place);
+	pile.emplace(pile.begin() + std::get<2>(card2Place), std::move(tmp));
+}
+else
+{
+	fieldZones[card2Place] = std::move(tmp);
+}
 }
 
 HANDLE(ShuffleLocation)
