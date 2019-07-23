@@ -1,5 +1,6 @@
 build/
 lib/json/
+lib/fmt/
 
 # Android build stuff
 android-project/.gradle
