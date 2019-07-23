@@ -12,34 +12,17 @@ if(NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
-# Set up C++ project and executable
-project(ygopen-gui CXX)
+# Set up project and executable
+project(ygopen-gui C CXX)
 add_executable(ygopen-gui)
 
 # Find all dependencies
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
 find_package(SDL2_ttf REQUIRED)
-
-option(YGOPEN_GUI_USE_SYSTEM_JSON "Use system's JSON for Modern C++" ON)
-if(YGOPEN_GUI_USE_SYSTEM_JSON)
-	find_package(nlohmann_json REQUIRED)
-else()
-	set(JSON_BuildTests OFF CACHE INTERNAL "")
-	add_subdirectory(lib/json)
-endif()
-
-option(YGOPEN_GUI_USE_SYSTEM_FMT "Use system's {fmt} library" ON)
-if(YGOPEN_GUI_USE_SYSTEM_FMT)
-	find_package(fmt REQUIRED)
-else()
-	add_subdirectory(lib/fmt) # TODO: test needed
-endif()
-
 find_package(glm REQUIRED)
 
-add_subdirectory(lib/ocgcore-proto)
-add_subdirectory(lib/ygopen)
+add_subdirectory(lib)
 
 # Add include directories from dependencies to executable
 target_include_directories(ygopen-gui PRIVATE
