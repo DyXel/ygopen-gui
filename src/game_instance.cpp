@@ -4,6 +4,21 @@
 namespace YGOpen
 {
 
+bool GetDisplayIndexFromWindow(SDL_Window* window, int* displayIndex)
+{
+	// NOTE: not checking number of displays because its assumed a display
+	// exist if window creation succeeded.
+	*displayIndex = SDL_GetWindowDisplayIndex(window);
+	if(*displayIndex < 0)
+	{
+		SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
+		            "Unable to get display for current window: %s",
+		            SDL_GetError());
+		return false;
+	}
+	return true;
+}
+
 GameInstance::GameInstance() : data(*this)
 {}
 
@@ -33,19 +48,18 @@ int GameInstance::Init(Drawing::Backend backend)
 		                "Unable to load selected backend");
 		return -1;
 	}
+	if(data.Init() != 0)
+	{
+		SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
+		                "Unable to init game data.");
+		return -1;
+	}
 	auto SetDPI = [this]() -> bool
 	{
-		// NOTE: not checking number of displays because we already were able
-		// to create a window which means we have at least 1 display available.
-		int displayIndex = SDL_GetWindowDisplayIndex(window);
-		if(displayIndex < 0)
-		{
-			SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
-			            "Unable to get display for current window: %s",
-			            SDL_GetError());
+		int displayIndex;
+		if(!GetDisplayIndexFromWindow(window, &displayIndex))
 			return false;
-		}
-	    if(SDL_GetDisplayDPI(displayIndex, &data.dpi, nullptr, nullptr) < 0)
+		if(SDL_GetDisplayDPI(displayIndex, &data.dpi, nullptr, nullptr) < 0)
 		{
 			SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
 			            "Unable to get display DPI: %s",
@@ -61,12 +75,32 @@ int GameInstance::Init(Drawing::Backend backend)
 		data.dpi = DEFAULT_DPI;
 	}
 	SDL_Log("Current DPI: %.2f", static_cast<double>(data.dpi));
-	if(data.Init() != 0)
+#ifndef __ANDROID__
+	auto SetWindowSize = [this]() -> bool
 	{
-		SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
-		                "Unable to init game data.");
-		return -1;
+		int displayIndex;
+		SDL_Rect r;
+		if(!GetDisplayIndexFromWindow(window, &displayIndex))
+			return false;
+		if(SDL_GetDisplayUsableBounds(displayIndex, &r) < 0)
+		{
+			SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
+			            "Unable to get display usable bounds: %s",
+			            SDL_GetError());
+			return false;
+		}
+		int fWidth  = static_cast<int>(static_cast<float>(r.w - r.x) * 0.8f);
+		int fHeight = static_cast<int>(static_cast<float>(r.h - r.y) * 0.8f);
+		SDL_Log("Setting window size to (%i, %i)", fWidth, fHeight);
+		SDL_SetWindowSize(window, fWidth, fHeight);
+		return true;
+	};
+	if(!SetWindowSize())
+	{
+		SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
+		            "Unable to set window size. Using default.");
 	}
+#endif // #ifndef __ANDROID__
 	// TODO: move this to the API
 // 	if(SDL_GL_SetSwapInterval(-1) == -1)
 // 	{
