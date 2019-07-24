@@ -106,17 +106,9 @@ void Loading::Tick()
 			SDL_DetachThread(t);
 		}
 	}
-	else if(status == SDL_MUTEX_TIMEDOUT) // Waiting...
+	else // status == SDL_MUTEX_TIMEDOUT // Waiting...
 	{
 		
-	}
-	else if (status == -1) // Error
-	{
-		SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
-		                "SDL_TryLockMutex: %s\n",
-		                SDL_GetError());
-		data->instance.Exit();
-		return;
 	}
 }
 
