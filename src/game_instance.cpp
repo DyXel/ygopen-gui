@@ -5,9 +5,7 @@ namespace YGOpen
 {
 
 GameInstance::GameInstance() : data(*this)
-{
-	SDL_Log("GameInstance constructor");
-}
+{}
 
 GameInstance::~GameInstance()
 {
@@ -15,7 +13,6 @@ GameInstance::~GameInstance()
 	if(window != nullptr)
 		SDL_DestroyWindow(window);
 	Drawing::API::UnloadBackend();
-	SDL_Log("GameInstance destructor");
 }
 
 int GameInstance::Init(Drawing::Backend backend)

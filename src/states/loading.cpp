@@ -62,17 +62,12 @@ int LoadGlobalConfig(void* voidData)
 
 Loading::Loading(GameData* ptrData) : data(ptrData)
 {
-	SDL_Log("State::Loading constructor");
-	
 	pendingJobs.emplace(&LoadGlobalConfig);
-	
 	totalJobs = pendingJobs.size();
 }
 
 Loading::~Loading()
-{
-	SDL_Log("State::Loading destructor");
-}
+{}
 
 void Loading::OnEvent(const SDL_Event& e)
 {
