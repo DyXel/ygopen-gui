@@ -79,9 +79,8 @@ inline bool GLCreateContext(SDL_Window* window)
 	glCtx = SDL_GL_CreateContext(window);
 	if(glCtx == nullptr)
 	{
-		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
-		             "Unable to create OpenGL context: %s",
-		SDL_GetError());
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "SDL_GL_CreateContext: %s",
+		             SDL_GetError());
 		return false;
 	}
 	return true;
