@@ -51,8 +51,8 @@ int LoadGlobalConfig(void* voidData)
 	}
 	catch(std::exception& e)
 	{
-		SDL_LogCritical(SDL_LOG_CATEGORY_ERROR,
-		             "Could not apply user settings: %s", e.what());
+		SDL_LogWarn(SDL_LOG_CATEGORY_ERROR,
+		            "Could not apply user settings: %s", e.what());
 	}
 // 	std::cout << data->cfgs->global.dump(1, '\t', false, nlohmann::json::error_handler_t::replace);
 	
