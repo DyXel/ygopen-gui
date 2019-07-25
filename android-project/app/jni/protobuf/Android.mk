@@ -135,7 +135,7 @@ LOCAL_SRC_FILES := \
   google/protobuf/util/time_util.cc                            \
   google/protobuf/util/type_resolver_util.cc
 
-LOCAL_CFLAGS := -std=c++11 -fexceptions -frtti -DHAVE_PTHREAD
+LOCAL_CPPFLAGS := -std=c++11 -fexceptions -frtti -DHAVE_PTHREAD
 LOCAL_LDLIBS := -llog -lz
 
 LOCAL_MODULE_FILENAME := libprotobuf
