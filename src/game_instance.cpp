@@ -132,16 +132,12 @@ void GameInstance::PropagateEvent(const SDL_Event& e)
 	if(e.type == SDL_QUIT)
 		exiting = true;
 	
-	// If the event is a window resize/size change event and the changed window
-	// is the one managed by this game instance then change the viewport/extent
+	// If the event is a window size change event update the viewport/extent
 	// to match the new size, also, save the new size.
 	if(e.type == SDL_WINDOWEVENT &&
-	   (e.window.event == SDL_WINDOWEVENT_RESIZED ||
-	   e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) &&
-	   e.window.windowID == SDL_GetWindowID(window))
+	   e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
 	{
-		Drawing::API::UpdateDrawableSize(&data.canvasWidth,
-		                                 &data.canvasHeight);
+		Drawing::API::UpdateDrawableSize(&data.canvasWidth, &data.canvasHeight);
 	}
 	state->OnEvent(e);
 }
