@@ -2,6 +2,8 @@
 
 #include <SDL_image.h>
 
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "../game_data.hpp"
 
 #include "../drawing/primitive.hpp"
@@ -67,6 +69,7 @@ Menu::Menu(GameData* ptrData) : data(ptrData)
 	triangle->SetTexCoords(texCoords);
 	triangle->SetTexture(texture);
 	triangle->SetColors(colors);
+	OnResize();
 }
 
 Menu::~Menu()
@@ -76,7 +79,11 @@ Menu::~Menu()
 
 void Menu::OnEvent([[maybe_unused]] const SDL_Event& e)
 {
-
+	if(e.type == SDL_WINDOWEVENT &&
+	   e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
+	{
+		OnResize();
+	}
 }
 
 void Menu::Tick()
@@ -89,6 +96,22 @@ void Menu::Draw()
 	Drawing::API::Clear();
 	triangle->Draw();
 	Drawing::API::Present();
+}
+
+void Menu::OnResize()
+{
+	float ar;
+	if(data->canvasWidth >= data->canvasHeight)
+	{
+		ar = static_cast<float>(data->canvasWidth) / data->canvasHeight;
+		proj = glm::ortho(-ar, ar, 1.0f, -1.0f);
+	}
+	else
+	{
+		ar = static_cast<float>(data->canvasHeight) / data->canvasWidth;
+		proj = glm::ortho(-1.0f, 1.0f, ar, -ar);
+	}
+	triangle->SetMatrix(proj);
 }
 
 } // State

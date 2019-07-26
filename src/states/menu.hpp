@@ -22,7 +22,10 @@ public:
 	void Draw() override;
 private:
 	GameData* data;
+	Drawing::Matrix proj;
 	Drawing::Primitive triangle;
+	
+	void OnResize();
 };
 
 } // State
