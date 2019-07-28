@@ -10,8 +10,16 @@ namespace GUI
 
 class Button : public IElement
 {
+public:
+	Button();
 	void Resize(const Drawing::Matrix& mat, const SDL_Rect& rect);
 	void Draw();
+// 	void OnSelect(bool selecting);
+// 	void OnPress(bool releasing);
+private:
+	Drawing::Primitive shadow;
+	Drawing::Primitive content;
+	Drawing::Primitive lines;
 };
 
 }
