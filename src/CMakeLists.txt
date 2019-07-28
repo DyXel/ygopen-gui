@@ -35,6 +35,9 @@ target_sources(ygopen-gui PRIVATE
 	${CSR}/drawing/gl_shared/shader.hpp
 	${CSR}/drawing/gl_shared/texture.cpp
 	${CSR}/drawing/gl_shared/texture.hpp
+	${CSR}/gui/button.cpp
+	${CSR}/gui/button.hpp
+	${CSR}/gui/element.hpp
 	${CSR}/states/loading.cpp
 	${CSR}/states/loading.hpp
 	${CSR}/states/menu.cpp
