@@ -72,11 +72,6 @@ Menu::Menu(GameData* ptrData) : data(ptrData)
 	OnResize();
 }
 
-Menu::~Menu()
-{
-
-}
-
 void Menu::OnEvent([[maybe_unused]] const SDL_Event& e)
 {
 	if(e.type == SDL_WINDOWEVENT &&

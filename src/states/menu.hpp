@@ -16,7 +16,7 @@ class Menu : public IState
 {
 public:
 	Menu(GameData* ptrData);
-	virtual ~Menu();
+	virtual ~Menu() = default;
 	void OnEvent(const SDL_Event& e) override;
 	void Tick() override;
 	void Draw() override;
