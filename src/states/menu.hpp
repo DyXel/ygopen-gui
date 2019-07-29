@@ -1,8 +1,10 @@
 #ifndef MENU_HPP
 #define MENU_HPP
 #include <memory>
-#include "../state.hpp"
 #include "../drawing/api.hpp"
+#include "../gui/environment.hpp"
+#include "../gui/button.hpp"
+#include "../state.hpp"
 
 namespace YGOpen
 {
@@ -23,7 +25,10 @@ public:
 private:
 	GameData* data;
 	Drawing::Matrix proj;
-	Drawing::Primitive triangle;
+	Drawing::Primitive bkg;
+	GUI::Environment env;
+	GUI::Button duelBtn;
+	GUI::Button exitBtn;
 	
 	void OnResize();
 };

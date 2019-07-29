@@ -2,7 +2,7 @@
 
 #include <SDL_image.h>
 
-#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/matrix_transform.hpp> // glm::ortho
 
 #include "../game_data.hpp"
 
@@ -15,98 +15,108 @@ namespace YGOpen
 
 namespace State
 {
+constexpr auto BKG_DRAWING_MODE = Drawing::PDM_TRIANGLE_STRIP;
+const Drawing::Color BKG_COLOR = {0.110f, 0.114f, 0.125f, 1.0f};
+static const Drawing::Vertices BKG_VERTICES =
+{
+	// Corners
+	{ -1.0f,  1.0f, 0.0f},
+	{  1.0f,  1.0f, 0.0f},
+	{ -1.0f, -1.0f, 0.0f},
+	{  1.0f, -1.0f, 0.0f},
+};
+static const Drawing::Colors BKG_COLORS =
+{
+	BKG_COLOR, BKG_COLOR, BKG_COLOR, BKG_COLOR,
+};
 
 Menu::Menu(GameData* ptrData) : data(ptrData)
 {
-	auto texture = Drawing::API::NewTexture();
-	SDL_Surface* image = IMG_Load("texture.png");
-	if(!image)
-	{
-		SDL_Log("IMG_Load: %s\n", IMG_GetError());
-	}
-	if(image && image->format->format != SDL_PIXELFORMAT_RGBA32)
-	{
-		SDL_Log("Changing image format");
-		SDL_Surface* temp = image;
-		image = SDL_ConvertSurfaceFormat(temp, SDL_PIXELFORMAT_RGBA32, 0);
-		if(!image)
-		{
-			SDL_Log("SDL_ConvertSurfaceFormat: %s\n", SDL_GetError());
-		}
-		SDL_FreeSurface(temp);
-	}
+// 	auto texture = Drawing::API::NewTexture();
+// 	SDL_Surface* image = IMG_Load("texture.png");
+// 	if(!image)
+// 	{
+// 		SDL_Log("IMG_Load: %s\n", IMG_GetError());
+// 	}
+// 	if(image && image->format->format != SDL_PIXELFORMAT_RGBA32)
+// 	{
+// 		SDL_Log("Changing image format");
+// 		SDL_Surface* temp = image;
+// 		image = SDL_ConvertSurfaceFormat(temp, SDL_PIXELFORMAT_RGBA32, 0);
+// 		if(!image)
+// 		{
+// 			SDL_Log("SDL_ConvertSurfaceFormat: %s\n", SDL_GetError());
+// 		}
+// 		SDL_FreeSurface(temp);
+// 	}
+// 	
+// 	if(image)
+// 		texture->SetImage(image->w, image->h, image->pixels);
+// 	
+// 	SDL_FreeSurface(image);
+	bkg = Drawing::API::NewPrimitive();
 	
-	if(image)
-		texture->SetImage(image->w, image->h, image->pixels);
+	// Background quad
+	bkg->SetDrawMode(BKG_DRAWING_MODE);
+	bkg->SetVertices(BKG_VERTICES);
+	bkg->SetColors(BKG_COLORS);
 	
-	SDL_FreeSurface(image);
+	duelBtn = std::make_shared<GUI::CButton>(env);
+	exitBtn = std::make_shared<GUI::CButton>(env);
 	
-	triangle = Drawing::API::NewPrimitive();
-	const Drawing::Vertices vertices =
-	{
-		{ -1.0f,  1.0f, 0.0f},
-		{  1.0f,  1.0f, 0.0f},
-		{ -1.0f, -1.0f, 0.0f},
-		{  1.0f, -1.0f, 0.0f},
-	};
-	const Drawing::Colors colors =
-	{
-		{1.0f, 0.0f, 0.0f, 1.0f},
-		{0.0f, 1.0f, 0.0f, 1.0f},
-		{0.0f, 0.0f, 1.0f, 1.0f},
-		{1.0f, 1.0f, 1.0f, 1.0f},
-	};
-	const Drawing::TexCoords texCoords =
-	{
-		{0.0f, 0.0f},
-		{1.0f, 0.0f},
-		{0.0f, 1.0f},
-		{1.0f, 1.0f},
-	};
+	env.Add(duelBtn);
+	env.Add(exitBtn);
 	
-	triangle->SetDrawMode(Drawing::PDM_TRIANGLE_STRIP);
-	triangle->SetVertices(vertices);
-	triangle->SetTexCoords(texCoords);
-	triangle->SetTexture(texture);
-	triangle->SetColors(colors);
 	OnResize();
 }
 
-void Menu::OnEvent([[maybe_unused]] const SDL_Event& e)
+void Menu::OnEvent(const SDL_Event& e)
 {
 	if(e.type == SDL_WINDOWEVENT &&
 	   e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
 	{
 		OnResize();
 	}
+	env.PropagateEvent(e);
 }
 
 void Menu::Tick()
 {
-
+	env.Tick();
 }
 
 void Menu::Draw()
 {
-	Drawing::API::Clear();
-	triangle->Draw();
+// 	Drawing::API::Clear();
+	bkg->Draw();
+	env.Draw();
 	Drawing::API::Present();
 }
 
 void Menu::OnResize()
 {
-	float ar;
-	if(data->canvasWidth >= data->canvasHeight)
+	SDL_Rect bCanvas;
+	const float w = static_cast<float>(data->canvasWidth);
+	const float h = static_cast<float>(data->canvasHeight);
+	proj = glm::ortho<float>(0.0f, w, h, 0.0f);
+	if(w / h >= 1.0f)
 	{
-		ar = static_cast<float>(data->canvasWidth) / data->canvasHeight;
-		proj = glm::ortho(-ar, ar, 1.0f, -1.0f);
+		bCanvas.w = static_cast<int>(w * 0.2f);
+		bCanvas.h = static_cast<int>(h * 0.05f);
 	}
 	else
 	{
-		ar = static_cast<float>(data->canvasHeight) / data->canvasWidth;
-		proj = glm::ortho(-1.0f, 1.0f, ar, -ar);
+		bCanvas.w = static_cast<int>(w * 0.8f);
+		bCanvas.h = static_cast<int>(h * 0.1f);
 	}
-	triangle->SetMatrix(proj);
+	
+	const float bSeparation = h * 0.025f;
+	
+	bCanvas.x = static_cast<int>(w / 2.0f - bCanvas.w / 2);
+	bCanvas.y = bSeparation;
+	duelBtn->Resize(proj, bCanvas);
+	bCanvas.y += bSeparation + bCanvas.h;
+	exitBtn->Resize(proj, bCanvas);
 }
 
 } // State
