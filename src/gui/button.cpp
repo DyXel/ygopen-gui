@@ -100,7 +100,7 @@ static const Drawing::Colors LINES_COLORS =
 	LINE_RIGHT, LINE_RIGHT,
 };
 
-Button::Button()
+CButton::CButton(Environment& env) : IElement(env)
 {
 	shadow = Drawing::API::NewPrimitive();
 	content = Drawing::API::NewPrimitive();
@@ -117,8 +117,9 @@ Button::Button()
 	lines->SetColors(LINES_COLORS);
 }
 
-void Button::Resize(const Drawing::Matrix& mat, const SDL_Rect& rect)
+void CButton::Resize(const Drawing::Matrix& mat, const SDL_Rect& rect)
 {
+	r = rect;
 	const float w = static_cast<float>(rect.w);
 	const float h = static_cast<float>(rect.h);
 	
@@ -154,11 +155,21 @@ void Button::Resize(const Drawing::Matrix& mat, const SDL_Rect& rect)
 	lines->SetMatrix(projModel);
 }
 
-void Button::Draw()
+void CButton::Draw()
 {
 	shadow->Draw();
 	content->Draw();
 	lines->Draw();
+}
+
+bool CButton::OnEvent(const SDL_Event& e)
+{
+	return false;
+}
+
+void CButton::SetCallback(Callback callback)
+{
+	cb = callback;
 }
 
 } // GUI
