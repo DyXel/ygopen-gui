@@ -1,8 +1,6 @@
 #ifndef GUI_ELEMENT_HPP
 #define GUI_ELEMENT_HPP
-#include <SDL.h>
-
-#include "../drawing/types.hpp"
+#include "common.hpp"
 
 namespace YGOpen
 {
@@ -10,17 +8,32 @@ namespace YGOpen
 namespace GUI
 {
 
-class IElement
+class Environment;
+
+class IElement : std::enable_shared_from_this<IElement>
 {
 public:
+	IElement(Environment& env) : env(env) {}
 	virtual void Resize(const Drawing::Matrix& mat, const SDL_Rect& rect) = 0;
-	virtual void Tick() {};
 	virtual void Draw() = 0;
-	virtual void OnSelect(bool selecting) {};
+protected:
+	friend Environment;
+	Environment& env;
+
+	virtual void Tick() {};
+
+	// Controls both when gaining and losing focus
+	virtual void OnFocus([[maybe_unused]] bool gained) {};
+
+	// Handles any event. The event is not passed to subsequent elements
+	// (managed by GUI::Environment) if the function returns true.
+	virtual bool OnEvent([[maybe_unused]] const SDL_Event& e) = 0;
 };
 
-}
+using Element = std::shared_ptr<IElement>;
 
-}
+} // GUI
+
+} // YGOpen
 
 #endif // GUI_ELEMENT_HPP
