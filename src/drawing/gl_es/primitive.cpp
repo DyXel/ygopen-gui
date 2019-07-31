@@ -11,7 +11,10 @@ namespace Detail
 namespace GLES
 {
 
-Primitive::Primitive(const GLShared::Program& program) : program(program)
+Primitive::Primitive(const GLShared::Program& program,
+                     const GLShared::Program& texProgram) :
+	program(program),
+	texProgram(texProgram)
 {
 	glGenBuffers(GLShared::ATTR_COUNT, vbo.data());
 	usedVbo.fill(false);
@@ -72,13 +75,21 @@ void Primitive::SetTexture(const Drawing::Texture& texture)
 
 void Primitive::Draw()
 {
-	program.Use();
-	if(tex.use_count() > 0)
+	if(tex)
+	{
+		texProgram.Use();
 		tex->Bind();
+		texProgram.SetModelMatrix(mat);
+	}
 	else
+	{
+		program.Use();
 		glBindTexture(GL_TEXTURE_2D, 0);
+		program.SetModelMatrix(mat);
+	}
 	program.SetModelMatrix(mat);
 	TryEnableVBO(GLShared::ATTR_VERTICES);
+	// TODO: generate empty array to get same behaviour as OpenGL Core
 	TryEnableVBO(GLShared::ATTR_COLORS);
 	TryEnableVBO(GLShared::ATTR_TEXCOORDS);
 	TryEnableVBO(GLShared::ATTR_INDICES);

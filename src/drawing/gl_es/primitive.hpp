@@ -25,7 +25,8 @@ namespace GLES
 class Primitive : public IPrimitive
 {
 public:
-	Primitive(const GLShared::Program& program);
+	Primitive(const GLShared::Program& program,
+	          const GLShared::Program& texProgram);
 	virtual ~Primitive();
 	
 	void SetDrawMode(const PrimitiveDrawMode& pdm) override;
@@ -44,6 +45,7 @@ public:
 	void SetProgram(const GLShared::Program& program);
 private:
 	const GLShared::Program& program;
+	const GLShared::Program& texProgram;
 	std::array<GLuint, GLShared::ATTR_COUNT> vbo;
 	std::array<bool, GLShared::ATTR_COUNT> usedVbo;
 	GLenum mode{GL_TRIANGLES};

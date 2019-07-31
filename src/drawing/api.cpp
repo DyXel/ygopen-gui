@@ -19,14 +19,37 @@ namespace API
 static Backend preloadedBackend = NOT_LOADED;
 static Backend activeBackend = NOT_LOADED;
 static SDL_Window* sdlWindow = nullptr;
+
+// GL stuff
 static SDL_GLContext glCtx = nullptr;
-
-// GLCore stuff
-
-// GLES stuff
-
-// Basic GL stuff
 static const GLchar* PRIMITIVE_VERTEX_SHADER_SRC =
+R"(#version 100
+
+attribute vec3 in_pos;
+attribute vec4 in_color;
+
+varying vec4 out_color;
+
+uniform mat4 in_model;
+
+void main()
+{
+	gl_Position = in_model * vec4(in_pos, 1.0);
+	out_color = in_color;
+})";
+static const GLchar* PRIMITIVE_FRAGMENT_SHADER_SRC =
+R"(#version 100
+precision mediump float;
+
+varying vec4 out_color; // input from vertex shader
+
+uniform sampler2D tex;
+
+void main()
+{
+	gl_FragColor = out_color;
+})";
+static const GLchar* TEXTURED_PRIMITIVE_VERTEX_SHADER_SRC =
 R"(#version 100
 
 attribute vec3 in_pos;
@@ -44,7 +67,7 @@ void main()
 	out_color = in_color;
 	out_texCoord = in_texCoord;
 })";
-static const GLchar* PRIMITIVE_FRAGMENT_SHADER_SRC =
+static const GLchar* TEXTURED_PRIMITIVE_FRAGMENT_SHADER_SRC =
 R"(#version 100
 precision mediump float;
 
@@ -57,11 +80,12 @@ void main()
 {
 	gl_FragColor = out_color + texture2D(tex, out_texCoord);
 })";
-static std::shared_ptr<Detail::GLShared::Program> glPrimProg;
 
-inline void LoadGLPrimProg()
+static std::shared_ptr<Detail::GLShared::Program> glPrimProg;
+static std::shared_ptr<Detail::GLShared::Program> glTexPrimProg;
+
+inline void GLLoadProgs()
 {
-	// Load default Primitive Shaders and Program
 	glPrimProg = std::make_shared<Detail::GLShared::Program>();
 	{
 		Detail::GLShared::Shader vs(GL_VERTEX_SHADER,
@@ -72,6 +96,26 @@ inline void LoadGLPrimProg()
 		glPrimProg->Attach(fs);
 		glPrimProg->Link();
 	}
+	
+	glTexPrimProg = std::make_shared<Detail::GLShared::Program>();
+	{
+		Detail::GLShared::Shader vs(GL_VERTEX_SHADER,
+		                            TEXTURED_PRIMITIVE_VERTEX_SHADER_SRC);
+		Detail::GLShared::Shader fs(GL_FRAGMENT_SHADER,
+		                            TEXTURED_PRIMITIVE_FRAGMENT_SHADER_SRC);
+		glTexPrimProg->Attach(vs);
+		glTexPrimProg->Attach(fs);
+		glTexPrimProg->Link();
+	}
+}
+
+inline void GLEnableStuff()
+{
+	// Disable face culling
+	glDisable(GL_CULL_FACE);
+	// Enable default blending
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 inline bool GLCreateContext(SDL_Window* window)
@@ -133,7 +177,8 @@ inline bool LoadGLCore(SDL_Window* window)
 #include "gl_core_funcs.h"
 #endif
 	GLLogStrings();
-	LoadGLPrimProg();
+	GLEnableStuff();
+	GLLoadProgs();
 	return true;
 }
 
@@ -145,7 +190,8 @@ inline bool LoadGLES(SDL_Window* window)
 #include "gl_es2_funcs.h"
 #endif
 	GLLogStrings();
-	LoadGLPrimProg();
+	GLEnableStuff();
+	GLLoadProgs();
 	return true;
 }
 
@@ -160,7 +206,7 @@ bool PreloadBackend(Backend backend)
 			SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
 			SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
 			SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
-			// 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
+			SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 8);
 			SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
 			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
@@ -173,7 +219,7 @@ bool PreloadBackend(Backend backend)
 			SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
 			SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
 			SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
-			// 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
+			SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 8);
 			SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
 			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
@@ -314,11 +360,13 @@ Primitive NewPrimitive()
 	{
 		case OPENGL_CORE:
 		{
-			return std::make_shared<Detail::GLCore::Primitive>(*glPrimProg);
+			return std::make_shared<Detail::GLCore::Primitive>(*glPrimProg,
+			                                                   *glTexPrimProg);
 		}
 		case OPENGL_ES:
 		{
-			return std::make_shared<Detail::GLES::Primitive>(*glPrimProg);
+			return std::make_shared<Detail::GLES::Primitive>(*glPrimProg,
+			                                                 *glTexPrimProg);
 		}
 		case NOT_LOADED: break;
 	}

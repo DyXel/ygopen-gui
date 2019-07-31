@@ -25,7 +25,8 @@ namespace GLCore
 class Primitive : public IPrimitive
 {
 public:
-	Primitive(const GLShared::Program& program);
+	Primitive(const GLShared::Program& program,
+	          const GLShared::Program& texProgram);
 	virtual ~Primitive();
 	
 	void SetDrawMode(const PrimitiveDrawMode& pdm) override;
@@ -39,11 +40,9 @@ public:
 	void SetTexture(const Texture& texture) override;
 	
 	void Draw() override;
-	
-	// Extended public functions
-	void SetProgram(const GLShared::Program& program);
 private:
 	const GLShared::Program& program;
+	const GLShared::Program& texProgram;
 	bool drawByIndex{false};
 	GLuint vao;
 	std::array<GLuint, GLShared::ATTR_COUNT> vbo;

@@ -11,7 +11,10 @@ namespace Detail
 namespace GLCore
 {
 
-Primitive::Primitive(const GLShared::Program& program) : program(program)
+Primitive::Primitive(const GLShared::Program& program,
+                     const GLShared::Program& texProgram) :
+	program(program),
+	texProgram(texProgram)
 {
 	glGenVertexArrays(1, &vao);
 	glGenBuffers(GLShared::ATTR_COUNT, vbo.data());
@@ -89,12 +92,18 @@ void Primitive::SetTexture(const Drawing::Texture& texture)
 
 void Primitive::Draw()
 {
-	program.Use();
-	if(tex.use_count() > 0)
+	if(tex)
+	{
+		texProgram.Use();
 		tex->Bind();
+		texProgram.SetModelMatrix(mat);
+	}
 	else
+	{
+		program.Use();
 		glBindTexture(GL_TEXTURE_2D, 0);
-	program.SetModelMatrix(mat);
+		program.SetModelMatrix(mat);
+	}
 	glBindVertexArray(vao);
 	if(drawByIndex)
 		glDrawElements(mode, drawCount, GL_UNSIGNED_SHORT, nullptr);

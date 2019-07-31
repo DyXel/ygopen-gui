@@ -32,34 +32,35 @@ static const Drawing::Colors BKG_COLORS =
 
 Menu::Menu(GameData* ptrData) : data(ptrData)
 {
-// 	auto texture = Drawing::API::NewTexture();
-// 	SDL_Surface* image = IMG_Load("texture.png");
-// 	if(!image)
-// 	{
-// 		SDL_Log("IMG_Load: %s\n", IMG_GetError());
-// 	}
-// 	if(image && image->format->format != SDL_PIXELFORMAT_RGBA32)
-// 	{
-// 		SDL_Log("Changing image format");
-// 		SDL_Surface* temp = image;
-// 		image = SDL_ConvertSurfaceFormat(temp, SDL_PIXELFORMAT_RGBA32, 0);
-// 		if(!image)
-// 		{
-// 			SDL_Log("SDL_ConvertSurfaceFormat: %s\n", SDL_GetError());
-// 		}
-// 		SDL_FreeSurface(temp);
-// 	}
-// 	
-// 	if(image)
-// 		texture->SetImage(image->w, image->h, image->pixels);
-// 	
-// 	SDL_FreeSurface(image);
+	auto texture = Drawing::API::NewTexture();
+	SDL_Surface* image = IMG_Load("texture.png");
+	if(!image)
+	{
+		SDL_Log("IMG_Load: %s\n", IMG_GetError());
+	}
+	if(image && image->format->format != SDL_PIXELFORMAT_RGBA32)
+	{
+		SDL_Log("Changing image format");
+		SDL_Surface* temp = image;
+		image = SDL_ConvertSurfaceFormat(temp, SDL_PIXELFORMAT_RGBA32, 0);
+		if(!image)
+		{
+			SDL_Log("SDL_ConvertSurfaceFormat: %s\n", SDL_GetError());
+		}
+		SDL_FreeSurface(temp);
+	}
+	if(image)
+		texture->SetImage(image->w, image->h, image->pixels);
+	SDL_FreeSurface(image);
+	
 	bkg = Drawing::API::NewPrimitive();
 	
 	// Background quad
 	bkg->SetDrawMode(BKG_DRAWING_MODE);
 	bkg->SetVertices(BKG_VERTICES);
-	bkg->SetColors(BKG_COLORS);
+// 	bkg->SetColors(BKG_COLORS);
+	bkg->SetTexCoords({{0.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 1.0f}, {1.0f, 1.0f}});
+	bkg->SetTexture(texture);
 	
 	duelBtn = std::make_shared<GUI::CButton>(env);
 	exitBtn = std::make_shared<GUI::CButton>(env);
