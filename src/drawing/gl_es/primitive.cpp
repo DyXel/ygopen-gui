@@ -87,12 +87,12 @@ void Primitive::Draw()
 		glBindTexture(GL_TEXTURE_2D, 0);
 		program.SetModelMatrix(mat);
 	}
-	program.SetModelMatrix(mat);
 	TryEnableVBO(GLShared::ATTR_VERTICES);
-	// TODO: generate empty array to get same behaviour as OpenGL Core
 	TryEnableVBO(GLShared::ATTR_COLORS);
 	TryEnableVBO(GLShared::ATTR_TEXCOORDS);
-	TryEnableVBO(GLShared::ATTR_INDICES);
+	// TODO: indices are never bound. 
+	// This will break as soon as using diff indices
+// 	TryEnableVBO(GLShared::ATTR_INDICES);
 	if(usedVbo[GLShared::ATTR_INDICES])
 		glDrawElements(mode, drawCount, GL_UNSIGNED_SHORT, nullptr);
 	else
@@ -113,7 +113,10 @@ void Primitive::TryEnableVBO(const GLShared::AttrLocation& attrLoc)
 		static_cast<GLint>(TEXCOORD_LENGTH),
 	};
 	if(!usedVbo[attrLoc])
+	{
+		glDisableVertexAttribArray(attrLoc);
 		return;
+	}
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[attrLoc]);
 	glVertexAttribPointer(attrLoc, ATTR_LENGTHS[attrLoc], GL_FLOAT,
 	                      GL_FALSE, 0, nullptr);
