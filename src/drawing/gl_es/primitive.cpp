@@ -59,6 +59,16 @@ void Primitive::SetIndices(const Indices& indices)
 	usedVbo[GLShared::ATTR_INDICES] = true;
 }
 
+void Primitive::SetMatrix(const Matrix& matrix)
+{
+	mat = matrix;
+}
+
+void Primitive::SetBrightness(const float val)
+{
+	brightness = val;
+}
+
 void Primitive::SetTexCoords(const TexCoords& texCoords)
 {
 	const std::size_t numBytes = texCoords.size() * TEXCOORD_SIZE;
@@ -80,12 +90,14 @@ void Primitive::Draw()
 		texProgram.Use();
 		tex->Bind();
 		texProgram.SetModelMatrix(mat);
+		texProgram.SetBrightness(brightness);
 	}
 	else
 	{
 		program.Use();
 		glBindTexture(GL_TEXTURE_2D, 0);
 		program.SetModelMatrix(mat);
+		texProgram.SetBrightness(brightness);
 	}
 	TryEnableVBO(GLShared::ATTR_VERTICES);
 	TryEnableVBO(GLShared::ATTR_COLORS);
@@ -97,11 +109,6 @@ void Primitive::Draw()
 		glDrawElements(mode, drawCount, GL_UNSIGNED_SHORT, nullptr);
 	else
 		glDrawArrays(mode, 0, drawCount);
-}
-
-void Primitive::SetMatrix(const Matrix& matrix)
-{
-	mat = matrix;
 }
 
 void Primitive::TryEnableVBO(const GLShared::AttrLocation& attrLoc)

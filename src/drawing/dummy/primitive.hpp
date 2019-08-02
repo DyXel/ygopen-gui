@@ -25,6 +25,7 @@ public:
 	void SetIndices(const Indices& indices) override;
 	
 	void SetMatrix(const Matrix& matrix) override;
+	void SetBrightness(const float val) override;
 	
 	void SetTexCoords(const TexCoords& texCoords) override;
 	void SetTexture(const Texture& texture) override;

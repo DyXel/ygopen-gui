@@ -73,6 +73,11 @@ void Primitive::SetMatrix(const Matrix& matrix)
 	mat = matrix;
 }
 
+void Primitive::SetBrightness(const float val)
+{
+	brightness = val;
+}
+
 void Primitive::SetTexCoords(const TexCoords& texCoords)
 {
 	const std::size_t numBytes = texCoords.size() * TEXCOORD_SIZE;
@@ -97,12 +102,14 @@ void Primitive::Draw()
 		texProgram.Use();
 		tex->Bind();
 		texProgram.SetModelMatrix(mat);
+		texProgram.SetBrightness(brightness);
 	}
 	else
 	{
 		program.Use();
 		glBindTexture(GL_TEXTURE_2D, 0);
 		program.SetModelMatrix(mat);
+		program.SetBrightness(brightness);
 	}
 	glBindVertexArray(vao);
 	if(drawByIndex)

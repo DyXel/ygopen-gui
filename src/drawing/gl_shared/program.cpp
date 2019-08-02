@@ -64,6 +64,7 @@ bool Program::Link()
 	static const char* UNI_NAMES[UNI_COUNT] =
 	{
 		"in_model",
+		"in_brightness",
 	};
 	for(std::size_t i = 0; i < UNI_COUNT; i++)
 		uni[i] = glGetUniformLocation(ref, UNI_NAMES[i]);
@@ -80,6 +81,13 @@ void Program::SetModelMatrix(const Matrix& mat) const
 	if(uni[UNI_MODEL_MAT] == -1)
 		return;
 	glUniformMatrix4fv(uni[UNI_MODEL_MAT], 1, GL_FALSE, glm::value_ptr(mat));
+}
+
+void Program::SetBrightness(const GLfloat val) const
+{
+	if(uni[UNI_BRIGHTNESS_FLOAT] == -1)
+		return;
+	glUniform1f(uni[UNI_BRIGHTNESS_FLOAT], val);
 }
 
 GLuint Program::GetGLRef() const

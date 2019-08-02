@@ -43,11 +43,12 @@ precision mediump float;
 
 varying vec4 out_color; // input from vertex shader
 
-uniform sampler2D tex;
+uniform float in_brightness;
 
 void main()
 {
-	gl_FragColor = out_color;
+	gl_FragColor = out_color *
+	               vec4(in_brightness, in_brightness, in_brightness, 1.0);
 })";
 static const GLchar* TEXTURED_PRIMITIVE_VERTEX_SHADER_SRC =
 R"(#version 100
@@ -74,17 +75,19 @@ precision mediump float;
 varying vec4 out_color; // input from vertex shader
 varying vec2 out_texCoord; // input from vertex shader
 
-uniform sampler2D tex;
+uniform sampler2D in_tex;
+uniform float in_brightness;
 
 void main()
 {
-	gl_FragColor = out_color + texture2D(tex, out_texCoord);
+	gl_FragColor = (out_color + texture2D(in_tex, out_texCoord)) *
+	               vec4(in_brightness, in_brightness, in_brightness, 1.0);
 })";
 
 static std::shared_ptr<Detail::GLShared::Program> glPrimProg;
 static std::shared_ptr<Detail::GLShared::Program> glTexPrimProg;
 
-inline void GLLoadProgs()
+inline void GLLoadPrograms()
 {
 	glPrimProg = std::make_shared<Detail::GLShared::Program>();
 	{
@@ -178,7 +181,7 @@ inline bool LoadGLCore(SDL_Window* window)
 #endif
 	GLLogStrings();
 	GLEnableStuff();
-	GLLoadProgs();
+	GLLoadPrograms();
 	return true;
 }
 
@@ -191,7 +194,7 @@ inline bool LoadGLES(SDL_Window* window)
 #endif
 	GLLogStrings();
 	GLEnableStuff();
-	GLLoadProgs();
+	GLLoadPrograms();
 	return true;
 }
 

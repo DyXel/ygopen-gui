@@ -35,6 +35,7 @@ public:
 	void SetIndices(const Indices& indices) override;
 	
 	void SetMatrix(const Matrix& matrix) override;
+	void SetBrightness(const float val) override;
 	
 	void SetTexCoords(const TexCoords& texCoords) override;
 	void SetTexture(const Texture& texture) override;
@@ -51,6 +52,7 @@ private:
 	GLenum mode{GL_TRIANGLES};
 	GLsizei drawCount{0};
 	Matrix mat{1.0f};
+	float brightness{1.0f};
 	std::shared_ptr<GLShared::Texture> tex;
 	
 	void TryEnableVBO(const GLShared::AttrLocation& attrLoc);

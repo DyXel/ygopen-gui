@@ -26,11 +26,12 @@ public:
 	void Use() const;
 	
 	void SetModelMatrix(const Matrix& mat) const;
+	void SetBrightness(const GLfloat val) const;
 	
 	GLuint GetGLRef() const;
 private:
 	GLuint ref{0};
-	enum {UNI_MODEL_MAT, UNI_COUNT};
+	enum {UNI_MODEL_MAT, UNI_BRIGHTNESS_FLOAT, UNI_COUNT};
 	std::array<GLint, UNI_COUNT> uni;
 };
 
