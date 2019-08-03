@@ -51,7 +51,7 @@ LOCAL_SRC_FILES := $(SRC_PATH)/board.hpp \
 
 LOCAL_CPPFLAGS := -std=c++17 -fexceptions -DFMT_HEADER_ONLY
 
-LOCAL_SHARED_LIBRARIES := SDL2 SDL2_image protobuf ygopen
+LOCAL_SHARED_LIBRARIES := SDL2 SDL2_image protobuf ygopen ocgcore-proto
 
 LOCAL_LDLIBS := -lGLESv1_CM -lGLESv2 -llog
 
