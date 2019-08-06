@@ -1,6 +1,7 @@
 #ifndef GUI_ENVIRONMENT_HPP
 #define GUI_ENVIRONMENT_HPP
 #include <set>
+#include <queue>
 #include "common.hpp"
 #include "element.hpp"
 
@@ -35,6 +36,7 @@ public:
 private:
 	std::set<Element> elements;
 	std::set<Element> tickset;
+	std::queue<Element> ticksetToRemove;
 	Element focused;
 	const float& elapsed;
 };

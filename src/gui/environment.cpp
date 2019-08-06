@@ -21,19 +21,25 @@ void Environment::Remove(const Element& ele)
 
 void Environment::AddToTickSet(const Element& ele)
 {
-	if(elements.count(ele))
+	if(focused == ele || elements.count(ele))
 		tickset.insert(ele);
 }
 
 void Environment::RemoveFromTickSet(const Element& ele)
 {
-	tickset.erase(ele);
+	if(tickset.count(ele))
+		ticksetToRemove.push(ele);
 }
 
 void Environment::Tick()
 {
 	for(auto& ele : tickset)
 		ele->Tick();
+	while(!ticksetToRemove.empty())
+	{
+		tickset.erase(ticksetToRemove.front());
+		ticksetToRemove.pop();
+	}
 }
 
 void Environment::Draw()

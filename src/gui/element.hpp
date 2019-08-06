@@ -10,7 +10,7 @@ namespace GUI
 
 class Environment;
 
-class IElement : std::enable_shared_from_this<IElement>
+class IElement : public std::enable_shared_from_this<IElement>
 {
 public:
 	IElement(Environment& env) : env(env) {}
