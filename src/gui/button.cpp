@@ -2,6 +2,8 @@
 
 #include <glm/gtc/matrix_transform.hpp> // glm::translate
 
+#include "environment.hpp"
+
 #include "../drawing/api.hpp"
 #include "../drawing/primitive.hpp"
 
@@ -86,7 +88,7 @@ static Drawing::Vertices linesVertices =
 	{ 0.0f, 0.0f, 0.0f},
 	{ 1.0f, 0.0f, 0.0f},
 	// Bottom Line
-	{ 0.0f, 1.0f, 0.0f},
+	{ -1.0f, 1.0f, 0.0f},
 	{ 1.0f, 1.0f, 0.0f},
 	// Right Line
 	{ 1.0f, 0.0f, 0.0f},
@@ -127,7 +129,7 @@ void CButton::Resize(const Drawing::Matrix& mat, const SDL_Rect& rect)
 	shadowVertices[1].x = (shadowVertices[5].x = w) + SHADOW_SIZE;
 	shadowVertices[2].y = (shadowVertices[6].y = h) + SHADOW_SIZE;
 	shadowVertices[3].x = (shadowVertices[7].x = w) + SHADOW_SIZE;
-	shadowVertices[3].y = (shadowVertices[7].y = h) + SHADOW_SIZE;	
+	shadowVertices[3].y = (shadowVertices[7].y = h) + SHADOW_SIZE;
 	
 	// Update content vertices
 	contentVertices[1].x = contentVertices[3].x = w;
@@ -162,8 +164,45 @@ void CButton::Draw()
 	lines->Draw();
 }
 
+void CButton::Tick()
+{
+	brightness -= 2.0f * env.GetTimeElapsed();
+	if(brightness <= 1.0f)
+	{
+		brightness = 1.0f;
+		env.RemoveFromTickSet(IElement::shared_from_this());
+	}
+	content->SetBrightness(brightness);
+	lines->SetBrightness(brightness);
+}
+
+void CButton::OnFocus(bool gained)
+{
+	if(gained)
+	{
+		brightness = 2.0f;
+		content->SetBrightness(brightness);
+		lines->SetBrightness(brightness);
+	}
+	else
+	{
+		env.AddToTickSet(IElement::shared_from_this());
+	}
+}
+
 bool CButton::OnEvent(const SDL_Event& e)
 {
+	if(e.type == SDL_MOUSEMOTION)
+	{
+		SDL_Point p = {e.motion.x, e.motion.y};
+		if(SDL_PointInRect(&p, &r))
+		{
+			auto ele = IElement::shared_from_this();
+			env.RemoveFromTickSet(ele);
+			env.Focus(ele);
+			return true;
+		}
+	}
 	return false;
 }
 
