@@ -129,17 +129,20 @@ void GameInstance::Exit()
 
 void GameInstance::PropagateEvent(const SDL_Event& e)
 {
-	if(e.type == SDL_QUIT)
+	const auto eType = e.type;
+	if(eType == SDL_QUIT)
 		exiting = true;
 	
 	// If the event is a window size change event update the viewport/extent
 	// to match the new size, also, save the new size.
-	if(e.type == SDL_WINDOWEVENT &&
+	if(eType == SDL_WINDOWEVENT &&
 	   e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
 	{
 		Drawing::API::UpdateDrawableSize(&data.canvasWidth, &data.canvasHeight);
 	}
-	state->OnEvent(e);
+	
+	if(eType != SDL_SYSWMEVENT)
+		state->OnEvent(e);
 }
 
 void GameInstance::TickOnce()
@@ -148,7 +151,7 @@ void GameInstance::TickOnce()
 		now += 1000u / recording;
 	else
 		now = static_cast<unsigned>(SDL_GetTicks());
-	data.elapsed = static_cast<float>(now - then) * 0.001;
+	data.elapsed = static_cast<float>(now - then) * 0.001f;
 	state->Tick();
 	then = now;
 }
