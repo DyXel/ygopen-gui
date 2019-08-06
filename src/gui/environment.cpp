@@ -6,6 +6,9 @@ namespace YGOpen
 namespace GUI
 {
 
+Environment::Environment(const float& elapsed) : elapsed(elapsed)
+{}
+
 void Environment::Add(const Element& ele)
 {
 	elements.insert(ele);
@@ -65,6 +68,11 @@ void Environment::PropagateEvent(const SDL_Event& e)
 	for(auto& ele : elements)
 		if(ele->OnEvent(e))
 			break;
+}
+
+float Environment::GetTimeElapsed() const
+{
+	return elapsed;
 }
 
 } // GUI

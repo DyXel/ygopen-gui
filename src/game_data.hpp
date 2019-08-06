@@ -33,7 +33,6 @@ struct GameData
 	
 	// Miscellaneous data
 	std::unique_ptr<Configs> cfgs;
-	bool recording{false};
 	bool powerSaving{false};
 };
 

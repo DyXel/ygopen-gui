@@ -38,6 +38,9 @@ private:
 	bool exiting{false};
 	SDL_Window* window{nullptr};
 	std::shared_ptr<State::IState> state;
+	
+	unsigned now{0u}, then{0u};
+	unsigned recording{0u}; // if non 0. Framerate being recorded at.
 };
 
 } // YGOpen

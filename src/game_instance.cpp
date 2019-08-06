@@ -112,8 +112,8 @@ int GameInstance::Init(Drawing::Backend backend)
 	Drawing::API::Clear();
 	Drawing::API::Present();
 	SDL_ShowWindow(window);
-	
 	state = std::make_shared<State::Loading>(&data);
+	now = then = static_cast<unsigned>(SDL_GetTicks());
 	return 0;
 }
 
@@ -144,7 +144,13 @@ void GameInstance::PropagateEvent(const SDL_Event& e)
 
 void GameInstance::TickOnce()
 {
+	if(recording)
+		now += 1000u / recording;
+	else
+		now = static_cast<unsigned>(SDL_GetTicks());
+	data.elapsed = static_cast<float>(now - then) * 0.001;
 	state->Tick();
+	then = now;
 }
 
 void GameInstance::DrawOnce()
