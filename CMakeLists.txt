@@ -15,6 +15,7 @@ endif()
 # Set up project and executable
 project(ygopen-gui C CXX)
 add_executable(ygopen-gui)
+set_property (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT "ygopen-gui")
 
 # Find all dependencies
 option(YGOPEN_GUI_USE_SYSTEM_JSON "Use system's JSON for Modern C++" ON)
