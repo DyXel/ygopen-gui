@@ -5,6 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp> // glm::ortho
 
 #include "../game_data.hpp"
+#include "../sdl_utility.hpp"
 
 #include "../drawing/primitive.hpp"
 #include "../drawing/texture.hpp"
@@ -34,24 +35,16 @@ Menu::Menu(GameData* ptrData) : data(ptrData), env(data->elapsed)
 {
 	auto texture = Drawing::API::NewTexture();
 	SDL_Surface* image = IMG_Load("texture.png");
-	if(!image)
+	if(image)
+	{
+		image = SDLU_SurfaceToRGBA32(image);
+		texture->SetImage(image->w, image->h, image->pixels);
+		SDL_FreeSurface(image);
+	}
+	else
 	{
 		SDL_Log("IMG_Load: %s\n", IMG_GetError());
 	}
-	if(image && image->format->format != SDL_PIXELFORMAT_RGBA32)
-	{
-		SDL_Log("Changing image format");
-		SDL_Surface* temp = image;
-		image = SDL_ConvertSurfaceFormat(temp, SDL_PIXELFORMAT_RGBA32, 0);
-		if(!image)
-		{
-			SDL_Log("SDL_ConvertSurfaceFormat: %s\n", SDL_GetError());
-		}
-		SDL_FreeSurface(temp);
-	}
-	if(image)
-		texture->SetImage(image->w, image->h, image->pixels);
-	SDL_FreeSurface(image);
 	
 	bkg = Drawing::API::NewPrimitive();
 	
