@@ -20,7 +20,7 @@ int LoadGlobalConfig(void* voidData)
 	auto data = static_cast<GameData*>(voidData);
 	SDL_LockMutex(data->cfgMutex);
 
-	std::string path = fmt::format("{}{}", CONFIG_PATH, GLOBAL_CONFIG_FILENAME);
+	std::string path = std::string(CONFIG_PATH) + GLOBAL_CONFIG_FILENAME;
 	data->cfgs = std::make_unique<Configs>();
 	data->cfgs->global = DefaultGlobalConfig();
 	SDL_Log("Loading global config file: %s", path.c_str());
@@ -49,9 +49,9 @@ int LoadGlobalConfig(void* voidData)
 		nlohmann::json j = nlohmann::json::parse(fileData.get());
 		data->cfgs->global.merge_patch(j);
 	}
-	catch(std::exception& e)
+	catch(const std::exception& e)
 	{
-		SDL_LogWarn(SDL_LOG_CATEGORY_ERROR,
+		SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
 		            "Could not apply user settings: %s", e.what());
 	}
 // 	data->cfgs->global.dump(1, '\t', false,
@@ -67,7 +67,7 @@ int LoadFont(void* voidData)
 	SDL_LockMutex(data->cfgMutex);
 	
 	const auto fp = data->cfgs->global["guiFontFile"].get<std::string>();
-	std::string path = fmt::format("{}{}", GAME_FONTS_PATH, fp);
+	std::string path = GAME_FONTS_PATH + fp;
 	const int guiFontSz = static_cast<int>(data->dpi / DEFAULT_DPI * 22.0f);
 	SDL_Log("Loading gui font: %s", path.c_str());
 	try
@@ -77,10 +77,12 @@ int LoadFont(void* voidData)
 			throw std::invalid_argument(SDL_GetError());
 		data->guiFont.LoadFont(data->guiFontFile, guiFontSz);
 	}
-	catch(std::exception& e)
+	catch(const std::exception& e)
 	{
-		SDL_Log("Could not load font: %s", e.what());
+		SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
+		            "Could not load font: %s", e.what());
 	}
+	
 	SDL_UnlockMutex(data->cfgMutex);
 	return 1;
 }
