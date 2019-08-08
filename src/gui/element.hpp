@@ -14,16 +14,17 @@ class IElement : public std::enable_shared_from_this<IElement>
 {
 public:
 	IElement(Environment& env) : env(env) {}
+	virtual ~IElement() = default;
 	virtual void Resize(const Drawing::Matrix& mat, const SDL_Rect& rect) = 0;
 	virtual void Draw() = 0;
 protected:
 	friend Environment;
 	Environment& env;
 
-	virtual void Tick() {};
+	virtual void Tick() {}
 
 	// Controls both when gaining and losing focus
-	virtual void OnFocus([[maybe_unused]] bool gained) {};
+	virtual void OnFocus([[maybe_unused]] bool gained) {}
 
 	// Handles any event. The event is not passed to subsequent elements
 	// (managed by GUI::Environment) if the function returns true.
