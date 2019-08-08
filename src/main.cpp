@@ -33,6 +33,15 @@ extern "C" int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			goto quit;
 		}
 	}
+	{
+		if(TTF_Init() != 0)
+		{
+			SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
+			                "Unable to initialize SDL_ttf: %s",
+			                TTF_GetError());
+			exitCode = 1;
+		}
+	}
 	// TODO: select backend from commandline and fallback
 	Drawing::API::PreloadBackend(DEFAULT_BACKEND);
 	gi = std::make_unique<YGOpen::GameInstance>();
@@ -53,6 +62,7 @@ extern "C" int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 	}
 quit:
 	gi.reset();
+	TTF_Quit();
 	IMG_Quit();
 	SDL_Quit();
 	return exitCode;
