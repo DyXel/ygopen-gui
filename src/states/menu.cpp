@@ -96,24 +96,24 @@ void Menu::Draw()
 
 void Menu::OnResize()
 {
+	const int& w = data->canvasWidth;
+	const int& h = data->canvasHeight;
 	SDL_Rect bCanvas;
-	const float w = static_cast<float>(data->canvasWidth);
-	const float h = static_cast<float>(data->canvasHeight);
 	proj = glm::ortho<float>(0.0f, w, h, 0.0f);
-	if(w / h >= 1.0f)
+	if(w >= h)
 	{
-		bCanvas.w = static_cast<int>(w * 0.2f);
-		bCanvas.h = static_cast<int>(h * 0.05f);
+		bCanvas.w = w / 5;
+		bCanvas.h = h / 20;
 	}
 	else
 	{
-		bCanvas.w = static_cast<int>(w * 0.8f);
-		bCanvas.h = static_cast<int>(h * 0.1f);
+		bCanvas.w = w * 3 / 4;
+		bCanvas.h = h / 10;
 	}
 	
-	const float bSeparation = h * 0.025f;
+	const int bSeparation = h / 40;
 	
-	bCanvas.x = static_cast<int>(w / 2.0f - bCanvas.w / 2);
+	bCanvas.x = w / 2 - bCanvas.w / 2;
 	bCanvas.y = bSeparation;
 	duelBtn->Resize(proj, bCanvas);
 	bCanvas.y += bSeparation + bCanvas.h;

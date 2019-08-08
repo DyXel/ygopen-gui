@@ -89,8 +89,8 @@ int GameInstance::Init(Drawing::Backend backend)
 			            SDL_GetError());
 			return false;
 		}
-		int fWidth  = static_cast<int>(static_cast<float>(r.w - r.x) * 0.8f);
-		int fHeight = static_cast<int>(static_cast<float>(r.h - r.y) * 0.8f);
+		int fWidth  = (r.w - r.x) * 4 / 5;
+		int fHeight = (r.h - r.y) * 4 / 5;
 		SDL_Log("Setting window size to (%i, %i)", fWidth, fHeight);
 		SDL_SetWindowSize(window, fWidth, fHeight);
 		return true;
