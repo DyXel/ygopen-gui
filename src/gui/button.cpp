@@ -6,6 +6,7 @@
 
 #include "../drawing/api.hpp"
 #include "../drawing/primitive.hpp"
+#include "../drawing/texture.hpp"
 
 namespace YGOpen
 {
@@ -102,11 +103,30 @@ static const Drawing::Colors LINES_COLORS =
 	LINE_RIGHT, LINE_RIGHT,
 };
 
+// Button's text
+constexpr auto TEXT_DRAW_MODE = Drawing::PDM_TRIANGLE_STRIP;
+static Drawing::Vertices textVertices =
+{
+	// Corners
+	{ 0.0f, 0.0f, 0.0f},
+	{ 1.0f, 0.0f, 0.0f},
+	{ 0.0f, 1.0f, 0.0f},
+	{ 1.0f, 1.0f, 0.0f},
+};
+static const Drawing::TexCoords TEXT_TEXCOORDS =
+{
+	{0.0f, 0.0f},
+	{1.0f, 0.0f},
+	{0.0f, 1.0f},
+	{1.0f, 1.0f},
+};
+
 CButton::CButton(Environment& env) : IElement(env)
 {
 	shadow = Drawing::API::NewPrimitive();
 	content = Drawing::API::NewPrimitive();
 	lines = Drawing::API::NewPrimitive();
+	text = Drawing::API::NewPrimitive();
 	
 	// Set up constant data
 	shadow->SetDrawMode(SHADOW_DRAW_MODE);
@@ -117,6 +137,9 @@ CButton::CButton(Environment& env) : IElement(env)
 	
 	lines->SetDrawMode(LINES_DRAW_MODE);
 	lines->SetColors(LINES_COLORS);
+	
+	text->SetDrawMode(TEXT_DRAW_MODE);
+	text->SetTexCoords(TEXT_TEXCOORDS);
 }
 
 void CButton::Resize(const Drawing::Matrix& mat, const SDL_Rect& rect)
@@ -140,21 +163,31 @@ void CButton::Resize(const Drawing::Matrix& mat, const SDL_Rect& rect)
 	linesVertices[7].y = h;
 	linesVertices[3].x = linesVertices[5].x = linesVertices[6].x =
 	linesVertices[7].x = w;
+
+	// Update text vertices
+	textVertices[1].x = textVertices[3].x = txtWidth;
+	textVertices[2].y = textVertices[3].y = txtHeight;
 	
 	// Set up vertices in primitives
 	shadow->SetVertices(shadowVertices);
 	shadow->SetIndices(SHADOW_INDICES);
 	content->SetVertices(contentVertices);
 	lines->SetVertices(linesVertices);
+	text->SetVertices(textVertices);
 	
 	// Move to right position
+	const int tx = rect.x + (rect.w / 2) - (txtWidth / 2);
+	const int ty = rect.y + (rect.h / 2) - (txtHeight / 2);
 	auto projModel = mat * glm::translate(glm::mat4(1.0f),
 	                                      glm::vec3(rect.x, rect.y, 0.0f));
-	
+	auto textProjModel = mat * glm::translate(glm::mat4(1.0f),
+	                                          glm::vec3(tx, ty, 0.0f));
+
 	// Set up matrices for use with the shader
 	shadow->SetMatrix(projModel);
 	content->SetMatrix(projModel);
 	lines->SetMatrix(projModel);
+	text->SetMatrix(textProjModel);
 }
 
 void CButton::Draw()
@@ -162,6 +195,7 @@ void CButton::Draw()
 	shadow->Draw();
 	content->Draw();
 	lines->Draw();
+	text->Draw();
 }
 
 void CButton::Tick()
@@ -174,6 +208,7 @@ void CButton::Tick()
 	}
 	content->SetBrightness(brightness);
 	lines->SetBrightness(brightness);
+	text->SetBrightness(brightness);
 }
 
 void CButton::OnFocus(bool gained)
@@ -183,6 +218,7 @@ void CButton::OnFocus(bool gained)
 		brightness = 2.0f;
 		content->SetBrightness(brightness);
 		lines->SetBrightness(brightness);
+		text->SetBrightness(brightness);
 	}
 	else
 	{
@@ -209,6 +245,18 @@ bool CButton::OnEvent(const SDL_Event& e)
 void CButton::SetCallback(Callback callback)
 {
 	cb = callback;
+}
+
+void CButton::SetText(std::string_view txt)
+{
+	// Rebuild image
+	auto texture = Drawing::API::NewTexture();
+	SDL_Surface* image = env.font.ShadowedText(txt);
+	txtWidth = image->w;
+	txtHeight = image->h;
+	texture->SetImage(txtWidth, txtHeight, image->pixels);
+	text->SetTexture(texture);
+	SDL_FreeSurface(image);
 }
 
 } // GUI

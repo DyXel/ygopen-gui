@@ -56,8 +56,11 @@ Menu::Menu(GameData* ptrData) :
 	bkg->SetTexCoords({{0.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 1.0f}, {1.0f, 1.0f}});
 	bkg->SetTexture(texture);
 	
+	// GUI setup
 	duelBtn = std::make_shared<GUI::CButton>(env);
+	duelBtn->SetText(u8"Duel"); // TODO: move to i18n config file
 	exitBtn = std::make_shared<GUI::CButton>(env);
+	exitBtn->SetText(u8"Exit"); // TODO: move to i18n config file
 	
 	env.Add(duelBtn);
 	env.Add(exitBtn);

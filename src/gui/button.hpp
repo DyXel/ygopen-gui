@@ -15,14 +15,14 @@ public:
 	CButton(Environment& env);
 	void Resize(const Drawing::Matrix& mat, const SDL_Rect& rect) override;
 	void Draw() override;
-	void OnFocus(bool gained) override;
-	bool OnEvent(const SDL_Event& e) override;
 	
-	// Function to call when the button is pressed
 	using Callback = std::function<void(void)>;
 	void SetCallback(Callback callback);
+	void SetText(std::string_view desired);
 protected:
 	void Tick() override;
+	void OnFocus(bool gained) override;
+	bool OnEvent(const SDL_Event& e) override;
 private:
 	SDL_Rect r;
 	Callback cb;
@@ -30,6 +30,9 @@ private:
 	Drawing::Primitive shadow;
 	Drawing::Primitive content;
 	Drawing::Primitive lines;
+	Drawing::Primitive text;
+	int txtWidth{0};
+	int txtHeight{0};
 };
 
 using Button = std::shared_ptr<CButton>;
