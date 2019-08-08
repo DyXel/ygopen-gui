@@ -68,14 +68,14 @@ int LoadFont(void* voidData)
 	
 	const auto fp = data->cfgs->global["guiFontFile"].get<std::string>();
 	std::string path = fmt::format("{}{}", GAME_FONTS_PATH, fp);
-	const auto guiNormalFontSz = static_cast<int>(22);
+	const int guiFontSz = static_cast<int>(data->dpi / DEFAULT_DPI * 22.0f);
 	SDL_Log("Loading gui font: %s", path.c_str());
 	try
 	{
 		data->guiFontFile = SDL_RWFromFile(path.c_str(), "rb");
 		if(data->guiFontFile == nullptr)
 			throw std::invalid_argument(SDL_GetError());
-		data->guiFont.LoadFont(data->guiFontFile, guiNormalFontSz);
+		data->guiFont.LoadFont(data->guiFontFile, guiFontSz);
 	}
 	catch(std::exception& e)
 	{
