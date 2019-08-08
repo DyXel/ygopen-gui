@@ -2,6 +2,7 @@
 #define GAME_DATA_HPP
 #include <memory>
 #include "configs.hpp"
+#include "text_smith.hpp"
 
 struct SDL_mutex;
 
@@ -17,6 +18,7 @@ class GameInstance;
 struct GameData
 {
 	GameData(GameInstance& gi);
+	~GameData();
 	int Init();
 	GameInstance& instance; // Owner of this data
 	
@@ -33,6 +35,8 @@ struct GameData
 	
 	// Miscellaneous data
 	std::unique_ptr<Configs> cfgs;
+	SDL_RWops* guiFontFile{nullptr};
+	TextSmith guiFont;
 	bool powerSaving{false};
 };
 

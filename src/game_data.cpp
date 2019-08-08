@@ -9,6 +9,12 @@ namespace YGOpen
 GameData::GameData(GameInstance& gi) : instance(gi)
 {}
 
+GameData::~GameData()
+{
+	if(guiFontFile)
+		SDL_RWclose(guiFontFile);
+}
+
 int GameData::Init()
 {
 	cfgMutex = SDL_CreateMutex();

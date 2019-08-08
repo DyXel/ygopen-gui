@@ -6,7 +6,8 @@ namespace YGOpen
 namespace GUI
 {
 
-Environment::Environment(const float& elapsed) : elapsed(elapsed)
+Environment::Environment(TextSmith& font, const float& elapsed)
+	: font(font), elapsed(elapsed)
 {}
 
 void Environment::Add(const Element& ele)

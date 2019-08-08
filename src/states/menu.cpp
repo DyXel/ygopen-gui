@@ -31,7 +31,8 @@ static const Drawing::Colors BKG_COLORS =
 	BKG_COLOR, BKG_COLOR, BKG_COLOR, BKG_COLOR,
 };
 
-Menu::Menu(GameData* ptrData) : data(ptrData), env(data->elapsed)
+Menu::Menu(GameData* ptrData) :
+	data(ptrData), env(data->guiFont, data->elapsed)
 {
 	auto texture = Drawing::API::NewTexture();
 	SDL_Surface* image = IMG_Load("texture.png");

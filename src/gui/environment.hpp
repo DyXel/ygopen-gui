@@ -5,6 +5,8 @@
 #include "common.hpp"
 #include "element.hpp"
 
+#include "../text_smith.hpp"
+
 namespace YGOpen
 {
 
@@ -14,7 +16,9 @@ namespace GUI
 class Environment
 {
 public:
-	Environment(const float& elapsed);
+	TextSmith& font;
+
+	Environment(TextSmith& font, const float& elapsed);
 	void Add(const Element& ele);
 	void Remove(const Element& ele);
 	

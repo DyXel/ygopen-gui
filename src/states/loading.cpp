@@ -54,15 +54,50 @@ int LoadGlobalConfig(void* voidData)
 		SDL_LogWarn(SDL_LOG_CATEGORY_ERROR,
 		            "Could not apply user settings: %s", e.what());
 	}
-// 	std::cout << data->cfgs->global.dump(1, '\t', false, nlohmann::json::error_handler_t::replace);
+// 	data->cfgs->global.dump(1, '\t', false,
+// 	nlohmann::json::error_handler_t::replace);
 	
 	SDL_UnlockMutex(data->cfgMutex);
 	return 1;
 }
 
+int LoadFont(void* voidData)
+{
+	auto data = static_cast<GameData*>(voidData);
+	SDL_LockMutex(data->cfgMutex);
+	
+	const auto fp = data->cfgs->global["guiFontFile"].get<std::string>();
+	std::string path = fmt::format("{}{}", GAME_FONTS_PATH, fp);
+	const auto guiNormalFontSz = static_cast<int>(22);
+	SDL_Log("Loading gui font: %s", path.c_str());
+	try
+	{
+		data->guiFontFile = SDL_RWFromFile(path.c_str(), "rb");
+		if(data->guiFontFile == nullptr)
+			throw std::invalid_argument(SDL_GetError());
+		data->guiFont.LoadFont(data->guiFontFile, guiNormalFontSz);
+	}
+	catch(std::exception& e)
+	{
+		SDL_Log("Could not load font: %s", e.what());
+	}
+	SDL_UnlockMutex(data->cfgMutex);
+	return 1;
+}
+
+// int LoadJob(void* voidData)
+// {
+// 	auto data = static_cast<GameData*>(voidData);
+// 	SDL_LockMutex(data->cfgMutex);
+// 	// Code here
+// 	SDL_UnlockMutex(data->cfgMutex);
+// 	return 1;
+// }
+
 Loading::Loading(GameData* ptrData) : data(ptrData)
 {
 	pendingJobs.emplace(&LoadGlobalConfig);
+	pendingJobs.emplace(&LoadFont);
 	totalJobs = pendingJobs.size();
 }
 
