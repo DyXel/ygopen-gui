@@ -9,7 +9,11 @@ target_sources(ygopen-gui PRIVATE
 	${CSR}/game_instance.cpp
 	${CSR}/game_instance.hpp
 	${CSR}/main.cpp
+	${CSR}/sdl_utility.cpp
+	${CSR}/sdl_utility.hpp
 	${CSR}/state.hpp
+	${CSR}/text_smith.cpp
+	${CSR}/text_smith.hpp
 	${CSR}/drawing/api.cpp
 	${CSR}/drawing/api.hpp
 	${CSR}/drawing/gl_core_funcs.h
