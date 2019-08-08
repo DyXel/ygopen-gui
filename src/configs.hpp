@@ -10,6 +10,7 @@ extern const char* CARD_PICTURES_PATH;
 extern const char* CARD_DATABASES_PATH;
 extern const char* GAME_IMAGES_PATH;
 extern const char* GAME_SOUNDS_PATH;
+extern const char* GAME_FONTS_PATH;
 
 extern const char* GLOBAL_CONFIG_FILENAME;
 
