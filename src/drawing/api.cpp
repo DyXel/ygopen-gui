@@ -80,8 +80,10 @@ uniform float in_brightness;
 
 void main()
 {
-	gl_FragColor = (out_color + texture2D(in_tex, out_texCoord)) *
-	               vec4(in_brightness, in_brightness, in_brightness, 1.0);
+	vec4 ogColor = texture2D(in_tex, out_texCoord);
+	vec4 brightness = vec4(in_brightness, in_brightness, in_brightness, 0.0);
+	gl_FragColor = ((out_color + ogColor) * brightness) +
+	               vec4(0, 0, 0, ogColor.w);
 })";
 
 static std::shared_ptr<Detail::GLShared::Program> glPrimProg;
