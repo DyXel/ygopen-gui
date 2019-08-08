@@ -1,6 +1,7 @@
 #ifndef GUI_BUTTON_HPP
 #define GUI_BUTTON_HPP
 #include <functional>
+#include <string_view>
 #include "element.hpp"
 
 namespace YGOpen
