@@ -1,6 +1,6 @@
 language: cpp
 sudo: required
-dist: xenial
+dist: bionic
 git:
   depth: 1
 env:
@@ -10,8 +10,7 @@ addons:
   apt:
     update: true
     sources:
-    - ubuntu-toolchain-r-test
-    - sourceline: 'ppa:maarten-fonville/protobuf'
+    - sourceline: 'ppa:ubuntu-toolchain-r/test'
     packages:
     - g++-9
     - protobuf-compiler
@@ -19,6 +18,7 @@ addons:
     - libsdl2-dev
     - libsdl2-image-dev
     - libsdl2-ttf-dev
+    - libglm-dev
   homebrew:
     update: true
     packages:
@@ -35,13 +35,13 @@ matrix:
     os: windows
     env:
     - VCPKG_ROOT=/c/vcpkg
-  - name: "Xenial LLVM/Clang"
+  - name: "Bionic LLVM/Clang"
     os: linux
     compiler: clang
     env: 
     - CC=clang
     - CXX=clang++
-  - name: "Xenial GCC"
+  - name: "Bionic GCC"
     os: linux
     compiler: gcc
     env: 
@@ -64,7 +64,6 @@ install:
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     cd lib; 
     git clone --depth=1 https://github.com/fmtlib/fmt.git & 
-    git clone --depth=1 https://github.com/g-truc/glm.git & 
     git clone --depth=1 https://github.com/nlohmann/json.git;
     cd -;
   fi
@@ -75,7 +74,7 @@ script:
     cmake --build .;
   fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-    cmake .. -DYGOPEN_GUI_USE_SYSTEM_FMT=OFF -DYGOPEN_GUI_USE_SYSTEM_GLM=OFF -DYGOPEN_GUI_USE_SYSTEM_JSON=OFF && make;
+    cmake .. -DYGOPEN_GUI_USE_SYSTEM_FMT=OFF -DYGOPEN_GUI_USE_SYSTEM_JSON=OFF && make;
   fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     cmake .. && make;
