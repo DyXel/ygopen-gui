@@ -1,4 +1,4 @@
-# YGOpen GUI
+# YGOpen GUI [![Build Status](https://travis-ci.org/DyXel/ygopen-gui.svg?branch=master)](https://travis-ci.org/DyXel/ygopen-gui)
 
 The YGOpen project aims to create a free-as-in-freedom, cleanly-engineered, cross-platform Yu-Gi-Oh! Official Card Game simulator, complete with client and server support.
 
