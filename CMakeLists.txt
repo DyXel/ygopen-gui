@@ -15,8 +15,17 @@ endif()
 # Set up project and executable
 project(ygopen-gui C CXX)
 add_executable(ygopen-gui)
+set_property (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT "ygopen-gui")
 
 # Find all dependencies
+option(YGOPEN_GUI_USE_SYSTEM_JSON "Use system's JSON for Modern C++" ON)
+if(YGOPEN_GUI_USE_SYSTEM_JSON)
+	find_package(nlohmann_json REQUIRED)
+endif()
+option(YGOPEN_GUI_USE_SYSTEM_FMT "Use system's {fmt} library" ON)
+if (YGOPEN_GUI_USE_SYSTEM_FMT)
+	find_package(fmt REQUIRED)
+endif ()
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
 find_package(SDL2_ttf REQUIRED)
