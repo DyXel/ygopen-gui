@@ -54,7 +54,8 @@ install:
 - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then 
     git clone --depth=1 https://github.com/Microsoft/vcpkg.git $VCPKG_ROOT;
     cd $VCPKG_ROOT;
-    curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://github.com/kevinlul/ygopen-vcpkg-cache/raw/master/installed-gui.zip;
+    curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name 
+      https://github.com/kevinlul/ygopen-vcpkg-cache/raw/master/installed-gui.zip;
     unzip -uo installed-gui.zip;
     powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "& '.\bootstrap-vcpkg.bat'";
     ./vcpkg.exe integrate install;
@@ -70,7 +71,9 @@ install:
 script:
 - mkdir -p build && cd build
 - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
-    cmake .. -DVCPKG_TARGET_TRIPLET=x64-windows -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake &&
+    cmake .. -DVCPKG_TARGET_TRIPLET=x64-windows 
+      -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake 
+      -DCMAKE_GENERATOR_PLATFORM=x64 &&
     cmake --build .;
   fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
