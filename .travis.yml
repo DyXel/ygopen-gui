@@ -11,6 +11,7 @@ addons:
     update: true
     sources:
     - ubuntu-toolchain-r-test
+    - sourceline: 'ppa:maarten-fonville/protobuf'
     packages:
     - g++-9
     - protobuf-compiler
@@ -18,7 +19,6 @@ addons:
     - libsdl2-dev
     - libsdl2-image-dev
     - libsdl2-ttf-dev
-    - libglm-dev
   homebrew:
     update: true
     packages:
@@ -63,7 +63,9 @@ install:
   fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     cd lib; 
-    git clone --depth=1 https://github.com/fmtlib/fmt.git & git clone --depth=1 https://github.com/nlohmann/json.git;
+    git clone --depth=1 https://github.com/fmtlib/fmt.git & 
+    git clone --depth=1 https://github.com/g-truc/glm.git & 
+    git clone --depth=1 https://github.com/nlohmann/json.git;
     cd -;
   fi
 script:
@@ -73,7 +75,7 @@ script:
     cmake --build .;
   fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-    cmake .. -DYGOPEN_GUI_USE_SYSTEM_JSON=OFF -DYGOPEN_GUI_USE_SYSTEM_FMT=OFF && make;
+    cmake .. -DYGOPEN_GUI_USE_SYSTEM_FMT=OFF -DYGOPEN_GUI_USE_SYSTEM_GLM=OFF -DYGOPEN_GUI_USE_SYSTEM_JSON=OFF && make;
   fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     cmake .. && make;
