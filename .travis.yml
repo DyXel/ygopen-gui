@@ -1,0 +1,80 @@
+language: cpp
+sudo: required
+dist: xenial
+git:
+  depth: 1
+env:
+  global:
+  - MSBUILD_PATH="/c/Program Files (x86)/Microsoft Visual Studio/2017/BuildTools/MSBuild/15.0/Bin"
+addons:
+  apt:
+    update: true
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - g++-9
+    - protobuf-compiler
+    - libprotobuf-dev
+    - libsdl2-dev
+    - libsdl2-image-dev
+    - libsdl2-ttf-dev
+    - libglm-dev
+  homebrew:
+    update: true
+    packages:
+    - protobuf
+    - sdl2
+    - sdl2_image
+    - sdl2_ttf
+    - glm
+    - fmt
+    - nlohmann-json
+matrix:
+  include:
+  - name: "Windows 10"
+    os: windows
+    env:
+    - VCPKG_ROOT=/c/vcpkg
+  - name: "Xenial LLVM/Clang"
+    os: linux
+    compiler: clang
+    env: 
+    - CC=clang
+    - CXX=clang++
+  - name: "Xenial GCC"
+    os: linux
+    compiler: gcc
+    env: 
+    - CC=gcc-9 
+    - CXX=g++-9
+  - name: "macOS Mojave"
+    os: osx
+    osx_image: xcode10.2
+install:
+- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then 
+    git clone --depth=1 https://github.com/Microsoft/vcpkg.git $VCPKG_ROOT;
+    cd $VCPKG_ROOT;
+    curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://github.com/kevinlul/ygopen-vcpkg-cache/raw/master/installed-gui.zip;
+    unzip -uo installed-gui.zip;
+    powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "& '.\bootstrap-vcpkg.bat'";
+    ./vcpkg.exe integrate install;
+    ./vcpkg.exe install --triplet x64-windows protobuf sdl2 sdl2-image sdl2-ttf glm fmt nlohmann-json;
+    cd -;
+  fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+    cd lib; 
+    git clone --depth=1 https://github.com/fmtlib/fmt.git & git clone --depth=1 https://github.com/nlohmann/json.git;
+    cd -;
+  fi
+script:
+- mkdir -p build && cd build
+- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
+    cmake .. -DVCPKG_TARGET_TRIPLET=x64-windows -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake &&
+    cmake --build .;
+  fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+    cmake .. -DYGOPEN_GUI_USE_SYSTEM_JSON=OFF -DYGOPEN_GUI_USE_SYSTEM_FMT=OFF && make;
+  fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+    cmake .. && make;
+  fi
