@@ -35,6 +35,9 @@ matrix:
     os: windows
     env:
     - VCPKG_ROOT=/c/vcpkg
+    - VCPKG_DEFAULT_TRIPLET=x64-windows
+    - VCPKG_LIBS="protobuf sdl2 sdl2-image sdl2-ttf glm fmt nlohmann-json"
+    - VCPKG_CACHE_ZIP_URL=https://github.com/kevinlul/ygopen-vcpkg-cache/raw/master/installed-gui.zip
   - name: "Bionic LLVM/Clang"
     os: linux
     compiler: clang
@@ -50,35 +53,5 @@ matrix:
   - name: "macOS Mojave"
     os: osx
     osx_image: xcode10.2
-install:
-- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then 
-    git clone --depth=1 https://github.com/Microsoft/vcpkg.git $VCPKG_ROOT;
-    cd $VCPKG_ROOT;
-    curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name 
-      https://github.com/kevinlul/ygopen-vcpkg-cache/raw/master/installed-gui.zip;
-    unzip -uo installed-gui.zip;
-    powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "& '.\bootstrap-vcpkg.bat'";
-    ./vcpkg.exe integrate install;
-    ./vcpkg.exe install --triplet x64-windows protobuf sdl2 sdl2-image sdl2-ttf glm fmt nlohmann-json;
-    cd -;
-  fi
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-    cd lib; 
-    git clone --depth=1 https://github.com/fmtlib/fmt.git & 
-    git clone --depth=1 https://github.com/nlohmann/json.git;
-    cd -;
-  fi
-script:
-- mkdir -p build && cd build
-- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
-    cmake .. -DVCPKG_TARGET_TRIPLET=x64-windows 
-      -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake 
-      -DCMAKE_GENERATOR_PLATFORM=x64 &&
-    cmake --build .;
-  fi
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-    cmake .. -DYGOPEN_GUI_USE_SYSTEM_FMT=OFF -DYGOPEN_GUI_USE_SYSTEM_JSON=OFF && make;
-  fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-    cmake .. && make;
-  fi
+install: ./travis/dependencies.sh
+script: ./travis/build.sh
