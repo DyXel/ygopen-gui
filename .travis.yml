@@ -41,9 +41,6 @@ matrix:
   - name: "Bionic LLVM/Clang"
     os: linux
     compiler: clang
-    env: 
-    - CC=clang
-    - CXX=clang++
   - name: "Bionic GCC"
     os: linux
     compiler: gcc
