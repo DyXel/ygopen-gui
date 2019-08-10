@@ -1,0 +1,54 @@
+language: cpp
+sudo: required
+dist: bionic
+git:
+  depth: 1
+env:
+  global:
+  - MSBUILD_PATH="/c/Program Files (x86)/Microsoft Visual Studio/2017/BuildTools/MSBuild/15.0/Bin"
+addons:
+  apt:
+    update: true
+    sources:
+    - sourceline: 'ppa:ubuntu-toolchain-r/test'
+    packages:
+    - g++-9
+    - protobuf-compiler
+    - libprotobuf-dev
+    - libsdl2-dev
+    - libsdl2-image-dev
+    - libsdl2-ttf-dev
+    - libglm-dev
+  homebrew:
+    update: true
+    packages:
+    - protobuf
+    - sdl2
+    - sdl2_image
+    - sdl2_ttf
+    - glm
+    - fmt
+    - nlohmann-json
+matrix:
+  include:
+  - name: "Windows 10"
+    os: windows
+    env:
+    - VCPKG_ROOT=/c/vcpkg
+    - VCPKG_DEFAULT_TRIPLET=x64-windows
+    - VCPKG_LIBS="protobuf sdl2 sdl2-image sdl2-ttf glm fmt nlohmann-json"
+    - VCPKG_CACHE_ZIP_URL=https://github.com/kevinlul/ygopen-vcpkg-cache/raw/master/installed-gui.zip
+  - name: "Bionic LLVM/Clang"
+    os: linux
+    compiler: clang
+  - name: "Bionic GCC"
+    os: linux
+    compiler: gcc
+    env: 
+    - CC=gcc-9 
+    - CXX=g++-9
+  - name: "macOS Mojave"
+    os: osx
+    osx_image: xcode10.2
+install: ./travis/dependencies.sh
+script: ./travis/build.sh
