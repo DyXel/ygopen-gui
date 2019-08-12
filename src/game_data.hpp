@@ -19,25 +19,22 @@ struct GameData
 {
 	GameData(GameInstance& gi);
 	~GameData();
-	int Init();
 	GameInstance& instance; // Owner of this data
 	
-	// Synchronization data
-	SDL_mutex* cfgMutex;
-	
-	// Video data
+	// Values updated by GameInstance
+	float elapsed; // Time elapsed since last draw call.
 	int canvasWidth{DEFAULT_WINDOW_WIDTH}; // Canvas width in pixels
 	int canvasHeight{DEFAULT_WINDOW_HEIGHT}; // Canvas height in pixels
-	float dpi; // DPI of the screen, may be overriden by user settings
+	float dpi{}; // DPI of the screen, may be overriden by user settings
+	bool powerSaving{false};
 	
-	// Time data
-	float elapsed;
-	
-	// Miscellaneous data
+	// Loadable content, each function loads the members that follows them
+	bool LoadConfigs();
 	std::unique_ptr<Configs> cfgs;
+	
+	bool LoadGUIFont();
 	SDL_RWops* guiFontFile{nullptr};
 	TextSmith guiFont;
-	bool powerSaving{false};
 };
 
 } // YGOpen

@@ -48,12 +48,6 @@ int GameInstance::Init(Drawing::Backend backend)
 		                "Unable to load selected backend");
 		return -1;
 	}
-	if(data.Init() != 0)
-	{
-		SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
-		                "Unable to init game data.");
-		return -1;
-	}
 	auto SetDPI = [this]() -> bool
 	{
 		int displayIndex;

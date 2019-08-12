@@ -22,6 +22,7 @@ public:
 	void Tick() override;
 	void Draw() override;
 	
+	SDL_mutex* taskMtx;
 	GameData* data; // Accessed by SDL_ThreadFunction
 private:
 	bool cancelled{false};
