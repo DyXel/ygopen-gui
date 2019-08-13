@@ -1,4 +1,4 @@
-build/
+[Bb]uild*/
 lib/json/
 lib/fmt/
 
