@@ -34,27 +34,13 @@ static const Drawing::Colors BKG_COLORS =
 Menu::Menu(GameData* ptrData) :
 	data(ptrData), env(data->guiFont, data->elapsed)
 {
-	auto texture = Drawing::API::NewTexture();
-	SDL_Surface* image = IMG_Load("texture.png");
-	if(image)
-	{
-		image = SDLU_SurfaceToRGBA32(image);
-		texture->SetImage(image->w, image->h, image->pixels);
-		SDL_FreeSurface(image);
-	}
-	else
-	{
-		SDL_Log("IMG_Load: %s\n", IMG_GetError());
-	}
-	
 	bkg = Drawing::API::NewPrimitive();
 	
 	// Background quad
 	bkg->SetDrawMode(BKG_DRAWING_MODE);
 	bkg->SetVertices(BKG_VERTICES);
-// 	bkg->SetColors(BKG_COLORS);
 	bkg->SetTexCoords({{0.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 1.0f}, {1.0f, 1.0f}});
-	bkg->SetTexture(texture);
+	bkg->SetTexture(data->menuBkg);
 	
 	// GUI setup
 	duelBtn = std::make_shared<GUI::CButton>(env);

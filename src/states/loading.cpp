@@ -16,7 +16,8 @@ namespace State
 
 #define TASKS() \
 	X(LoadConfigs) \
-	X(LoadGUIFont)
+	X(LoadGUIFont) \
+	X(LoadBkgs)
 
 #define X(func) \
 	int TASK_##func(void* voidData) \
@@ -41,6 +42,7 @@ Loading::Loading(GameData* ptrData) : data(ptrData)
 		cancelled = true;
 		return;
 	}
+	data->InitLoad();
 #define X(func) pendingJobs.emplace(&TASK_##func);
 TASKS()
 #undef X
@@ -72,7 +74,10 @@ void Loading::Tick()
 		if(pendingJobs.empty()) // We are out of tasks
 		{
 			if(!cancelled) // If tasks were not cancelled proceed normally
+			{
+				data->FinishLoad();
 				data->instance.SetState(std::make_shared<State::Menu>(data));
+			}
 		}
 		else // Start next task, thread will unlock mutex when done
 		{

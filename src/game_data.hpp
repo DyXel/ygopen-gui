@@ -1,8 +1,10 @@
 #ifndef GAME_DATA_HPP
 #define GAME_DATA_HPP
 #include <memory>
+#include <queue>
 #include "configs.hpp"
 #include "text_smith.hpp"
+#include "drawing/types.hpp"
 
 struct SDL_mutex;
 
@@ -28,13 +30,24 @@ struct GameData
 	float dpi{}; // DPI of the screen, may be overriden by user settings
 	bool powerSaving{false};
 	
-	// Loadable content, each function loads the members that follows them
+	void InitLoad();
+	void FinishLoad();
+	
+	// The following functions are called on a different thread they represent
+	// the loadable content, each one loads the members that follows them
 	bool LoadConfigs();
 	std::unique_ptr<Configs> cfgs;
 	
 	bool LoadGUIFont();
 	SDL_RWops* guiFontFile{nullptr};
 	TextSmith guiFont;
+	
+	bool LoadBkgs();
+	Drawing::Texture menuBkg;
+private:
+	// Queue used to push image data down the GPU memory
+	// NOTE: needed because OpenGL is not multithreaded
+	std::queue<std::pair<Drawing::Texture, SDL_Surface*>> gpuPushQueue;
 };
 
 } // YGOpen

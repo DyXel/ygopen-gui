@@ -1,9 +1,13 @@
 #include "game_data.hpp"
-#include "game_instance.hpp"
 
-#include "sdl_utility.hpp"
-
+#include <string_view>
 #include <SDL_mutex.h>
+#include <SDL_image.h>
+
+#include "game_instance.hpp"
+#include "sdl_utility.hpp"
+#include "drawing/api.hpp"
+#include "drawing/texture.hpp"
 
 namespace YGOpen
 {
@@ -15,6 +19,22 @@ GameData::~GameData()
 {
 	if(guiFontFile)
 		SDL_RWclose(guiFontFile);
+}
+
+void GameData::InitLoad()
+{
+	menuBkg = Drawing::API::NewTexture();
+}
+
+void GameData::FinishLoad()
+{
+	while(!gpuPushQueue.empty())
+	{
+		auto p = std::move(gpuPushQueue.front());
+		gpuPushQueue.pop();
+		p.first->SetImage(p.second->w, p.second->h, p.second->pixels);
+		SDL_FreeSurface(p.second);
+	}
 }
 
 bool GameData::LoadConfigs()
@@ -62,6 +82,21 @@ bool GameData::LoadGUIFont()
 		            "Could not load font: %s", e.what());
 		return false;
 	}
+	return true;
+}
+
+bool GameData::LoadBkgs()
+{
+	auto TryPushOne = [&](Drawing::Texture tex, std::string_view path)
+	{
+		SDL_Surface* image = IMG_Load(path.data());
+		if(image && (image = SDLU_SurfaceToRGBA32(image)))
+			gpuPushQueue.emplace(tex, image);
+		else
+			SDL_Log("Unable to load %s: %s\n", path.data(), SDL_GetError());
+	};
+	std::string basePath = GAME_IMAGES_PATH;
+	TryPushOne(menuBkg, basePath + "menu_bkg.png");
 	return true;
 }
 
