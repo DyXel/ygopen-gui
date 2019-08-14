@@ -1,6 +1,7 @@
 #ifndef SDL_UTILITY_HPP
 #define SDL_UTILITY_HPP
 #include <memory>
+#include <string_view>
 #include <SDL_video.h>
 
 SDL_Surface* SDLU_EmptySurface();
