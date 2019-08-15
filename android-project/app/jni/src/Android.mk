@@ -18,7 +18,9 @@ LOCAL_SRC_FILES := $(SRC_PATH)/board.hpp \
 	$(SRC_PATH)/game_instance.cpp \
 	$(SRC_PATH)/game_instance.hpp \
 	$(SRC_PATH)/main.cpp \
+	$(SRC_PATH)/sdl_utility.cpp \
 	$(SRC_PATH)/state.hpp \
+	$(SRC_PATH)/text_smith.cpp \
 	$(SRC_PATH)/drawing/api.cpp \
 	$(SRC_PATH)/drawing/api.hpp \
 	$(SRC_PATH)/drawing/gl_core_funcs.h \
@@ -44,6 +46,8 @@ LOCAL_SRC_FILES := $(SRC_PATH)/board.hpp \
 	$(SRC_PATH)/drawing/gl_shared/shader.hpp \
 	$(SRC_PATH)/drawing/gl_shared/texture.cpp \
 	$(SRC_PATH)/drawing/gl_shared/texture.hpp \
+	$(SRC_PATH)/gui/button.cpp \
+	$(SRC_PATH)/gui/environment.cpp \
 	$(SRC_PATH)/states/loading.cpp \
 	$(SRC_PATH)/states/loading.hpp \
 	$(SRC_PATH)/states/menu.cpp \
@@ -51,7 +55,7 @@ LOCAL_SRC_FILES := $(SRC_PATH)/board.hpp \
 
 LOCAL_CPPFLAGS := -std=c++17 -fexceptions -DFMT_HEADER_ONLY
 
-LOCAL_SHARED_LIBRARIES := SDL2 SDL2_image protobuf ygopen ocgcore-proto
+LOCAL_SHARED_LIBRARIES := SDL2 SDL2_image SDL2_ttf protobuf ygopen ocgcore-proto
 
 LOCAL_LDLIBS := -lGLESv1_CM -lGLESv2 -llog
 
