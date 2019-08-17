@@ -16,3 +16,13 @@ if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
 	git clone --depth=1 https://github.com/fmtlib/fmt.git &
 	git clone --depth=1 https://github.com/nlohmann/json.git
 fi
+if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+	if [[ "$CXX" == "g++-9" ]]; then
+		brew install gcc
+	else
+		brew install llvm
+		curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://raw.githubusercontent.com/edo9300/ygopro/master/build-support/install-macOS-sdk.sh
+		chmod +x install-macOS-sdk.sh
+		./install-macOS-sdk.sh $MACOSX_DEPLOYMENT_TARGET
+	fi
+fi
