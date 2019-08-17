@@ -14,5 +14,5 @@ if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
 	cmake .. -DYGOPEN_GUI_USE_SYSTEM_FMT=OFF -DYGOPEN_GUI_USE_SYSTEM_JSON=OFF && make;
 fi
 if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-	cmake .. && make;
+	cmake .. && make VERBOSE=1;
 fi
