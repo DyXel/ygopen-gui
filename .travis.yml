@@ -65,3 +65,4 @@ matrix:
     - SDKROOT=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
 install: ./travis/dependencies.sh
 script: ./travis/build.sh
+before_deploy: ./travis/bundle.sh
