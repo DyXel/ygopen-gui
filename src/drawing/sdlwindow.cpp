@@ -1,4 +1,7 @@
 #include "sdlwindow.hpp"
+
+#include <string>
+
 #include "gl_include.hpp"
 #include "renderer.hpp"
 
