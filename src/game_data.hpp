@@ -19,10 +19,7 @@ class GameInstance;
 // between states and the main GameInstance.
 struct GameData
 {
-	GameData(GameInstance& gi);
 	~GameData();
-	GameInstance& instance; // Owner of this data
-	
 	// Values updated by GameInstance
 	float elapsed; // Time elapsed since last draw call.
 	int canvasWidth{DEFAULT_WINDOW_WIDTH}; // Canvas width in pixels
@@ -30,7 +27,7 @@ struct GameData
 	float dpi{}; // DPI of the screen, may be overriden by user settings
 	bool powerSaving{false};
 	
-	void InitLoad();
+	void InitLoad(Drawing::Renderer renderer);
 	void FinishLoad();
 	
 	// The following functions are called on a different thread they represent
@@ -45,6 +42,7 @@ struct GameData
 	bool LoadBkgs();
 	Drawing::Texture menuBkg;
 private:
+	Drawing::Renderer renderer{nullptr};
 	// Queue used to push image data down the GPU memory
 	// NOTE: needed because OpenGL is not multithreaded
 	std::queue<std::pair<Drawing::Texture, SDL_Surface*>> gpuPushQueue;

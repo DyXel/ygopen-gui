@@ -14,27 +14,30 @@ target_sources(ygopen-gui PRIVATE
 	${CSR}/state.hpp
 	${CSR}/text_smith.cpp
 	${CSR}/text_smith.hpp
-	${CSR}/drawing/api.cpp
-	${CSR}/drawing/api.hpp
 	${CSR}/drawing/gl_core_funcs.h
 	${CSR}/drawing/gl_es2_funcs.h
 	${CSR}/drawing/gl_include_defines.h
 	${CSR}/drawing/gl_include.cpp
 	${CSR}/drawing/gl_include.hpp
 	${CSR}/drawing/primitive.hpp
+	${CSR}/drawing/renderer.hpp
+	${CSR}/drawing/sdlwindow.cpp
+	${CSR}/drawing/sdlwindow.hpp
 	${CSR}/drawing/texture.hpp
 	${CSR}/drawing/types.hpp
-	${CSR}/drawing/dummy/primitive.cpp
-	${CSR}/drawing/dummy/primitive.hpp
-	${CSR}/drawing/dummy/texture.cpp
-	${CSR}/drawing/dummy/texture.hpp
 	${CSR}/drawing/gl_core/primitive.cpp
 	${CSR}/drawing/gl_core/primitive.hpp
+	${CSR}/drawing/gl_core/renderer.cpp
+	${CSR}/drawing/gl_core/renderer.hpp
 	${CSR}/drawing/gl_es/primitive.cpp
 	${CSR}/drawing/gl_es/primitive.hpp
+	${CSR}/drawing/gl_es/renderer.cpp
+	${CSR}/drawing/gl_es/renderer.hpp
 	${CSR}/drawing/gl_shared/common.hpp
 	${CSR}/drawing/gl_shared/program.cpp
 	${CSR}/drawing/gl_shared/program.hpp
+	${CSR}/drawing/gl_shared/renderer.cpp
+	${CSR}/drawing/gl_shared/renderer.hpp
 	${CSR}/drawing/gl_shared/shader.cpp
 	${CSR}/drawing/gl_shared/shader.hpp
 	${CSR}/drawing/gl_shared/texture.cpp

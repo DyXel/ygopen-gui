@@ -3,22 +3,20 @@
 #include <memory>
 #include <SDL.h>
 #include "game_data.hpp"
-#include "drawing/api.hpp"
+#include "drawing/sdlwindow.hpp"
 
 namespace YGOpen
 {
 
 namespace State
 {
-
 class IState;
-
 } // State
 
-class GameInstance
+class GameInstance : public Drawing::SDLWindow
 {
 public:
-	GameInstance();
+	GameInstance(const Drawing::Backend backend);
 	~GameInstance();
 	
 	GameInstance(const GameInstance&) = delete;
@@ -26,7 +24,6 @@ public:
 	GameInstance& operator=(const GameInstance&) = delete;
 	GameInstance& operator=(GameInstance&&) = delete;
 	
-	int Init(Drawing::Backend backend);
 	bool IsExiting() const;
 	void Exit();
 	void PropagateEvent(const SDL_Event& e);
@@ -36,7 +33,6 @@ public:
 private:
 	GameData data;
 	bool exiting{false};
-	SDL_Window* window{nullptr};
 	std::shared_ptr<State::IState> state;
 	
 	unsigned now{0u}, then{0u};

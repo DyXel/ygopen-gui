@@ -1,13 +1,15 @@
 #include "loading.hpp"
-#include "menu.hpp"
-#include "../game_data.hpp"
-#include "../game_instance.hpp"
 
 #include <string>
 
 #include <SDL_mutex.h>
 #include <SDL_rwops.h>
 #include <fmt/format.h>
+
+#include "menu.hpp"
+#include "../game_data.hpp"
+#include "../game_instance.hpp"
+#include "../drawing/renderer.hpp"
 
 namespace YGOpen
 {
@@ -31,18 +33,20 @@ namespace State
 TASKS()
 #undef X
 
-Loading::Loading(GameData* ptrData) : data(ptrData)
+Loading::Loading(GameData* ptrData, GameInstance& gi,
+                 Drawing::Renderer renderer) : data(ptrData), gi(gi),
+                 renderer(renderer)
 {
 	taskMtx = SDL_CreateMutex();
 	if(taskMtx == nullptr)
 	{
 		SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "SDL_CreateMutex: %s\n",
 		                SDL_GetError());
-		data->instance.Exit();
+		gi.Exit();
 		cancelled = true;
 		return;
 	}
-	data->InitLoad();
+	data->InitLoad(renderer);
 #define X(func) pendingJobs.emplace(&TASK_##func);
 TASKS()
 #undef X
@@ -76,7 +80,7 @@ void Loading::Tick()
 			if(!cancelled) // If tasks were not cancelled proceed normally
 			{
 				data->FinishLoad();
-				data->instance.SetState(std::make_shared<State::Menu>(data));
+				gi.SetState(std::make_shared<State::Menu>(renderer, data));
 			}
 		}
 		else // Start next task, thread will unlock mutex when done
@@ -89,7 +93,7 @@ void Loading::Tick()
 				SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
 				                "SDL_CreateThread: %s\n",
 				                SDL_GetError());
-				data->instance.Exit();
+				gi.Exit();
 				return;
 			}
 			SDL_DetachThread(t);
@@ -102,10 +106,7 @@ void Loading::Tick()
 }
 
 void Loading::Draw()
-{
-	Drawing::API::Clear();
-	Drawing::API::Present();
-}
+{}
 
 } // State
 } // YGOpen

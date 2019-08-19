@@ -4,16 +4,12 @@
 #include <SDL_mutex.h>
 #include <SDL_image.h>
 
-#include "game_instance.hpp"
 #include "sdl_utility.hpp"
-#include "drawing/api.hpp"
+#include "drawing/renderer.hpp"
 #include "drawing/texture.hpp"
 
 namespace YGOpen
 {
-
-GameData::GameData(GameInstance& gi) : instance(gi)
-{}
 
 GameData::~GameData()
 {
@@ -21,9 +17,10 @@ GameData::~GameData()
 		SDL_RWclose(guiFontFile);
 }
 
-void GameData::InitLoad()
+void GameData::InitLoad(Drawing::Renderer renderer)
 {
-	menuBkg = Drawing::API::NewTexture();
+	renderer = renderer;
+	menuBkg = renderer->NewTexture();
 }
 
 void GameData::FinishLoad()
@@ -89,11 +86,23 @@ bool GameData::LoadBkgs()
 {
 	auto TryPushOne = [&](Drawing::Texture tex, std::string_view path)
 	{
+		if(!tex)
+		{
+			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+			             "Invalid texture when loading '%s'", path.data());
+			return;
+		}
 		SDL_Surface* image = IMG_Load(path.data());
 		if(image && (image = SDLU_SurfaceToRGBA32(image)))
+		{
 			gpuPushQueue.emplace(tex, image);
+		}
 		else
-			SDL_Log("Unable to load %s: %s\n", path.data(), SDL_GetError());
+		{
+			SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+			             "Unable to load '%s': %s\n", path.data(),
+			             SDL_GetError());
+		}
 	};
 	std::string basePath = GAME_IMAGES_PATH;
 	TryPushOne(menuBkg, basePath + "menu_bkg.png");

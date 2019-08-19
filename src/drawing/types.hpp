@@ -53,10 +53,12 @@ enum PrimitiveDrawMode
 namespace Detail
 {
 class IPrimitive;
+class IRenderer;
 class ITexture;
 }
 
 using Primitive = std::shared_ptr<class Detail::IPrimitive>;
+using Renderer = std::shared_ptr<class Detail::IRenderer>;
 using Texture = std::shared_ptr<class Detail::ITexture>;
 
 } // Drawing

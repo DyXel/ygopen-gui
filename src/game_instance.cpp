@@ -1,4 +1,5 @@
 #include "game_instance.hpp"
+#include "drawing/renderer.hpp"
 #include "states/loading.hpp"
 
 namespace YGOpen
@@ -19,35 +20,9 @@ bool GetDisplayIndexFromWindow(SDL_Window* window, int* displayIndex)
 	return true;
 }
 
-GameInstance::GameInstance() : data(*this)
-{}
-
-GameInstance::~GameInstance()
+GameInstance::GameInstance(const Drawing::Backend backend) :
+	SDLWindow(backend)
 {
-	state.reset();
-	if(window != nullptr)
-		SDL_DestroyWindow(window);
-	Drawing::API::UnloadBackend();
-}
-
-int GameInstance::Init(Drawing::Backend backend)
-{
-	window = SDL_CreateWindow(DEFAULT_WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED,
-	                          SDL_WINDOWPOS_UNDEFINED, DEFAULT_WINDOW_WIDTH,
-	                          DEFAULT_WINDOW_HEIGHT, SDL_WINDOW_OPENGL |
-	                          SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN);
-	if(window == nullptr)
-	{
-		SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
-		                "Unable to create SDL Window: %s", SDL_GetError());
-		return -1;
-	}
-	if(!Drawing::API::LoadBackend(window, backend))
-	{
-		SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
-		                "Unable to load selected backend");
-		return -1;
-	}
 	auto SetDPI = [this]() -> bool
 	{
 		int displayIndex;
@@ -95,20 +70,17 @@ int GameInstance::Init(Drawing::Backend backend)
 		            "Unable to set window size. Using default.");
 	}
 #endif // #ifndef __ANDROID__
-	// TODO: move this to the API
-// 	if(SDL_GL_SetSwapInterval(-1) == -1)
-// 	{
-// 		SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
-// 		            "Unable to set adaptive vsync: %s", SDL_GetError());
-// 		// TODO: either make all of this a option or fallback to vsync
-// 	}
-	Drawing::API::UpdateDrawableSize(&data.canvasWidth, &data.canvasHeight);
-	Drawing::API::Clear();
-	Drawing::API::Present();
+	renderer->UpdateExtent(&data.canvasWidth, &data.canvasHeight);
+	renderer->Clear();
+	renderer->Present();
 	SDL_ShowWindow(window);
-	state = std::make_shared<State::Loading>(&data);
+	state = std::make_shared<State::Loading>(&data, *this, renderer);
 	now = then = static_cast<unsigned>(SDL_GetTicks());
-	return 0;
+}
+
+GameInstance::~GameInstance()
+{
+	state.reset();
 }
 
 bool GameInstance::IsExiting() const
@@ -132,7 +104,7 @@ void GameInstance::PropagateEvent(const SDL_Event& e)
 	if(eType == SDL_WINDOWEVENT &&
 	   e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
 	{
-		Drawing::API::UpdateDrawableSize(&data.canvasWidth, &data.canvasHeight);
+		renderer->UpdateExtent(&data.canvasWidth, &data.canvasHeight);
 	}
 	
 	if(eType != SDL_SYSWMEVENT)

@@ -4,8 +4,8 @@
 
 #include "environment.hpp"
 
-#include "../drawing/api.hpp"
 #include "../drawing/primitive.hpp"
+#include "../drawing/renderer.hpp"
 #include "../drawing/texture.hpp"
 
 namespace YGOpen
@@ -123,10 +123,10 @@ static const Drawing::TexCoords TEXT_TEXCOORDS =
 
 CButton::CButton(Environment& env) : IElement(env)
 {
-	shadow = Drawing::API::NewPrimitive();
-	content = Drawing::API::NewPrimitive();
-	lines = Drawing::API::NewPrimitive();
-	text = Drawing::API::NewPrimitive();
+	shadow = env.renderer->NewPrimitive();
+	content = env.renderer->NewPrimitive();
+	lines = env.renderer->NewPrimitive();
+	text = env.renderer->NewPrimitive();
 	
 	// Set up constant data
 	shadow->SetDrawMode(SHADOW_DRAW_MODE);
@@ -250,7 +250,7 @@ void CButton::SetCallback(Callback callback)
 void CButton::SetText(std::string_view txt)
 {
 	// Rebuild image
-	auto texture = Drawing::API::NewTexture();
+	auto texture = env.renderer->NewTexture();
 	SDL_Surface* image = env.font.ShadowedText(txt);
 	txtWidth = image->w;
 	txtHeight = image->h;

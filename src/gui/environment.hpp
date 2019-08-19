@@ -6,6 +6,7 @@
 #include "element.hpp"
 
 #include "../text_smith.hpp"
+#include "../drawing/types.hpp"
 
 namespace YGOpen
 {
@@ -16,9 +17,11 @@ namespace GUI
 class Environment
 {
 public:
+	Drawing::Renderer renderer;
 	TextSmith& font;
 
-	Environment(TextSmith& font, const float& elapsed);
+	Environment(Drawing::Renderer renderer, TextSmith& font,
+	            const float& elapsed);
 	void Add(const Element& ele);
 	void Remove(const Element& ele);
 	

@@ -1,10 +1,6 @@
-#include <memory>
 #include <SDL.h>
 #include <SDL_image.h>
 #include "game_instance.hpp"
-#include "drawing/api.hpp"
-
-static std::unique_ptr<YGOpen::GameInstance> gi;
 
 #if defined(__ANDROID__)
 static constexpr Drawing::Backend DEFAULT_BACKEND = Drawing::OPENGL_ES;
@@ -14,7 +10,8 @@ static constexpr Drawing::Backend DEFAULT_BACKEND = Drawing::OPENGL_CORE;
 
 extern "C" int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 {
-	static int exitCode = 0;
+	int exitCode = 0;
+	SDL_Event e;
 	if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
 	{
 		SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
@@ -29,7 +26,7 @@ extern "C" int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
 			                "Unable to initialize SDL_image: %s",
 			                IMG_GetError());
-			exitCode = 1;
+			exitCode = 2;
 			goto quit;
 		}
 	}
@@ -39,29 +36,27 @@ extern "C" int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 			SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
 			                "Unable to initialize SDL_ttf: %s",
 			                TTF_GetError());
-			exitCode = 1;
+			exitCode = 3;
 		}
 	}
-	// TODO: select backend from commandline and fallback
-	Drawing::API::PreloadBackend(DEFAULT_BACKEND);
-	gi = std::make_unique<YGOpen::GameInstance>();
-	if(gi->Init(DEFAULT_BACKEND) != 0)
+	try
 	{
-		SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
-		                "Unable to initialize main game instance");
-		exitCode = 1;
+		YGOpen::GameInstance gi(DEFAULT_BACKEND);
+		while(!gi.IsExiting())
+		{
+			while(SDL_PollEvent(&e))
+				gi.PropagateEvent(e);
+			gi.TickOnce();
+			gi.DrawOnce();
+		}
+	}
+	catch(const std::exception& e)
+	{
+		SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, e.what());
+		exitCode = 4;
 		goto quit;
 	}
-	SDL_Event e;
-	while(!gi->IsExiting())
-	{
-		while(SDL_PollEvent(&e))
-			gi->PropagateEvent(e);
-		gi->TickOnce();
-		gi->DrawOnce();
-	}
 quit:
-	gi.reset();
 	TTF_Quit();
 	IMG_Quit();
 	SDL_Quit();

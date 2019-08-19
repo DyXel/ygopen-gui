@@ -8,6 +8,7 @@
 #include "../sdl_utility.hpp"
 
 #include "../drawing/primitive.hpp"
+#include "../drawing/renderer.hpp"
 #include "../drawing/texture.hpp"
 #include "../drawing/types.hpp"
 
@@ -31,10 +32,11 @@ static const Drawing::Colors BKG_COLORS =
 	BKG_COLOR, BKG_COLOR, BKG_COLOR, BKG_COLOR,
 };
 
-Menu::Menu(GameData* ptrData) :
-	data(ptrData), env(data->guiFont, data->elapsed)
+Menu::Menu(Drawing::Renderer renderer, GameData* ptrData) :
+	renderer(renderer), data(ptrData), env(renderer, data->guiFont,
+	data->elapsed)
 {
-	bkg = Drawing::API::NewPrimitive();
+	bkg = renderer->NewPrimitive();
 	
 	// Background quad
 	bkg->SetDrawMode(BKG_DRAWING_MODE);
@@ -71,10 +73,10 @@ void Menu::Tick()
 
 void Menu::Draw()
 {
-// 	Drawing::API::Clear();
+	renderer->Clear();
 	bkg->Draw();
 	env.Draw();
-	Drawing::API::Present();
+	renderer->Present();
 }
 
 void Menu::OnResize()
