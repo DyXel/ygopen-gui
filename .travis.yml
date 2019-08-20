@@ -22,6 +22,7 @@ addons:
   homebrew:
     update: true
     packages:
+    - dylibbundler
     - protobuf
     - sdl2
     - sdl2_image
@@ -47,8 +48,21 @@ matrix:
     env: 
     - CC=gcc-9 
     - CXX=g++-9
-  - name: "macOS Mojave"
+  - name: "Mojave LLVM"
     os: osx
-    osx_image: xcode10.2
+    osx_image: xcode10.3
+    env:
+    - CXX="/usr/local/opt/llvm/bin/clang++"
+    - MACOSX_DEPLOYMENT_TARGET=10.11
+    - CXXFLAGS="-I/usr/local/opt/llvm/include"
+    - LDFLAGS="-L/usr/local/opt/llvm/lib"
+  - name: "Mojave GCC"
+    os: osx
+    osx_image: xcode10.3
+    env:
+    - CXX=g++-9
+    - MACOSX_DEPLOYMENT_TARGET=10.11
+    - SDKROOT=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
 install: ./travis/dependencies.sh
 script: ./travis/build.sh
+before_deploy: ./travis/bundle.sh
