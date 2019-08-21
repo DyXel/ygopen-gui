@@ -1,6 +1,8 @@
 #include "game_instance.hpp"
+
 #include "drawing/renderer.hpp"
 #include "states/loading.hpp"
+#include <utility>
 
 namespace YGOpen
 {
@@ -113,7 +115,7 @@ void GameInstance::PropagateEvent(const SDL_Event& e)
 
 void GameInstance::TickOnce()
 {
-	if(recording)
+	if(recording != 0u)
 		now += 1000u / recording;
 	else
 		now = static_cast<unsigned>(SDL_GetTicks());
@@ -129,8 +131,8 @@ void GameInstance::DrawOnce()
 
 void GameInstance::SetState(std::shared_ptr<State::IState> newState)
 {
-	state = newState;
+	state = std::move(newState);
 }
 
 
-} // YGOpen
+} // namespace YGOpen

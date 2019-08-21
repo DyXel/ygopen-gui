@@ -7,7 +7,7 @@ SDL_Surface* SDLU_EmptySurface()
 
 SDL_Surface* SDLU_SurfaceToRGBA32(SDL_Surface* surf)
 {
-	if(!surf)
+	if(surf == nullptr)
 	{
 		SDL_SetError("Surface is NULL");
 		return nullptr;
@@ -16,7 +16,7 @@ SDL_Surface* SDLU_SurfaceToRGBA32(SDL_Surface* surf)
 	{
 		newSurf = SDL_ConvertSurfaceFormat(surf, SDL_PIXELFORMAT_RGBA32, 0);
 		SDL_FreeSurface(surf);
-		if(!newSurf)
+		if(newSurf == nullptr)
 			newSurf = SDLU_EmptySurface();
 		return newSurf;
 	}
@@ -28,7 +28,7 @@ std::unique_ptr<char[]> SDLU_TextFromFile(std::string_view path)
 	SDL_RWops* rw = SDL_RWFromFile(path.data(), "rb");
 	if (rw == nullptr)
 		return std::unique_ptr<char[]>();
-	const std::size_t fileSize = static_cast<std::size_t>(SDL_RWsize(rw));
+	const auto fileSize = static_cast<std::size_t>(SDL_RWsize(rw));
 	std::unique_ptr<char[]> fileData(new char[fileSize + 1]);
 	std::size_t readTotal = 0, read = 1;
 	char* buf = fileData.get();
@@ -42,5 +42,5 @@ std::unique_ptr<char[]> SDLU_TextFromFile(std::string_view path)
 	if(readTotal != fileSize)
 		return std::unique_ptr<char[]>();
 	fileData[readTotal] = '\0';
-	return std::move(fileData);
+	return fileData;
 }

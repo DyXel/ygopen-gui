@@ -3,7 +3,7 @@
 
 #ifndef USE_PROTOTYPES_GL
 #define SDL_PROC(ret,func,params) ret (APIENTRY *func) params;
-#include "gl_es2_funcs.h"
 #include "gl_core_funcs.h"
+#include "gl_es2_funcs.h"
 #undef SDL_PROC
 #endif

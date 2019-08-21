@@ -32,7 +32,7 @@ static const Drawing::Colors BKG_COLORS =
 	BKG_COLOR, BKG_COLOR, BKG_COLOR, BKG_COLOR,
 };
 
-Menu::Menu(Drawing::Renderer renderer, GameData* ptrData) :
+Menu::Menu(const Drawing::Renderer& renderer, GameData* ptrData) :
 	renderer(renderer), data(ptrData), env(renderer, data->guiFont,
 	data->elapsed)
 {
@@ -46,9 +46,9 @@ Menu::Menu(Drawing::Renderer renderer, GameData* ptrData) :
 	
 	// GUI setup
 	duelBtn = std::make_shared<GUI::CButton>(env);
-	duelBtn->SetText(u8"Duel"); // TODO: move to i18n config file
+	duelBtn->SetText(u8"Duel"); // TODO(dyxel): move to i18n config file
 	exitBtn = std::make_shared<GUI::CButton>(env);
-	exitBtn->SetText(u8"Exit"); // TODO: move to i18n config file
+	exitBtn->SetText(u8"Exit"); // TODO(dyxel): move to i18n config file
 	
 	env.Add(duelBtn);
 	env.Add(exitBtn);
@@ -105,6 +105,6 @@ void Menu::OnResize()
 	exitBtn->Resize(proj, bCanvas);
 }
 
-} // State
+} // namespace State
 
-} // YGOpen
+} // namespace YGOpen

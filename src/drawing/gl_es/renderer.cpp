@@ -18,8 +18,8 @@ Drawing::Primitive Renderer::NewPrimitive()
 	return std::make_shared<Primitive>(primProg, texPrimProg);
 }
 
-} // GLES
+}  // namespace GLES
 
-} // Detail
+}  // namespace Detail
 
-} // Drawing
+}  // namespace Drawing

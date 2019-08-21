@@ -12,21 +12,21 @@ static SDL_Rect SHADOW_RECT = {SHADOW_DISTANCE_X, SHADOW_DISTANCE_Y, 0, 0};
 
 TextSmith::~TextSmith()
 {
-	if(f)
+	if(f != nullptr)
 		TTF_CloseFont(f);
 }
 
 bool TextSmith::LoadFont(SDL_RWops* fontFile, int size)
 {
-	if(f)
+	if(f != nullptr)
 		TTF_CloseFont(f);
-	if(!(f = TTF_OpenFontRW(fontFile, 0, size)))
+	if((f = TTF_OpenFontRW(fontFile, 0, size)) == nullptr)
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't load font: %s",
 		             TTF_GetError());
-		return f;
+		return f != nullptr;
 	}
-	return f;
+	return f != nullptr;
 }
 
 void TextSmith::SetTextColor(const SDL_Color& c)
@@ -41,7 +41,7 @@ void TextSmith::SetShadowColor(const SDL_Color& c)
 
 SDL_Surface* TextSmith::Text(std::string_view text) const
 {
-	if(!f)
+	if(f == nullptr)
 		return SDLU_EmptySurface();
 	SDL_Surface* fgText = TTF_RenderUTF8_Blended(f, text.data(), tc);
 	return SDLU_SurfaceToRGBA32(fgText);
@@ -49,13 +49,13 @@ SDL_Surface* TextSmith::Text(std::string_view text) const
 
 SDL_Surface* TextSmith::ShadowedText(std::string_view text) const
 {
-	if(!f)
+	if(f == nullptr)
 		return SDLU_EmptySurface();
 	SDL_Surface* fgText;
 	SDL_Surface* bgText;
-	if(!(fgText = TTF_RenderUTF8_Blended(f, text.data(), tc)))
+	if((fgText = TTF_RenderUTF8_Blended(f, text.data(), tc)) == nullptr)
 		return SDLU_EmptySurface();
-	if(!(bgText = TTF_RenderUTF8_Blended(f, text.data(), sc)))
+	if((bgText = TTF_RenderUTF8_Blended(f, text.data(), sc)) == nullptr)
 	{
 		SDL_FreeSurface(fgText);
 		return SDLU_EmptySurface();
@@ -72,4 +72,4 @@ SDL_Surface* TextSmith::ShadowedText(std::string_view text) const
 	return eText;
 }
 
-} // YGOpen
+}  // namespace YGOpen

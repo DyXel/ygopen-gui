@@ -1,19 +1,19 @@
 #include "game_data.hpp"
 
-#include <string_view>
-#include <SDL_mutex.h>
 #include <SDL_image.h>
+#include <SDL_mutex.h>
+#include <string_view>
 
-#include "sdl_utility.hpp"
 #include "drawing/renderer.hpp"
 #include "drawing/texture.hpp"
+#include "sdl_utility.hpp"
 
 namespace YGOpen
 {
 
 GameData::~GameData()
 {
-	if(guiFontFile)
+	if(guiFontFile != nullptr)
 		SDL_RWclose(guiFontFile);
 }
 
@@ -93,7 +93,8 @@ bool GameData::LoadBkgs()
 			return;
 		}
 		SDL_Surface* image = IMG_Load(path.data());
-		if(image && (image = SDLU_SurfaceToRGBA32(image)))
+		if((image != nullptr) &&
+		  ((image = SDLU_SurfaceToRGBA32(image)) != nullptr))
 		{
 			gpuPushQueue.emplace(tex, image);
 		}
@@ -109,4 +110,4 @@ bool GameData::LoadBkgs()
 	return true;
 }
 
-} // YGOpen
+} // namespace YGOpen

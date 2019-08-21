@@ -18,7 +18,7 @@ namespace State
 class Menu : public IState
 {
 public:
-	Menu(Drawing::Renderer renderer, GameData* ptrData);
+	Menu(const Drawing::Renderer& renderer, GameData* ptrData);
 	virtual ~Menu() = default;
 	void OnEvent(const SDL_Event& e) override;
 	void Tick() override;
@@ -26,7 +26,7 @@ public:
 private:
 	Drawing::Renderer renderer;
 	GameData* data;
-	Drawing::Matrix proj;
+	Drawing::Matrix proj{};
 	Drawing::Primitive bkg;
 	GUI::Environment env;
 	GUI::Button duelBtn;

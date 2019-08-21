@@ -1,5 +1,7 @@
 #include "environment.hpp"
 
+#include <utility>
+
 namespace YGOpen
 {
 
@@ -8,7 +10,7 @@ namespace GUI
 
 Environment::Environment(Drawing::Renderer renderer, TextSmith& font,
                          const float& elapsed) :
-	renderer(renderer), font(font), elapsed(elapsed)
+	renderer(std::move(renderer)), font(font), elapsed(elapsed)
 {}
 
 void Environment::Add(const Element& ele)
@@ -23,13 +25,13 @@ void Environment::Remove(const Element& ele)
 
 void Environment::AddToTickSet(const Element& ele)
 {
-	if(focused == ele || elements.count(ele))
+	if(focused == ele || (elements.count(ele) != 0u))
 		tickset.insert(ele);
 }
 
 void Environment::RemoveFromTickSet(const Element& ele)
 {
-	if(tickset.count(ele))
+	if(tickset.count(ele) != 0u)
 		ticksetToRemove.push(ele);
 }
 
@@ -54,7 +56,7 @@ void Environment::Draw()
 
 bool Environment::Focus(const Element& ele)
 {
-	if(focused != ele && elements.count(ele))
+	if(focused != ele && (elements.count(ele) != 0u))
 	{
 		if(focused)
 		{
@@ -83,6 +85,6 @@ float Environment::GetTimeElapsed() const
 	return elapsed;
 }
 
-} // GUI
+}  // namespace GUI
 
-} // YGOpen
+}  // namespace YGOpen

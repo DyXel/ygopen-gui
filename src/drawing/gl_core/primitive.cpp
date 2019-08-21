@@ -118,8 +118,8 @@ void Primitive::Draw()
 		glDrawArrays(mode, 0, drawCount);
 }
 
-} // GLCore
+}  // namespace GLCore
 
-} // Detail
+}  // namespace Detail
 
-} // Drawing
+}  // namespace Drawing

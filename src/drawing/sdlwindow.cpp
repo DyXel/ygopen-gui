@@ -69,7 +69,7 @@ SDLWindow::SDLWindow(const Backend backend)
 	{
 		std::string errStr("Unable to create SDL Window: ");
 		errStr += SDL_GetError();
-		throw std::runtime_error(std::move(errStr));
+		throw std::runtime_error(errStr);
 	}
 	
 	glCtx = SDL_GL_CreateContext(window);
@@ -100,8 +100,8 @@ SDLWindow::~SDLWindow()
 #define SDL_PROC(ret,f,params) \
 	do \
 	{ \
-		f = reinterpret_cast<decltype(f)>(SDL_GL_GetProcAddress(#f)); \
-		if (!f) \
+		(f) = reinterpret_cast<decltype(f)>(SDL_GL_GetProcAddress(#f)); \
+		if (!(f)) \
 		{ \
 			SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, \
 			                "Couldn't load GL function %s: %s", \
@@ -113,8 +113,8 @@ SDLWindow::~SDLWindow()
 bool SDLWindow::LoadGLCore()
 {
 #ifndef USE_PROTOTYPES_GL
-#include "gl_es2_funcs.h"
 #include "gl_core_funcs.h"
+#include "gl_es2_funcs.h"
 #endif
 	GLLogStrings();
 	return true;
@@ -131,4 +131,4 @@ bool SDLWindow::LoadGLES()
 
 #undef SDL_PROC
 
-} // Drawing
+} // namespace Drawing

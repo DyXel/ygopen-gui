@@ -47,8 +47,8 @@ public:
 private:
 	const GLShared::Program& program;
 	const GLShared::Program& texProgram;
-	std::array<GLuint, GLShared::ATTR_COUNT> vbo;
-	std::array<bool, GLShared::ATTR_COUNT> usedVbo;
+	std::array<GLuint, GLShared::ATTR_COUNT> vbo{};
+	std::array<bool, GLShared::ATTR_COUNT> usedVbo{};
 	GLenum mode{GL_TRIANGLES};
 	GLsizei drawCount{0};
 	Matrix mat{1.0f};

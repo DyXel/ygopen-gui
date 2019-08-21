@@ -35,8 +35,8 @@ void Texture::Bind()
 	glBindTexture(GL_TEXTURE_2D, ref);
 }
 
-} // GLShared
+}  // namespace GLShared
 
-} // Detail
+}  // namespace Detail
 
-} // Drawing
+}  // namespace Drawing

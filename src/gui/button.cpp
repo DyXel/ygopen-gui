@@ -1,6 +1,7 @@
 #include "button.hpp"
 
 #include <glm/gtc/matrix_transform.hpp> // glm::translate
+#include <utility>
 
 #include "environment.hpp"
 
@@ -145,8 +146,8 @@ CButton::CButton(Environment& env) : IElement(env)
 void CButton::Resize(const Drawing::Matrix& mat, const SDL_Rect& rect)
 {
 	r = rect;
-	const float w = static_cast<float>(rect.w);
-	const float h = static_cast<float>(rect.h);
+	const auto w = static_cast<float>(rect.w);
+	const auto h = static_cast<float>(rect.h);
 	
 	// Update shadow vertices
 	shadowVertices[1].x = (shadowVertices[5].x = w) + SHADOW_SIZE;
@@ -231,7 +232,7 @@ bool CButton::OnEvent(const SDL_Event& e)
 	if(e.type == SDL_MOUSEMOTION)
 	{
 		SDL_Point p = {e.motion.x, e.motion.y};
-		if(SDL_PointInRect(&p, &r))
+		if(SDL_PointInRect(&p, &r) != 0u)
 		{
 			auto ele = IElement::shared_from_this();
 			env.RemoveFromTickSet(ele);
@@ -244,7 +245,7 @@ bool CButton::OnEvent(const SDL_Event& e)
 
 void CButton::SetCallback(Callback callback)
 {
-	cb = callback;
+	cb = std::move(callback);
 }
 
 void CButton::SetText(std::string_view txt)
@@ -259,6 +260,6 @@ void CButton::SetText(std::string_view txt)
 	SDL_FreeSurface(image);
 }
 
-} // GUI
+} // namespace GUI
 
-} // YGOpen
+} // namespace YGOpen

@@ -6,10 +6,10 @@
 #include <SDL_rwops.h>
 #include <fmt/format.h>
 
-#include "menu.hpp"
+#include "../drawing/renderer.hpp"
 #include "../game_data.hpp"
 #include "../game_instance.hpp"
-#include "../drawing/renderer.hpp"
+#include "menu.hpp"
 
 namespace YGOpen
 {
@@ -34,7 +34,7 @@ TASKS()
 #undef X
 
 Loading::Loading(GameData* ptrData, GameInstance& gi,
-                 Drawing::Renderer renderer) : data(ptrData), gi(gi),
+                 const Drawing::Renderer& renderer) : data(ptrData), gi(gi),
                  renderer(renderer)
 {
 	taskMtx = SDL_CreateMutex();
@@ -55,7 +55,7 @@ TASKS()
 
 Loading::~Loading()
 {
-	if(taskMtx)
+	if(taskMtx != nullptr)
 		SDL_DestroyMutex(taskMtx);
 }
 
@@ -85,7 +85,7 @@ void Loading::Tick()
 		}
 		else // Start next task, thread will unlock mutex when done
 		{
-			auto task = std::move(pendingJobs.front());
+			auto task = pendingJobs.front();
 			pendingJobs.pop();
 			SDL_Thread* t = SDL_CreateThread(task, "LOADTASK", this);
 			if(t == nullptr)
@@ -108,5 +108,5 @@ void Loading::Tick()
 void Loading::Draw()
 {}
 
-} // State
-} // YGOpen
+}  // namespace State
+}  // namespace YGOpen

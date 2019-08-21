@@ -19,13 +19,13 @@ public:
 	
 	using Callback = std::function<void(void)>;
 	void SetCallback(Callback callback);
-	void SetText(std::string_view desired);
+	void SetText(std::string_view txt);
 protected:
 	void Tick() override;
 	void OnFocus(bool gained) override;
 	bool OnEvent(const SDL_Event& e) override;
 private:
-	SDL_Rect r;
+	SDL_Rect r{};
 	Callback cb;
 	float brightness{1.0f};
 	Drawing::Primitive shadow;

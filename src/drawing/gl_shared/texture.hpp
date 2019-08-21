@@ -22,7 +22,7 @@ public:
 	
 	void Bind();
 private:
-	GLuint ref;
+	GLuint ref{};
 };
 
 } // GLShared

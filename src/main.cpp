@@ -1,6 +1,6 @@
+#include "game_instance.hpp"
 #include <SDL.h>
 #include <SDL_image.h>
-#include "game_instance.hpp"
 
 #if defined(__ANDROID__)
 static constexpr Drawing::Backend DEFAULT_BACKEND = Drawing::OPENGL_ES;
@@ -44,7 +44,7 @@ extern "C" int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		YGOpen::GameInstance gi(DEFAULT_BACKEND);
 		while(!gi.IsExiting())
 		{
-			while(SDL_PollEvent(&e))
+			while(SDL_PollEvent(&e) != 0)
 				gi.PropagateEvent(e);
 			gi.TickOnce();
 			gi.DrawOnce();
@@ -52,7 +52,7 @@ extern "C" int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 	}
 	catch(const std::exception& e)
 	{
-		SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, e.what());
+		SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "%s", e.what());
 		exitCode = 4;
 		goto quit;
 	}

@@ -102,7 +102,7 @@ void Primitive::Draw()
 	TryEnableVBO(GLShared::ATTR_VERTICES);
 	TryEnableVBO(GLShared::ATTR_COLORS);
 	TryEnableVBO(GLShared::ATTR_TEXCOORDS);
-	// TODO: indices are never bound. 
+	// TODO(dyxel): indices are never bound. 
 	// This will break as soon as using diff indices
 // 	TryEnableVBO(GLShared::ATTR_INDICES);
 	if(usedVbo[GLShared::ATTR_INDICES])
@@ -130,8 +130,8 @@ void Primitive::TryEnableVBO(const GLShared::AttrLocation& attrLoc)
 	glEnableVertexAttribArray(attrLoc);
 }
 
-} // GLES
+}  // namespace GLES
 
-} // Detail
+}  // namespace Detail
 
-} // Drawing
+}  // namespace Drawing

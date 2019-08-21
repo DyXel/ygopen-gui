@@ -95,8 +95,8 @@ GLuint Program::GetGLRef() const
 	return ref;
 }
 
-} // GLShared
+}  // namespace GLShared
 
-} // Detail
+}  // namespace Detail
 
-} // Drawing
+}  // namespace Drawing

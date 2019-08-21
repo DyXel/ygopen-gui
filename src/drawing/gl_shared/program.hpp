@@ -32,7 +32,7 @@ public:
 private:
 	GLuint ref{0};
 	enum {UNI_MODEL_MAT, UNI_BRIGHTNESS_FLOAT, UNI_COUNT};
-	std::array<GLint, UNI_COUNT> uni;
+	std::array<GLint, UNI_COUNT> uni{};
 };
 
 } // GLShared

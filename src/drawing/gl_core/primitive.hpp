@@ -45,8 +45,8 @@ private:
 	const GLShared::Program& program;
 	const GLShared::Program& texProgram;
 	bool drawByIndex{false};
-	GLuint vao;
-	std::array<GLuint, GLShared::ATTR_COUNT> vbo;
+	GLuint vao{};
+	std::array<GLuint, GLShared::ATTR_COUNT> vbo{};
 	GLenum mode{GL_TRIANGLES};
 	GLsizei drawCount{0};
 	Matrix mat{1.0f};

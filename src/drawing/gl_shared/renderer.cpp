@@ -121,22 +121,22 @@ bool Renderer::SetVSync([[maybe_unused]] VSyncState state)
 	{
 		case VSyncState::VSYNC_STATE_DISABLED:
 		{
-			return !SDL_GL_SetSwapInterval(0);
+			return SDL_GL_SetSwapInterval(0) == 0;
 		}
 		case VSyncState::VSYNC_STATE_ENABLED:
 		{
-			return !SDL_GL_SetSwapInterval(1);
+			return SDL_GL_SetSwapInterval(1) == 0;
 		}
 		case VSyncState::VSYNC_STATE_ADAPTIVE:
 		{
-			return !SDL_GL_SetSwapInterval(-1);
+			return SDL_GL_SetSwapInterval(-1) == 0;
 		}
 	}
 	return false;
 }
 
-} // GLShared
+}  // namespace GLShared
 
-} // Detail
+}  // namespace Detail
 
-} // Drawing
+}  // namespace Drawing
