@@ -32,9 +32,9 @@ static const Drawing::Colors BKG_COLORS =
 	BKG_COLOR, BKG_COLOR, BKG_COLOR, BKG_COLOR,
 };
 
-Menu::Menu(const Drawing::Renderer& renderer, GameData* ptrData) :
-	renderer(renderer), data(ptrData), env(renderer, data->guiFont,
-	data->elapsed)
+Menu::Menu(const Drawing::Renderer& renderer, GameData& data) :
+	renderer(renderer), data(data), env(renderer, data.guiFont,
+	data.elapsed)
 {
 	bkg = renderer->NewPrimitive();
 	
@@ -42,7 +42,7 @@ Menu::Menu(const Drawing::Renderer& renderer, GameData* ptrData) :
 	bkg->SetDrawMode(BKG_DRAWING_MODE);
 	bkg->SetVertices(BKG_VERTICES);
 	bkg->SetTexCoords({{0.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 1.0f}, {1.0f, 1.0f}});
-	bkg->SetTexture(data->menuBkg);
+	bkg->SetTexture(data.menuBkg);
 	
 	// GUI setup
 	duelBtn = std::make_shared<GUI::CButton>(env);
@@ -81,8 +81,8 @@ void Menu::Draw()
 
 void Menu::OnResize()
 {
-	const int& w = data->canvasWidth;
-	const int& h = data->canvasHeight;
+	const int& w = data.canvasWidth;
+	const int& h = data.canvasHeight;
 	SDL_Rect bCanvas;
 	proj = glm::ortho<float>(0.0f, w, h, 0.0f);
 	if(w >= h)

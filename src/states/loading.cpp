@@ -26,16 +26,16 @@ namespace State
 	{ \
 		auto loading = static_cast<Loading*>(voidData); \
 		SDL_LockMutex(loading->taskMtx); \
-		loading->data->func(); \
+		loading->data.func(); \
 		SDL_UnlockMutex(loading->taskMtx); \
 		return 1; \
 	}
 TASKS()
 #undef X
 
-Loading::Loading(GameData* ptrData, GameInstance& gi,
-                 const Drawing::Renderer& renderer) : data(ptrData), gi(gi),
-                 renderer(renderer)
+Loading::Loading(GameData& data, GameInstance& gi,
+                 const Drawing::Renderer& renderer) :
+	data(data), gi(gi), renderer(renderer)
 {
 	taskMtx = SDL_CreateMutex();
 	if(taskMtx == nullptr)
@@ -46,7 +46,7 @@ Loading::Loading(GameData* ptrData, GameInstance& gi,
 		cancelled = true;
 		return;
 	}
-	data->InitLoad(renderer);
+	data.InitLoad(renderer);
 #define X(func) pendingJobs.emplace(&TASK_##func);
 TASKS()
 #undef X
@@ -79,7 +79,7 @@ void Loading::Tick()
 		{
 			if(!cancelled) // If tasks were not cancelled proceed normally
 			{
-				data->FinishLoad();
+				data.FinishLoad();
 				gi.SetState(std::make_shared<State::Menu>(renderer, data));
 			}
 		}
