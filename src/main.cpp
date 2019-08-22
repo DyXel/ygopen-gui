@@ -48,6 +48,8 @@ extern "C" int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 	catch(const std::exception& e)
 	{
 		SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "%s", e.what());
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, u8"Critical Error",
+		                         e.what(), nullptr);
 		exitCode = 4;
 		goto quit;
 	}
