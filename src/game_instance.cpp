@@ -47,6 +47,7 @@ GameInstance::GameInstance(const Drawing::Backend backend) :
 	}
 	SDL_Log("Current DPI: %.2f", static_cast<double>(data.dpi));
 #ifndef __ANDROID__
+	// Sets window to 80% size of the display it is currently in.
 	auto SetWindowSize = [this]() -> bool
 	{
 		int displayIndex;
@@ -70,6 +71,7 @@ GameInstance::GameInstance(const Drawing::Backend backend) :
 	{
 		SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
 		            "Unable to set window size. Using default.");
+		SDL_SetWindowSize(window, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
 	}
 #endif // #ifndef __ANDROID__
 	renderer->UpdateExtent(&data.canvasWidth, &data.canvasHeight);
