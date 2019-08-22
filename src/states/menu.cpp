@@ -45,9 +45,9 @@ Menu::Menu(const Drawing::Renderer& renderer, GameData& data) :
 	bkg->SetTexture(data.menuBkg);
 	
 	// GUI setup
-	duelBtn = std::make_shared<GUI::CButton>(env);
+	duelBtn = GUI::CButton::New(env);
 	duelBtn->SetText(u8"Duel"); // TODO(dyxel): move to i18n config file
-	exitBtn = std::make_shared<GUI::CButton>(env);
+	exitBtn = GUI::CButton::New(env);
 	exitBtn->SetText(u8"Exit"); // TODO(dyxel): move to i18n config file
 	
 	env.Add(duelBtn);

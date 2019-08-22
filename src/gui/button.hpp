@@ -10,10 +10,18 @@ namespace YGOpen
 namespace GUI
 {
 
+class CButton;
+
+using Button = std::shared_ptr<CButton>;
+
 class CButton : public IElement
 {
 public:
-	CButton(Environment& env);
+	template<typename... Args>
+	static Button New(Args&&... args)
+	{
+		return Button(new CButton(std::forward<Args>(args)...));
+	}
 	void Resize(const Drawing::Matrix& mat, const SDL_Rect& rect) override;
 	void Draw() override;
 	
@@ -21,6 +29,7 @@ public:
 	void SetCallback(Callback callback);
 	void SetText(std::string_view txt);
 protected:
+	CButton(Environment& env);
 	void Tick() override;
 	void OnFocus(bool gained) override;
 	bool OnEvent(const SDL_Event& e) override;
@@ -35,8 +44,6 @@ private:
 	int txtWidth{0};
 	int txtHeight{0};
 };
-
-using Button = std::shared_ptr<CButton>;
 
 }
 
