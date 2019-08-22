@@ -51,8 +51,8 @@ bool GameData::LoadConfigs()
 	}
 	catch(const std::exception& e)
 	{
-		SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
-		            "Could not apply user settings: %s", e.what());
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+		             "Could not apply user settings: %s", e.what());
 		return false;
 	}
 // 	cfgs->global.dump(1, '\t', false,
@@ -75,8 +75,8 @@ bool GameData::LoadGUIFont()
 	}
 	catch(const std::exception& e)
 	{
-		SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
-		            "Could not load font: %s", e.what());
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
+		             "Could not load font: %s", e.what());
 		return false;
 	}
 	return true;
