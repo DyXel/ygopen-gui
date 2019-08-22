@@ -1,4 +1,5 @@
 #include "game_instance.hpp"
+#include <memory>
 #include <SDL.h>
 #include <SDL_image.h>
 
@@ -12,6 +13,7 @@ extern "C" int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 {
 	int exitCode = 0;
 	SDL_Event e;
+	std::unique_ptr<YGOpen::GameInstance> gi;
 	if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
 	{
 		SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
@@ -41,14 +43,7 @@ extern "C" int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 	}
 	try
 	{
-		YGOpen::GameInstance gi(DEFAULT_BACKEND);
-		while(!gi.IsExiting())
-		{
-			while(SDL_PollEvent(&e) != 0)
-				gi.PropagateEvent(e);
-			gi.TickOnce();
-			gi.DrawOnce();
-		}
+		gi = std::make_unique<YGOpen::GameInstance>(DEFAULT_BACKEND);
 	}
 	catch(const std::exception& e)
 	{
@@ -56,7 +51,15 @@ extern "C" int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		exitCode = 4;
 		goto quit;
 	}
+	while(!gi->IsExiting())
+	{
+		while(SDL_PollEvent(&e) != 0)
+			gi->PropagateEvent(e);
+		gi->TickOnce();
+		gi->DrawOnce();
+	}
 quit:
+	gi.reset();
 	TTF_Quit();
 	IMG_Quit();
 	SDL_Quit();
