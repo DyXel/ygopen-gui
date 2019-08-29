@@ -12,5 +12,4 @@ if(NOT YGOPEN_GUI_USE_SYSTEM_JSON)
 	add_subdirectory(json)
 endif()
 
-add_subdirectory(ocgcore-proto)
 add_subdirectory(ygopen)

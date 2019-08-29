@@ -59,7 +59,6 @@ target_link_libraries(ygopen-gui PRIVATE
 	glm
 	nlohmann_json::nlohmann_json
 	fmt::fmt
-	ocgcore-proto
 	ygopen
 )
 
