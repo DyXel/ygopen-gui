@@ -19,8 +19,6 @@ fi
 if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
 	if [[ "$CXX" == "/usr/local/opt/llvm/bin/clang++" ]]; then
 		brew install llvm
-		curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://raw.githubusercontent.com/edo9300/ygopro/master/build-support/install-macOS-sdk.sh
-		chmod +x install-macOS-sdk.sh
-		./install-macOS-sdk.sh $MACOSX_DEPLOYMENT_TARGET
+		./travis/get-osx-sdk.sh $MACOSX_DEPLOYMENT_TARGET
 	fi
 fi
