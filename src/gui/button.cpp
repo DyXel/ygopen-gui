@@ -6,6 +6,7 @@
 #include "environment.hpp"
 
 #include "../drawing/primitive.hpp"
+#include "../drawing/quad.hpp"
 #include "../drawing/renderer.hpp"
 #include "../drawing/texture.hpp"
 
@@ -23,28 +24,8 @@ static const Drawing::Color LINE_TOP = {0.333f, 0.333f, 0.333f, 1.0f};
 static const Drawing::Color LINE_BOTTOM = {0.200f, 0.200f, 0.200f, 1.0f};
 static const Drawing::Color LINE_RIGHT = {0.251f, 0.251f, 0.251f, 1.0f};
 
-// Primitive data
-// NOTE: to prevent costly copies, vertices are static but not constant
-// and are changed by the button Resize method, as a result these variables
-// are not thread-safe, however, i dont expect to have the GUI be
-// multithreaded, so in practice thats not an issue.
-
 // Button's shadow
-constexpr auto SHADOW_DRAW_MODE = Drawing::PDM_TRIANGLE_STRIP;
 constexpr float SHADOW_SIZE = 4.0f;
-static Drawing::Vertices shadowVertices =
-{
-	// Outermost corners
-	{ -SHADOW_SIZE, -SHADOW_SIZE, 0.0f},
-	{ 1.0f + SHADOW_SIZE, -SHADOW_SIZE, 0.0f},
-	{ -SHADOW_SIZE, 1.0f + SHADOW_SIZE, 0.0f},
-	{ 1.0f + SHADOW_SIZE, 1.0f + SHADOW_SIZE, 0.0f},
-	// Innermost corners
-	{ 0.0f, 0.0f, 0.0f},
-	{ 1.0f, 0.0f, 0.0f},
-	{ 0.0f, 1.0f, 0.0f},
-	{ 1.0f, 1.0f, 0.0f},
-};
 static const Drawing::Colors SHADOW_COLORS =
 {
 	// Outermost corners
@@ -64,15 +45,6 @@ static const Drawing::Indices SHADOW_INDICES =
 };
 
 // Button's content
-constexpr auto CONTENT_DRAW_MODE = Drawing::PDM_TRIANGLE_STRIP;
-static Drawing::Vertices contentVertices =
-{
-	// Corners
-	{ 0.0f, 0.0f, 0.0f},
-	{ 1.0f, 0.0f, 0.0f},
-	{ 0.0f, 1.0f, 0.0f},
-	{ 1.0f, 1.0f, 0.0f},
-};
 static const Drawing::Colors CONTENT_COLORS =
 {
 	CONTENT_TOP, CONTENT_TOP,
@@ -80,46 +52,12 @@ static const Drawing::Colors CONTENT_COLORS =
 };
 
 // Button's lines
-constexpr auto LINES_DRAW_MODE = Drawing::PDM_LINES;
-static Drawing::Vertices linesVertices =
-{
-	// Left line
-	{ 0.0f, 0.0f, 0.0f},
-	{ 0.0f, 1.0f, 0.0f},
-	// Top Line
-	{ 0.0f, 0.0f, 0.0f},
-	{ 1.0f, 0.0f, 0.0f},
-	// Bottom Line
-	{ -1.0f, 1.0f, 0.0f},
-	{ 1.0f, 1.0f, 0.0f},
-	// Right Line
-	{ 1.0f, 0.0f, 0.0f},
-	{ 1.0f, 1.0f, 0.0f},
-};
 static const Drawing::Colors LINES_COLORS =
 {
 	LINE_LEFT, LINE_LEFT,
 	LINE_TOP, LINE_TOP,
 	LINE_BOTTOM, LINE_BOTTOM,
 	LINE_RIGHT, LINE_RIGHT,
-};
-
-// Button's text
-constexpr auto TEXT_DRAW_MODE = Drawing::PDM_TRIANGLE_STRIP;
-static Drawing::Vertices textVertices =
-{
-	// Corners
-	{ 0.0f, 0.0f, 0.0f},
-	{ 1.0f, 0.0f, 0.0f},
-	{ 0.0f, 1.0f, 0.0f},
-	{ 1.0f, 1.0f, 0.0f},
-};
-static const Drawing::TexCoords TEXT_TEXCOORDS =
-{
-	{0.0f, 0.0f},
-	{1.0f, 0.0f},
-	{0.0f, 1.0f},
-	{1.0f, 1.0f},
 };
 
 CButton::CButton(Environment& env) : IElement(env)
@@ -129,18 +67,48 @@ CButton::CButton(Environment& env) : IElement(env)
 	lines = env.renderer->NewPrimitive();
 	text = env.renderer->NewPrimitive();
 	
-	// Set up constant data
-	shadow->SetDrawMode(SHADOW_DRAW_MODE);
+	shadowVertices =
+	{
+		// Outermost corners
+		{ -SHADOW_SIZE, -SHADOW_SIZE, 0.0f},
+		{ 1.0f + SHADOW_SIZE, -SHADOW_SIZE, 0.0f},
+		{ -SHADOW_SIZE, 1.0f + SHADOW_SIZE, 0.0f},
+		{ 1.0f + SHADOW_SIZE, 1.0f + SHADOW_SIZE, 0.0f},
+		// Innermost corners
+		{ 0.0f, 0.0f, 0.0f},
+		{ 1.0f, 0.0f, 0.0f},
+		{ 0.0f, 1.0f, 0.0f},
+		{ 1.0f, 1.0f, 0.0f},
+	};
+	contentVertices = Drawing::GetQuadVertices({}, {});
+	linesVertices =
+	{
+		// Left line
+		{ 0.0f, 0.0f, 0.0f},
+		{ 0.0f, 1.0f, 0.0f},
+		// Top Line
+		{ 0.0f, 0.0f, 0.0f},
+		{ 1.0f, 0.0f, 0.0f},
+		// Bottom Line
+		{ -1.0f, 1.0f, 0.0f},
+		{ 1.0f, 1.0f, 0.0f},
+		// Right Line
+		{ 1.0f, 0.0f, 0.0f},
+		{ 1.0f, 1.0f, 0.0f},
+	};
+	textVertices = Drawing::GetQuadVertices({}, {});
+	
+	shadow->SetDrawMode(Drawing::PDM_TRIANGLE_STRIP);
 	shadow->SetColors(SHADOW_COLORS);
 	
-	content->SetDrawMode(CONTENT_DRAW_MODE);
+	content->SetDrawMode(Drawing::GetQuadDrawMode());
 	content->SetColors(CONTENT_COLORS);
 	
-	lines->SetDrawMode(LINES_DRAW_MODE);
+	lines->SetDrawMode(Drawing::PDM_LINES);
 	lines->SetColors(LINES_COLORS);
 	
-	text->SetDrawMode(TEXT_DRAW_MODE);
-	text->SetTexCoords(TEXT_TEXCOORDS);
+	text->SetDrawMode(Drawing::GetQuadDrawMode());
+	text->SetTexCoords(Drawing::GetQuadTexCoords());
 }
 
 void CButton::Resize(const Drawing::Matrix& mat, const SDL_Rect& rect)
@@ -156,8 +124,7 @@ void CButton::Resize(const Drawing::Matrix& mat, const SDL_Rect& rect)
 	shadowVertices[3].y = (shadowVertices[7].y = h) + SHADOW_SIZE;
 	
 	// Update content vertices
-	contentVertices[1].x = contentVertices[3].x = w;
-	contentVertices[2].y = contentVertices[3].y = h;
+	Drawing::ResizeQuad(contentVertices, w, h);
 	
 	// Update lines vertices
 	linesVertices[1].y = linesVertices[4].y = linesVertices[5].y =
@@ -166,8 +133,7 @@ void CButton::Resize(const Drawing::Matrix& mat, const SDL_Rect& rect)
 	linesVertices[7].x = w;
 
 	// Update text vertices
-	textVertices[1].x = textVertices[3].x = txtWidth;
-	textVertices[2].y = textVertices[3].y = txtHeight;
+	Drawing::ResizeQuad(textVertices, txtWidth, txtHeight);
 	
 	// Set up vertices in primitives
 	shadow->SetVertices(shadowVertices);

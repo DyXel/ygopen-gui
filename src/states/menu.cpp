@@ -2,12 +2,11 @@
 
 #include <SDL_image.h>
 
-#include <glm/gtc/matrix_transform.hpp> // glm::ortho
-
 #include "../game_data.hpp"
 #include "../sdl_utility.hpp"
 
 #include "../drawing/primitive.hpp"
+#include "../drawing/quad.hpp"
 #include "../drawing/renderer.hpp"
 #include "../drawing/texture.hpp"
 #include "../drawing/types.hpp"
@@ -17,32 +16,18 @@ namespace YGOpen
 
 namespace State
 {
-constexpr auto BKG_DRAWING_MODE = Drawing::PDM_TRIANGLE_STRIP;
-const Drawing::Color BKG_COLOR = {0.110f, 0.114f, 0.125f, 1.0f};
-static const Drawing::Vertices BKG_VERTICES =
-{
-	// Corners
-	{ -1.0f,  1.0f, 0.0f},
-	{  1.0f,  1.0f, 0.0f},
-	{ -1.0f, -1.0f, 0.0f},
-	{  1.0f, -1.0f, 0.0f},
-};
-static const Drawing::Colors BKG_COLORS =
-{
-	BKG_COLOR, BKG_COLOR, BKG_COLOR, BKG_COLOR,
-};
 
 Menu::Menu(const Drawing::Renderer& renderer, GameData& data) :
 	renderer(renderer), data(data), env(renderer, data.guiFont,
 	data.elapsed)
 {
 	bkg = renderer->NewPrimitive();
+	bkgVertices = Drawing::GetQuadVertices({}, {});
 	
 	// Background quad
-	bkg->SetDrawMode(BKG_DRAWING_MODE);
-	bkg->SetVertices(BKG_VERTICES);
-	bkg->SetTexCoords({{0.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 1.0f}, {1.0f, 1.0f}});
 	bkg->SetTexture(data.menuBkg);
+	bkg->SetDrawMode(Drawing::GetQuadDrawMode());
+	bkg->SetTexCoords(Drawing::GetQuadTexCoords());
 	
 	// GUI setup
 	duelBtn = GUI::CButton::New(env);
@@ -84,7 +69,7 @@ void Menu::OnResize()
 	const int& w = data.canvasWidth;
 	const int& h = data.canvasHeight;
 	SDL_Rect bCanvas;
-	proj = glm::ortho<float>(0.0f, w, h, 0.0f);
+	Drawing::Matrix proj = Drawing::Get2DProjMatrix(w, h);
 	if(w >= h)
 	{
 		bCanvas.w = w / 5;
@@ -95,6 +80,10 @@ void Menu::OnResize()
 		bCanvas.w = w * 3 / 4;
 		bCanvas.h = h / 10;
 	}
+	
+	Drawing::ResizeQuad(bkgVertices, w, h);
+	bkg->SetVertices(bkgVertices);
+	bkg->SetMatrix(proj);
 	
 	const int bSeparation = h / 40;
 	

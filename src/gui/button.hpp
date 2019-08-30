@@ -41,6 +41,10 @@ private:
 	Drawing::Primitive content;
 	Drawing::Primitive lines;
 	Drawing::Primitive text;
+	Drawing::Vertices shadowVertices;
+	Drawing::Vertices contentVertices;
+	Drawing::Vertices linesVertices;
+	Drawing::Vertices textVertices;
 	int txtWidth{0};
 	int txtHeight{0};
 };

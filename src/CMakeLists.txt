@@ -20,6 +20,8 @@ target_sources(ygopen-gui PRIVATE
 	${CSR}/drawing/gl_include.cpp
 	${CSR}/drawing/gl_include.hpp
 	${CSR}/drawing/primitive.hpp
+	${CSR}/drawing/quad.cpp
+	${CSR}/drawing/quad.hpp
 	${CSR}/drawing/renderer.hpp
 	${CSR}/drawing/sdlwindow.cpp
 	${CSR}/drawing/sdlwindow.hpp

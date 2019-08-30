@@ -26,8 +26,8 @@ public:
 private:
 	Drawing::Renderer renderer;
 	GameData& data;
-	Drawing::Matrix proj{};
 	Drawing::Primitive bkg;
+	Drawing::Vertices bkgVertices;
 	GUI::Environment env;
 	GUI::Button duelBtn;
 	GUI::Button exitBtn;
