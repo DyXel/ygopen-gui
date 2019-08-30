@@ -35,8 +35,10 @@ protected:
 	bool OnEvent(const SDL_Event& e) override;
 private:
 	SDL_Rect r{};
-	Callback cb;
 	float brightness{1.0f};
+	Callback cb;
+	Drawing::Texture strTex;
+	using DyPrimitive = std::pair<Drawing::Primitive, Drawing::Vertices>;
 	Drawing::Primitive shadow;
 	Drawing::Primitive content;
 	Drawing::Primitive lines;
@@ -45,8 +47,6 @@ private:
 	Drawing::Vertices contentVertices;
 	Drawing::Vertices linesVertices;
 	Drawing::Vertices textVertices;
-	int txtWidth{0};
-	int txtHeight{0};
 };
 
 }

@@ -1,6 +1,5 @@
 #include "button.hpp"
 
-#include <glm/gtc/matrix_transform.hpp> // glm::translate
 #include <utility>
 
 #include "environment.hpp"
@@ -116,6 +115,8 @@ void CButton::Resize(const Drawing::Matrix& mat, const SDL_Rect& rect)
 	r = rect;
 	const auto w = static_cast<float>(rect.w);
 	const auto h = static_cast<float>(rect.h);
+	const auto txtWidth = strTex->GetWidth();
+	const auto txtHeight = strTex->GetHeight();
 	
 	// Update shadow vertices
 	shadowVertices[1].x = (shadowVertices[5].x = w) + SHADOW_SIZE;
@@ -145,10 +146,8 @@ void CButton::Resize(const Drawing::Matrix& mat, const SDL_Rect& rect)
 	// Move to right position
 	const int tx = rect.x + (rect.w / 2) - (txtWidth / 2);
 	const int ty = rect.y + (rect.h / 2) - (txtHeight / 2);
-	auto projModel = mat * glm::translate(glm::mat4(1.0f),
-	                                      glm::vec3(rect.x, rect.y, 0.0f));
-	auto textProjModel = mat * glm::translate(glm::mat4(1.0f),
-	                                          glm::vec3(tx, ty, 0.0f));
+	auto projModel = mat * Drawing::Trans2D(rect.x, rect.y);
+	auto textProjModel = mat * Drawing::Trans2D(tx, ty);
 
 	// Set up matrices for use with the shader
 	shadow->SetMatrix(projModel);
@@ -217,12 +216,10 @@ void CButton::SetCallback(Callback callback)
 void CButton::SetText(std::string_view txt)
 {
 	// Rebuild image
-	auto texture = env.renderer->NewTexture();
+	strTex = env.renderer->NewTexture();
 	SDL_Surface* image = env.font.ShadowedText(txt);
-	txtWidth = image->w;
-	txtHeight = image->h;
-	texture->SetImage(txtWidth, txtHeight, image->pixels);
-	text->SetTexture(texture);
+	strTex->SetImage(image->w, image->h, image->pixels);
+	text->SetTexture(strTex);
 	SDL_FreeSurface(image);
 }
 

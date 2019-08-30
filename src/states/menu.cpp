@@ -68,6 +68,7 @@ void Menu::OnResize()
 {
 	const int& w = data.canvasWidth;
 	const int& h = data.canvasHeight;
+	const int bkgW = data.menuBkg->GetWidth();
 	SDL_Rect bCanvas;
 	Drawing::Matrix proj = Drawing::Get2DProjMatrix(w, h);
 	if(w >= h)
@@ -81,9 +82,9 @@ void Menu::OnResize()
 		bCanvas.h = h / 10;
 	}
 	
-	Drawing::ResizeQuad(bkgVertices, w, h);
+	Drawing::ResizeQuad(bkgVertices, bkgW, h);
 	bkg->SetVertices(bkgVertices);
-	bkg->SetMatrix(proj);
+	bkg->SetMatrix(proj * Drawing::Trans2D((-bkgW / 2.0f) + (w / 2.0f), 0.0f));
 	
 	const int bSeparation = h / 40;
 	
