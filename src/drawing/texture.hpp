@@ -10,7 +10,12 @@ namespace Detail
 class ITexture
 {
 public:
-	virtual void SetImage(int w, int h, void* data) = 0;
+	virtual void SetImage(int width, int height, void* data) = 0;
+	
+	int GetWidth() const;
+	int GetHeight() const;
+protected:
+	int w, h;
 };
 
 } // Detail

@@ -18,7 +18,7 @@ public:
 	Texture();
 	virtual ~Texture();
 	
-	void SetImage(int w, int h, void* data) override;
+	void SetImage(int width, int height, void* data) override;
 	
 	void Bind();
 private:

@@ -25,6 +25,7 @@ target_sources(ygopen-gui PRIVATE
 	${CSR}/drawing/renderer.hpp
 	${CSR}/drawing/sdlwindow.cpp
 	${CSR}/drawing/sdlwindow.hpp
+	${CSR}/drawing/texture.cpp
 	${CSR}/drawing/texture.hpp
 	${CSR}/drawing/types.hpp
 	${CSR}/drawing/gl_core/primitive.cpp

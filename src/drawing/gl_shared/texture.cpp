@@ -22,11 +22,13 @@ Texture::~Texture()
 	glDeleteTextures(1, &ref);
 }
 
-void Texture::SetImage(int w, int h, void* data)
+void Texture::SetImage(int width, int height, void* data)
 {
 	static const GLint MIPS_COUNT = 0;
-	glTexImage2D(GL_TEXTURE_2D, MIPS_COUNT, GL_RGBA, w, h,
+	glTexImage2D(GL_TEXTURE_2D, MIPS_COUNT, GL_RGBA, width, height,
 	             0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	w = width;
+	h = height;
 }
 
 void Texture::Bind()
