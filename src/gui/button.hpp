@@ -39,14 +39,10 @@ private:
 	Callback cb;
 	Drawing::Texture strTex;
 	using DyPrimitive = std::pair<Drawing::Primitive, Drawing::Vertices>;
-	Drawing::Primitive shadow;
-	Drawing::Primitive content;
-	Drawing::Primitive lines;
-	Drawing::Primitive text;
-	Drawing::Vertices shadowVertices;
-	Drawing::Vertices contentVertices;
-	Drawing::Vertices linesVertices;
-	Drawing::Vertices textVertices;
+	DyPrimitive shadow;
+	DyPrimitive content;
+	DyPrimitive lines;
+	DyPrimitive text;
 };
 
 }

@@ -61,12 +61,12 @@ static const Drawing::Colors LINES_COLORS =
 
 CButton::CButton(Environment& env) : IElement(env)
 {
-	shadow = env.renderer->NewPrimitive();
-	content = env.renderer->NewPrimitive();
-	lines = env.renderer->NewPrimitive();
-	text = env.renderer->NewPrimitive();
+	shadow.first = env.renderer->NewPrimitive();
+	content.first = env.renderer->NewPrimitive();
+	lines.first = env.renderer->NewPrimitive();
+	text.first = env.renderer->NewPrimitive();
 	
-	shadowVertices =
+	shadow.second =
 	{
 		// Outermost corners
 		{ -SHADOW_SIZE, -SHADOW_SIZE, 0.0f},
@@ -79,8 +79,8 @@ CButton::CButton(Environment& env) : IElement(env)
 		{ 0.0f, 1.0f, 0.0f},
 		{ 1.0f, 1.0f, 0.0f},
 	};
-	contentVertices = Drawing::GetQuadVertices({}, {});
-	linesVertices =
+	content.second = Drawing::GetQuadVertices({}, {});
+	lines.second =
 	{
 		// Left line
 		{ 0.0f, 0.0f, 0.0f},
@@ -95,19 +95,19 @@ CButton::CButton(Environment& env) : IElement(env)
 		{ 1.0f, 0.0f, 0.0f},
 		{ 1.0f, 1.0f, 0.0f},
 	};
-	textVertices = Drawing::GetQuadVertices({}, {});
+	text.second = Drawing::GetQuadVertices({}, {});
 	
-	shadow->SetDrawMode(Drawing::PDM_TRIANGLE_STRIP);
-	shadow->SetColors(SHADOW_COLORS);
+	shadow.first->SetDrawMode(Drawing::PDM_TRIANGLE_STRIP);
+	shadow.first->SetColors(SHADOW_COLORS);
 	
-	content->SetDrawMode(Drawing::GetQuadDrawMode());
-	content->SetColors(CONTENT_COLORS);
+	content.first->SetDrawMode(Drawing::GetQuadDrawMode());
+	content.first->SetColors(CONTENT_COLORS);
 	
-	lines->SetDrawMode(Drawing::PDM_LINES);
-	lines->SetColors(LINES_COLORS);
+	lines.first->SetDrawMode(Drawing::PDM_LINES);
+	lines.first->SetColors(LINES_COLORS);
 	
-	text->SetDrawMode(Drawing::GetQuadDrawMode());
-	text->SetTexCoords(Drawing::GetQuadTexCoords());
+	text.first->SetDrawMode(Drawing::GetQuadDrawMode());
+	text.first->SetTexCoords(Drawing::GetQuadTexCoords());
 }
 
 void CButton::Resize(const Drawing::Matrix& mat, const SDL_Rect& rect)
@@ -119,29 +119,29 @@ void CButton::Resize(const Drawing::Matrix& mat, const SDL_Rect& rect)
 	const auto txtHeight = strTex->GetHeight();
 	
 	// Update shadow vertices
-	shadowVertices[1].x = (shadowVertices[5].x = w) + SHADOW_SIZE;
-	shadowVertices[2].y = (shadowVertices[6].y = h) + SHADOW_SIZE;
-	shadowVertices[3].x = (shadowVertices[7].x = w) + SHADOW_SIZE;
-	shadowVertices[3].y = (shadowVertices[7].y = h) + SHADOW_SIZE;
+	shadow.second[1].x = (shadow.second[5].x = w) + SHADOW_SIZE;
+	shadow.second[2].y = (shadow.second[6].y = h) + SHADOW_SIZE;
+	shadow.second[3].x = (shadow.second[7].x = w) + SHADOW_SIZE;
+	shadow.second[3].y = (shadow.second[7].y = h) + SHADOW_SIZE;
 	
 	// Update content vertices
-	Drawing::ResizeQuad(contentVertices, w, h);
+	Drawing::ResizeQuad(content.second, w, h);
 	
 	// Update lines vertices
-	linesVertices[1].y = linesVertices[4].y = linesVertices[5].y =
-	linesVertices[7].y = h;
-	linesVertices[3].x = linesVertices[5].x = linesVertices[6].x =
-	linesVertices[7].x = w;
+	lines.second[1].y = lines.second[4].y = lines.second[5].y =
+	lines.second[7].y = h;
+	lines.second[3].x = lines.second[5].x = lines.second[6].x =
+	lines.second[7].x = w;
 
 	// Update text vertices
-	Drawing::ResizeQuad(textVertices, txtWidth, txtHeight);
+	Drawing::ResizeQuad(text.second, txtWidth, txtHeight);
 	
 	// Set up vertices in primitives
-	shadow->SetVertices(shadowVertices);
-	shadow->SetIndices(SHADOW_INDICES);
-	content->SetVertices(contentVertices);
-	lines->SetVertices(linesVertices);
-	text->SetVertices(textVertices);
+	shadow.first->SetVertices(shadow.second);
+	shadow.first->SetIndices(SHADOW_INDICES);
+	content.first->SetVertices(content.second);
+	lines.first->SetVertices(lines.second);
+	text.first->SetVertices(text.second);
 	
 	// Move to right position
 	const int tx = rect.x + (rect.w / 2) - (txtWidth / 2);
@@ -150,18 +150,18 @@ void CButton::Resize(const Drawing::Matrix& mat, const SDL_Rect& rect)
 	auto textProjModel = mat * Drawing::Trans2D(tx, ty);
 
 	// Set up matrices for use with the shader
-	shadow->SetMatrix(projModel);
-	content->SetMatrix(projModel);
-	lines->SetMatrix(projModel);
-	text->SetMatrix(textProjModel);
+	shadow.first->SetMatrix(projModel);
+	content.first->SetMatrix(projModel);
+	lines.first->SetMatrix(projModel);
+	text.first->SetMatrix(textProjModel);
 }
 
 void CButton::Draw()
 {
-	shadow->Draw();
-	content->Draw();
-	lines->Draw();
-	text->Draw();
+	shadow.first->Draw();
+	content.first->Draw();
+	lines.first->Draw();
+	text.first->Draw();
 }
 
 void CButton::Tick()
@@ -172,9 +172,9 @@ void CButton::Tick()
 		brightness = 1.0f;
 		env.RemoveFromTickSet(IElement::shared_from_this());
 	}
-	content->SetBrightness(brightness);
-	lines->SetBrightness(brightness);
-	text->SetBrightness(brightness);
+	content.first->SetBrightness(brightness);
+	lines.first->SetBrightness(brightness);
+	text.first->SetBrightness(brightness);
 }
 
 void CButton::OnFocus(bool gained)
@@ -182,9 +182,9 @@ void CButton::OnFocus(bool gained)
 	if(gained)
 	{
 		brightness = 2.0f;
-		content->SetBrightness(brightness);
-		lines->SetBrightness(brightness);
-		text->SetBrightness(brightness);
+		content.first->SetBrightness(brightness);
+		lines.first->SetBrightness(brightness);
+		text.first->SetBrightness(brightness);
 	}
 	else
 	{
@@ -219,7 +219,7 @@ void CButton::SetText(std::string_view txt)
 	strTex = env.renderer->NewTexture();
 	SDL_Surface* image = env.font.ShadowedText(txt);
 	strTex->SetImage(image->w, image->h, image->pixels);
-	text->SetTexture(strTex);
+	text.first->SetTexture(strTex);
 	SDL_FreeSurface(image);
 }
 
