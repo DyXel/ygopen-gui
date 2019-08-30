@@ -9,6 +9,7 @@ namespace Drawing
 using OptFloat = std::optional<float>;
 
 Matrix Get2DProjMatrix(int w, int h);
+Matrix Trans2D(int x, int y);
 
 Vertices GetQuadVertices(OptFloat w, OptFloat h);
 const TexCoords GetQuadTexCoords();
