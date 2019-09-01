@@ -34,8 +34,10 @@ protected:
 	void OnFocus(bool gained) override;
 	bool OnEvent(const SDL_Event& e) override;
 private:
+	void SetBrightness(float b);
 	SDL_Rect r{};
 	float brightness{1.0f};
+	bool pressed{false};
 	Callback cb;
 	Drawing::Texture strTex;
 	using DyPrimitive = std::pair<Drawing::Primitive, Drawing::Vertices>;

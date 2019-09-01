@@ -172,9 +172,7 @@ void CButton::Tick()
 		brightness = 1.0f;
 		env.RemoveFromTickSet(IElement::shared_from_this());
 	}
-	content.first->SetBrightness(brightness);
-	lines.first->SetBrightness(brightness);
-	text.first->SetBrightness(brightness);
+	SetBrightness(brightness);
 }
 
 void CButton::OnFocus(bool gained)
@@ -182,9 +180,7 @@ void CButton::OnFocus(bool gained)
 	if(gained)
 	{
 		brightness = 2.0f;
-		content.first->SetBrightness(brightness);
-		lines.first->SetBrightness(brightness);
-		text.first->SetBrightness(brightness);
+		SetBrightness(brightness);
 	}
 	else
 	{
@@ -204,6 +200,35 @@ bool CButton::OnEvent(const SDL_Event& e)
 			env.Focus(ele);
 			return true;
 		}
+		else
+		{
+			SetBrightness(brightness);
+			pressed = false;
+		}
+	}
+	else if(e.type == SDL_MOUSEBUTTONDOWN)
+	{
+		SDL_Point p = {e.button.x, e.button.y};
+		if(SDL_PointInRect(&p, &r) != 0u)
+		{
+			SetBrightness(0.5f);
+			return pressed = true;
+		}
+	}
+	else if(e.type == SDL_MOUSEBUTTONUP)
+	{
+		if(pressed)
+		{
+			pressed = false;
+			SDL_Point p = {e.button.x, e.button.y};
+			if(SDL_PointInRect(&p, &r) != 0u)
+			{
+				SetBrightness(brightness);
+				if(cb)
+					cb();
+				return true;
+			}
+		}
 	}
 	return false;
 }
@@ -221,6 +246,12 @@ void CButton::SetText(std::string_view txt)
 	strTex->SetImage(image->w, image->h, image->pixels);
 	text.first->SetTexture(strTex);
 	SDL_FreeSurface(image);
+}
+
+inline void CButton::SetBrightness(float b)
+{
+	content.first->SetBrightness(b);
+	lines.first->SetBrightness(b);
 }
 
 } // namespace GUI
