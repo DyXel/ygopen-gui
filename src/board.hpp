@@ -11,8 +11,8 @@
 #include <list>
 #include <type_traits>
 
-#include "../common/enums/location.hpp"
-#include "../common/enums/position.hpp"
+#include "enums/location.hpp"
+#include "enums/position.hpp"
 #include "core_data.pb.h"
 #include "core_msg.pb.h"
 
@@ -40,8 +40,8 @@ using Counter = std::tuple<uint32_t /*type*/, uint32_t /*count*/>;
 
 inline bool IsPile(const uint32_t location)
 {
-	return !((LocationMonsterZone | LocationSpellZone | LocationOverlay |
-	       LocationOnField | LocationFieldZone | LocationPendulumZone)
+	return !((LOCATION_MZONE | LOCATION_SZONE | LOCATION_OVERLAY |
+	       LOCATION_ONFIELD | LOCATION_FZONE | LOCATION_PZONE)
 	       & location);
 }
 
@@ -58,7 +58,7 @@ Place PlaceFromProtobufPlace(const Core::Data::Place& p)
 Place PlaceFromCardInfo(const Core::Data::CardInfo& cd)
 {
 	return {cd.controller(), cd.location(), cd.sequence(),
-	        (cd.location() & LocationOverlay) ? cd.overlay_sequence() : -1}; // TODO: handle at encoder level?
+	        (cd.location() & LOCATION_OVERLAY) ? cd.overlay_sequence() : -1}; // TODO: handle at encoder level?
 }
 
 Counter CounterFromProtobufCounter(const Core::Data::Counter& c)
@@ -172,7 +172,7 @@ public:
 		auto& pile = GetPile(controller, location);
 		pile.resize(num);
 		for(auto& c : pile)
-			c.pos.AddOrNext(true, PositionFaceDown);
+			c.pos.AddOrNext(true, POS_FACEDOWN);
 	}
 	
 	// Set initial LP for player.
@@ -194,11 +194,11 @@ protected:
 	// 5) Cards on index 5-6 mean extra monster zone monsters in mZone.
 	// 6) Cards on index 5 in sZone are field cards.
 #define LOCATIONS() \
-	X(deck, LocationMainDeck); \
-	X(hand, LocationHand); \
-	X(grave, LocationGraveyard); \
-	X(rmp, LocationBanished); \
-	X(eDeck, LocationExtraDeck)
+	X(deck, LOCATION_DECK); \
+	X(hand, LOCATION_HAND); \
+	X(grave, LOCATION_GRAVE); \
+	X(rmp, LOCATION_REMOVED); \
+	X(eDeck, LOCATION_EXTRA)
 #define X(name, enums) std::array<Pile<C>, 2> name
 	LOCATIONS();
 #undef X
@@ -216,16 +216,16 @@ protected:
 	// Holds which fields are blocked due to card effects.
 	// 1) Initialized with all the zones that can be blocked. Ranges:
 	// controller: (0, 1)
-	// location: (LocationMonsterZone, LocationSpellZone, LocationPendulumZone)
-	// sequence: for LocationMonsterZone: (0, 1, 2, 3, 4, 5, 6)
-	//           for LocationSpellZone: (0, 1, 2, 3, 4, 5)
-	//           for LocationPendulumZone: (0, 1)
+	// location: (LOCATION_MZONE, LOCATION_SZONE, LOCATION_PZONE)
+	// sequence: for LOCATION_MZONE: (0, 1, 2, 3, 4, 5, 6)
+	//           for LOCATION_SZONE: (0, 1, 2, 3, 4, 5)
+	//           for LOCATION_PZONE: (0, 1)
 	// NOTE: overlay_sequence is ALWAYS -1.
 	std::map<Place, Sequential<bool, false>> disabledZones = []()
 	{
 		std::map<Place, Sequential<bool, false>> tempMap;
-		std::array<int, 3> locations = {LocationMonsterZone, LocationSpellZone,
-		                                LocationPendulumZone};
+		std::array<int, 3> locations = {LOCATION_MZONE, LOCATION_SZONE,
+		                                LOCATION_PZONE};
 		for(int con = 0; con < 1; con++)
 		{
 			for(auto loc : locations)
@@ -237,11 +237,11 @@ protected:
 					p.first = {con, loc, seq, -1};
 					tempMap.emplace(std::move(p));
 					seq++;
-					if(loc == LocationMonsterZone && seq > 6)
+					if(loc == LOCATION_MZONE && seq > 6)
 						break;
-					if(loc == LocationSpellZone && seq > 5)
+					if(loc == LOCATION_SZONE && seq > 5)
 						break;
-					if(loc == LocationPendulumZone && seq > 1)
+					if(loc == LOCATION_PZONE && seq > 1)
 						break;
 				}while(true);
 			}
