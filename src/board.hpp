@@ -333,7 +333,7 @@ Pile<C>& DuelBoard<C>::GetPile(uint32_t controller, uint32_t location)
 {
 	switch(location)
 	{
-#define X(name, enums) case enums: {return std::ref(name[controller]); break;};
+#define X(name, enums) case enums: {return name[controller]; break;}
 		LOCATIONS();
 #undef X
 	}
@@ -350,9 +350,9 @@ template<typename C>
 C& DuelBoard<C>::GetCard(const Place& place)
 {
 	if(IsPile(place))
-		return std::ref(GetPile(place)[std::get<2>(place)]);
+		return GetPile(place)[std::get<2>(place)];
 	else
-		return std::ref(fieldZones[place]);
+		return fieldZones[place];
 }
 
 template<typename C>
@@ -368,7 +368,7 @@ C& DuelBoard<C>::MoveSingle(const Place& from, const Place& to)
 		toPile.emplace(toPile.begin() + std::get<2>(to),
 		               std::move(fromPile[std::get<2>(from)]));
 		fromPile.erase(fromPile.begin() + std::get<2>(from));
-		return std::ref(toPile[std::get<2>(to)]);
+		return toPile[std::get<2>(to)];
 	}
 	// TODO: when moving overlays, overlay_sequence balancing is required
 	else if(IsPile(from) && !IsPile(to))
@@ -376,7 +376,7 @@ C& DuelBoard<C>::MoveSingle(const Place& from, const Place& to)
 		auto& fromPile = GetPile(from);
 		fieldZones[to] = std::move(fromPile[std::get<2>(from)]);
 		fromPile.erase(fromPile.begin() + std::get<2>(from));
-		return std::ref(ClearAllCounters(fieldZones[to]));
+		return ClearAllCounters(fieldZones[to]);
 	}
 	else if(!IsPile(from) && IsPile(to))
 	{
@@ -384,13 +384,13 @@ C& DuelBoard<C>::MoveSingle(const Place& from, const Place& to)
 		toPile.emplace(toPile.begin() + std::get<2>(to),
 		               std::move(fieldZones[from]));
 		fieldZones.erase(from);
-		return std::ref(ClearAllCounters(toPile[std::get<2>(to)]));
+		return ClearAllCounters(toPile[std::get<2>(to)]);
 	}
 	else // (!IsPile(from) && !IsPile(to))
 	{
 		fieldZones[to] = std::move(fieldZones[from]);
 		fieldZones.erase(from);
-		return std::ref(fieldZones[to]);
+		return fieldZones[to];
 	}
 }
 
