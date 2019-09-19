@@ -50,18 +50,18 @@ inline bool IsPile(const Place& place)
 	return IsPile(std::get<1>(place));
 }
 
-Place PlaceFromProtobufPlace(const Core::Data::Place& p)
+inline Place PlaceFromProtobufPlace(const Core::Data::Place& p)
 {
 	return {p.controller(), p.location(), p.sequence(), -1};
 }
 
-Place PlaceFromCardInfo(const Core::Data::CardInfo& cd)
+inline Place PlaceFromCardInfo(const Core::Data::CardInfo& cd)
 {
 	return {cd.controller(), cd.location(), cd.sequence(),
 	        (cd.location() & LOCATION_OVERLAY) ? cd.overlay_sequence() : -1}; // TODO: handle at encoder level?
 }
 
-Counter CounterFromProtobufCounter(const Core::Data::Counter& c)
+inline Counter CounterFromProtobufCounter(const Core::Data::Counter& c)
 {
 	return {c.type(), c.count()};
 }
