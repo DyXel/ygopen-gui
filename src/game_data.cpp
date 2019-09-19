@@ -43,10 +43,10 @@ bool GameData::LoadConfigs()
 	try
 	{
 		auto fileData = SDLU_TextFromFile(path);
-		if(!fileData)
+		if(fileData.empty())
 			throw std::invalid_argument(SDL_GetError());
 		// Parse JSON and merge onto current configuration
-		nlohmann::json j = nlohmann::json::parse(fileData.get());
+		nlohmann::json j = nlohmann::json::parse(fileData.data());
 		cfgs->global.merge_patch(j);
 	}
 	catch(const std::exception& e)
