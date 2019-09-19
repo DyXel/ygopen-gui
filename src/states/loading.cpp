@@ -33,9 +33,8 @@ namespace State
 TASKS()
 #undef X
 
-Loading::Loading(GameData& data, GameInstance& gi,
-                 const Drawing::Renderer& renderer) :
-	data(data), gi(gi), renderer(renderer)
+Loading::Loading(GameInstance& gi, GameData& data, const Drawing::Renderer& renderer) :
+	gi(gi), data(data), renderer(renderer)
 {
 	taskMtx = SDL_CreateMutex();
 	if(taskMtx == nullptr)
@@ -80,7 +79,7 @@ void Loading::Tick()
 			if(!cancelled) // If tasks were not cancelled proceed normally
 			{
 				data.FinishLoad();
-				gi.SetState(std::make_shared<State::Menu>(renderer, data));
+				gi.SetState(std::make_shared<State::Menu>(gi, data, renderer));
 			}
 		}
 		else // Start next task, thread will unlock mutex when done

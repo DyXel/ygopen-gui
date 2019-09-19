@@ -78,7 +78,7 @@ GameInstance::GameInstance(const Drawing::Backend backend) :
 	renderer->Clear();
 	renderer->Present();
 	SDL_ShowWindow(window);
-	state = std::make_shared<State::Loading>(data, *this, renderer);
+	state = std::make_shared<State::Loading>(*this, data, renderer);
 	now = then = static_cast<unsigned>(SDL_GetTicks());
 }
 

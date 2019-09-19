@@ -17,9 +17,8 @@ namespace YGOpen
 namespace State
 {
 
-Menu::Menu(const Drawing::Renderer& renderer, GameData& data) :
-	renderer(renderer), data(data), env(renderer, data.guiFont,
-	data.elapsed)
+Menu::Menu(GameInstance& gi, GameData& data, const Drawing::Renderer& renderer) :
+	gi(gi), data(data), renderer(renderer), env(renderer, data.guiFont, data.elapsed)
 {
 	bkg = renderer->NewPrimitive();
 	bkgVertices = Drawing::GetQuadVertices({}, {});

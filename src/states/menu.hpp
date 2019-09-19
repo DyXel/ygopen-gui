@@ -10,6 +10,7 @@
 namespace YGOpen
 {
 
+class GameInstance;
 struct GameData;
 
 namespace State
@@ -18,14 +19,15 @@ namespace State
 class Menu : public IState
 {
 public:
-	Menu(const Drawing::Renderer& renderer, GameData& ptrData);
+	Menu(GameInstance& gi, GameData& data, const Drawing::Renderer& renderer);
 	virtual ~Menu() = default;
 	void OnEvent(const SDL_Event& e) override;
 	void Tick() override;
 	void Draw() override;
 private:
-	Drawing::Renderer renderer;
+	GameInstance& gi;
 	GameData& data;
+	Drawing::Renderer renderer;
 	Drawing::Primitive bkg;
 	Drawing::Vertices bkgVertices;
 	GUI::Environment env;
