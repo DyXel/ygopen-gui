@@ -17,7 +17,7 @@ namespace YGOpen
 namespace State
 {
 
-Menu::Menu(GameInstance& gi, GameData& data, const Drawing::Renderer& renderer) :
+Menu::Menu(GameInstance& gi, GameData& data, Drawing::Renderer renderer) :
 	gi(gi), data(data), renderer(renderer), env(renderer, data.guiFont, data.elapsed)
 {
 	bkg = renderer->NewPrimitive();

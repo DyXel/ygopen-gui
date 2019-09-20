@@ -33,7 +33,7 @@ namespace State
 TASKS()
 #undef X
 
-Loading::Loading(GameInstance& gi, GameData& data, const Drawing::Renderer& renderer) :
+Loading::Loading(GameInstance& gi, GameData& data, Drawing::Renderer renderer) :
 	gi(gi), data(data), renderer(renderer)
 {
 	taskMtx = SDL_CreateMutex();

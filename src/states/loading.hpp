@@ -19,7 +19,7 @@ namespace State
 class Loading : public IState
 {
 public:
-	Loading(GameInstance& gi, GameData& data, const Drawing::Renderer& renderer);
+	Loading(GameInstance& gi, GameData& data, Drawing::Renderer renderer);
 	virtual ~Loading();
 	void OnEvent(const SDL_Event& e) override;
 	void Tick() override;

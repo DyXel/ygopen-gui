@@ -19,7 +19,7 @@ namespace State
 class Menu : public IState
 {
 public:
-	Menu(GameInstance& gi, GameData& data, const Drawing::Renderer& renderer);
+	Menu(GameInstance& gi, GameData& data, Drawing::Renderer renderer);
 	virtual ~Menu() = default;
 	void OnEvent(const SDL_Event& e) override;
 	void Tick() override;
