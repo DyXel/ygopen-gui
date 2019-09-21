@@ -20,8 +20,8 @@ Vertices GetQuadVertices(OptFloat w, OptFloat h)
 	static const Vertices DEFAULT_VERTICES =
 	{
 		{ 0.0f, 0.0f, 0.0f}, // top-left corner
-		{ 1.0f, 0.0f, 0.0f}, // top-right corner
 		{ 0.0f, 1.0f, 0.0f}, // bottom-left corner
+		{ 1.0f, 0.0f, 0.0f}, // top-right corner
 		{ 1.0f, 1.0f, 0.0f}, // bottom-right corner
 	};
 	Vertices vertices = DEFAULT_VERTICES;
@@ -34,8 +34,8 @@ const TexCoords GetQuadTexCoords()
 	static const TexCoords DEFAULT_TEXCOORDS =
 	{
 		{0.0f, 0.0f},
-		{1.0f, 0.0f},
 		{0.0f, 1.0f},
+		{1.0f, 0.0f},
 		{1.0f, 1.0f},
 	};
 	return DEFAULT_TEXCOORDS;
@@ -49,9 +49,9 @@ PrimitiveDrawMode GetQuadDrawMode()
 void ResizeQuad(Vertices& vertices, OptFloat w, OptFloat h)
 {
 	if(w)
-		vertices[1].x = vertices[3].x = *w;
+		vertices[2].x = vertices[3].x = *w;
 	if(h)
-		vertices[2].y = vertices[3].y = *h;
+		vertices[1].y = vertices[3].y = *h;
 }
 
 } // Drawing

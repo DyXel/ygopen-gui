@@ -66,8 +66,8 @@ void main()
 
 Renderer::Renderer(SDL_Window* sdlWindow) : sdlWindow(sdlWindow)
 {
-	// Disable face culling
-	glDisable(GL_CULL_FACE);
+	// Enable face culling
+	glEnable(GL_CULL_FACE);
 	
 	// Enable additive blending
 	glEnable(GL_BLEND);
