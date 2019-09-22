@@ -211,7 +211,7 @@ protected:
 	// 4) When adding or removing cards from the field (mostly tokens), the
 	// cards will be moved onto the tempCards container, along with their
 	// state tag for retrieval when going backwards.
-	std::map<Place, Card> fieldZones;
+	std::map<Place, C> fieldZones;
 	
 	// Holds which fields are blocked due to card effects.
 	// 1) Initialized with all the zones that can be blocked. Ranges:
@@ -261,7 +261,7 @@ private:
 	uint32_t processedState{};
 	std::vector<Core::AnyMsg> msgs;
 
-	std::map<TempPlace, Card> tempCards; // See fieldZones comments.
+	std::map<TempPlace, C> tempCards; // See fieldZones comments.
 
 	// Moves a single card from one place to another. Deals with overlays
 	// and counters accordingly but does not update card sequential
