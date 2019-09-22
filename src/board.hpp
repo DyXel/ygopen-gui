@@ -50,18 +50,18 @@ inline bool IsPile(const Place& place)
 	return IsPile(std::get<1>(place));
 }
 
-inline Place PlaceFromProtobufPlace(const Core::Data::Place& p)
+inline Place PlaceFromPbPlace(const Core::Data::Place& p)
 {
 	return {p.controller(), p.location(), p.sequence(), -1};
 }
 
-inline Place PlaceFromCardInfo(const Core::Data::CardInfo& cd)
+inline Place PlaceFromPbCardInfo(const Core::Data::CardInfo& cd)
 {
 	return {cd.controller(), cd.location(), cd.sequence(),
 	        (cd.location() & LOCATION_OVERLAY) ? cd.overlay_sequence() : -1}; // TODO: handle at encoder level?
 }
 
-inline Counter CounterFromProtobufCounter(const Core::Data::Counter& c)
+inline Counter CounterFromPbCounter(const Core::Data::Counter& c)
 {
 	return {c.type(), c.count()};
 }
@@ -445,21 +445,21 @@ if(advancing)
 {
 	if(reason == Core::Msg::UpdateCard::REASON_DECK_TOP)
 	{
-		auto& pile = GetPile(PlaceFromCardInfo(previousInfo));
+		auto& pile = GetPile(PlaceFromPbCardInfo(previousInfo));
 		auto& card = *(pile.rbegin() - previousInfo.sequence());
 		card.code.AddOrNext(realtime, currentInfo.code());
 	}
 	else if(reason == Core::Msg::UpdateCard::REASON_MOVE)
 	{
-		auto previous = PlaceFromCardInfo(previousInfo);
-		auto current = PlaceFromCardInfo(currentInfo);
+		auto previous = PlaceFromPbCardInfo(previousInfo);
+		auto current = PlaceFromPbCardInfo(currentInfo);
 		auto& card = MoveSingle(previous, current);
 		card.code.AddOrNext(realtime, currentInfo.code());
 		card.pos.AddOrNext(realtime, currentInfo.position());
 	}
 	else // REASON_POS_CHANGE or REASON_SET
 	{
-		auto& card = GetCard(PlaceFromCardInfo(previousInfo));
+		auto& card = GetCard(PlaceFromPbCardInfo(previousInfo));
 		card.code.AddOrNext(realtime, currentInfo.code());
 		card.pos.AddOrNext(realtime, currentInfo.position());
 	}
@@ -468,14 +468,14 @@ else
 {
 	if(reason == Core::Msg::UpdateCard::REASON_DECK_TOP)
 	{
-		auto& pile = GetPile(PlaceFromCardInfo(previousInfo));
+		auto& pile = GetPile(PlaceFromPbCardInfo(previousInfo));
 		auto& card = *(pile.rbegin() - previousInfo.sequence());
 		card.code.Prev();
 	}
 	else if(reason == Core::Msg::UpdateCard::REASON_MOVE)
 	{
-		auto previous = PlaceFromCardInfo(previousInfo);
-		auto current = PlaceFromCardInfo(currentInfo);
+		auto previous = PlaceFromPbCardInfo(previousInfo);
+		auto current = PlaceFromPbCardInfo(currentInfo);
 		auto& card = GetCard(current);
 		card.code.Prev();
 		card.pos.Prev();
@@ -483,7 +483,7 @@ else
 	}
 	else // REASON_POS_CHANGE or REASON_SET
 	{
-		auto& card = GetCard(PlaceFromCardInfo(previousInfo));
+		auto& card = GetCard(PlaceFromPbCardInfo(previousInfo));
 		card.code.Prev();
 		card.pos.Prev();
 	}
@@ -496,7 +496,7 @@ const auto& addCard = info.add_card();
 const auto& cardInfo = addCard.card();
 if(advancing)
 {
-	auto place = PlaceFromCardInfo(addCard.card());
+	auto place = PlaceFromPbCardInfo(addCard.card());
 	if(realtime && IsPile(place))
 	{
 		auto& pile = GetPile(place);
@@ -534,7 +534,7 @@ if(advancing)
 }
 else
 {
-	auto place = PlaceFromCardInfo(addCard.card());
+	auto place = PlaceFromPbCardInfo(addCard.card());
 	// Move into the temporal
 	if(IsPile(place))
 	{
@@ -563,7 +563,7 @@ HANDLE(RemoveCard)
 const auto& removeCard = info.remove_card();
 if(advancing)
 {
-	auto place = PlaceFromCardInfo(removeCard.card());
+	auto place = PlaceFromPbCardInfo(removeCard.card());
 	// Move into the temporal
 	if(IsPile(place))
 	{
@@ -581,7 +581,7 @@ if(advancing)
 }
 else
 {
-	auto place = PlaceFromCardInfo(removeCard.card());
+	auto place = PlaceFromPbCardInfo(removeCard.card());
 	// Move out of the temporal
 	if(IsPile(place))
 	{
@@ -629,8 +629,8 @@ HANDLE(SwapCards)
 const auto& swapCards = info.swap_cards();
 const auto& card1Info = swapCards.card1();
 const auto& card2Info = swapCards.card2();
-const auto card1Place = PlaceFromCardInfo(card1Info);
-const auto card2Place = PlaceFromCardInfo(card2Info);
+const auto card1Place = PlaceFromPbCardInfo(card1Info);
+const auto card2Place = PlaceFromPbCardInfo(card2Info);
 C tmp;
 if(IsPile(card1Place))
 {
@@ -691,7 +691,7 @@ if(advancing)
 {
 	for(int i = 0; i < cardsPrevious.size(); i++)
 	{
-		auto& c = fieldZones[PlaceFromCardInfo(cardsPrevious[i])];
+		auto& c = fieldZones[PlaceFromPbCardInfo(cardsPrevious[i])];
 		if(!cardsCurrent.empty())
 		{
 			auto& currentInfo = cardsCurrent[i];
@@ -707,7 +707,7 @@ else
 {
 	for(int i = 0; i < cardsPrevious.size(); i++)
 	{
-		auto& c = fieldZones[PlaceFromCardInfo(cardsPrevious[i])];
+		auto& c = fieldZones[PlaceFromPbCardInfo(cardsPrevious[i])];
 		c.code.Prev();
 		c.pos.Prev();
 	}
@@ -717,8 +717,8 @@ else
 HANDLE(CounterChange)
 {
 const auto& counterChange = info.counter_change();
-const Counter counter = CounterFromProtobufCounter(counterChange.counter());
-const Place place = PlaceFromProtobufPlace(counterChange.place());
+const Counter counter = CounterFromPbCounter(counterChange.counter());
+const Place place = PlaceFromPbPlace(counterChange.place());
 if(advancing)
 {
 	if(counterChange.type() == Core::Msg::CounterChange::CHANGE_ADD)
@@ -750,7 +750,7 @@ if(advancing)
 	{
 		std::set<Place> s;
 		for(auto& p : places)
-			s.insert(PlaceFromProtobufPlace(p));
+			s.insert(PlaceFromPbPlace(p));
 		return s;
 	}();
 	for(auto& zone : disabledZones)
