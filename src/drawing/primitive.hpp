@@ -16,7 +16,7 @@ public:
 	virtual void SetColors(const Colors& colors) = 0;
 	virtual void SetIndices(const Indices& indices) = 0;
 	
-	virtual void SetMatrix(const Matrix& matrix) = 0; // Normally Model Matrix
+	virtual void SetMatrix(const glm::mat4& matrix) = 0; // Normally Model Matrix
 	virtual void SetBrightness(const float val) = 0; // Defaults to 1.0f
 	
 	virtual void SetTexCoords(const TexCoords& texCoords) = 0;

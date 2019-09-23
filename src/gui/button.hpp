@@ -22,7 +22,7 @@ public:
 	{
 		return Button(new CButton(std::forward<Args>(args)...));
 	}
-	void Resize(const Drawing::Matrix& mat, const SDL_Rect& rect) override;
+	void Resize(const glm::mat4& mat, const SDL_Rect& rect) override;
 	void Draw() override;
 	
 	using Callback = std::function<void(void)>;

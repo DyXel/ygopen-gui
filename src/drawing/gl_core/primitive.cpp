@@ -68,7 +68,7 @@ void Primitive::SetIndices(const Indices& indices)
 	drawByIndex = true;
 }
 
-void Primitive::SetMatrix(const Matrix& matrix)
+void Primitive::SetMatrix(const glm::mat4& matrix)
 {
 	mat = matrix;
 }

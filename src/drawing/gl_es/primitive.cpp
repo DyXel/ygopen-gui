@@ -59,7 +59,7 @@ void Primitive::SetIndices(const Indices& indices)
 	usedVbo[GLShared::ATTR_INDICES] = true;
 }
 
-void Primitive::SetMatrix(const Matrix& matrix)
+void Primitive::SetMatrix(const glm::mat4& matrix)
 {
 	mat = matrix;
 }

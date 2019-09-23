@@ -12,10 +12,9 @@ namespace Drawing
 {
 
 // Position
-using Vertex = glm::vec3;
-using Vertices = std::vector<Vertex>;
+using Vertices = std::vector<glm::vec3>;
 constexpr std::size_t VERTEX_LENGTH = 3;
-constexpr std::size_t VERTEX_SIZE = sizeof(Vertex);
+constexpr std::size_t VERTEX_SIZE = sizeof(glm::vec3);
 
 // Color
 using Color = glm::vec4;
@@ -35,8 +34,7 @@ using Indices = std::vector<Index>;
 constexpr std::size_t INDEX_SIZE = sizeof(Index);
 
 // Matrix
-using Matrix = glm::mat4;
-constexpr std::size_t MATRIX_SIZE = sizeof(Matrix);
+constexpr std::size_t MATRIX_SIZE = sizeof(glm::mat4);
 
 // Primitive drawing modes
 enum PrimitiveDrawMode

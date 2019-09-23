@@ -25,7 +25,7 @@ public:
 	bool Link();
 	void Use() const;
 	
-	void SetModelMatrix(const Matrix& mat) const;
+	void SetModelMatrix(const glm::mat4& mat) const;
 	void SetBrightness(const GLfloat val) const;
 	
 	GLuint GetGLRef() const;

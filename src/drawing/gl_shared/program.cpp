@@ -76,7 +76,7 @@ void Program::Use() const
 	glUseProgram(ref);
 }
 
-void Program::SetModelMatrix(const Matrix& mat) const
+void Program::SetModelMatrix(const glm::mat4& mat) const
 {
 	if(uni[UNI_MODEL_MAT] == -1)
 		return;

@@ -5,12 +5,12 @@
 namespace Drawing
 {
 
-Matrix Get2DProjMatrix(int w, int h)
+glm::mat4 Get2DProjMatrix(int w, int h)
 {
 	return glm::ortho<float>(0.0f, w, h, 0.0f);
 }
 
-Matrix Trans2D(int x, int y)
+glm::mat4 Trans2D(int x, int y)
 {
 	return glm::translate<float>(glm::mat4(1.0f), glm::vec3(x, y, 0.0f));
 }

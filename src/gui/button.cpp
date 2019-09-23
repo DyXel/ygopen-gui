@@ -110,7 +110,7 @@ CButton::CButton(Environment& env) : IElement(env)
 	text.first->SetTexCoords(Drawing::GetQuadTexCoords());
 }
 
-void CButton::Resize(const Drawing::Matrix& mat, const SDL_Rect& rect)
+void CButton::Resize(const glm::mat4& mat, const SDL_Rect& rect)
 {
 	r = rect;
 	const auto w = static_cast<float>(rect.w);
