@@ -77,6 +77,7 @@ GameInstance::GameInstance(const Drawing::Backend backend) :
 	renderer->UpdateExtent(&data.canvasWidth, &data.canvasHeight);
 	renderer->Clear();
 	renderer->Present();
+	SDL_SetWindowTitle(window, DEFAULT_WINDOW_TITLE);
 	SDL_ShowWindow(window);
 	state = std::make_shared<State::Loading>(*this, data, renderer);
 	now = then = static_cast<unsigned>(SDL_GetTicks());
