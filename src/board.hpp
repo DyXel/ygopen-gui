@@ -193,14 +193,14 @@ protected:
 	// 4) Start of index (0) means leftmost card in hand.
 	// 5) Cards on index 5-6 mean extra monster zone monsters in mZone.
 	// 6) Cards on index 5 in sZone are field cards.
-#define LOCATIONS() \
+#define DUEL_PILES() \
 	X(deck, LOCATION_DECK); \
 	X(hand, LOCATION_HAND); \
 	X(grave, LOCATION_GRAVE); \
 	X(rmp, LOCATION_REMOVED); \
 	X(eDeck, LOCATION_EXTRA)
 #define X(name, enums) std::array<Pile<C>, 2> name
-	LOCATIONS();
+	DUEL_PILES();
 #undef X
 	// Holds cards that are on the field (see IsPile implementation)
 	// 1) Moving from and onto the field is handled by MoveSingle.
@@ -211,7 +211,7 @@ protected:
 	// 4) When adding or removing cards from the field (mostly tokens), the
 	// cards will be moved onto the tempCards container, along with their
 	// state tag for retrieval when going backwards.
-	std::map<Place, C> fieldZones;
+	std::map<Place, C> zoneCards;
 	
 	// Holds which fields are blocked due to card effects.
 	// 1) Initialized with all the zones that can be blocked. Ranges:
@@ -261,7 +261,7 @@ private:
 	uint32_t processedState{};
 	std::vector<Core::AnyMsg> msgs;
 
-	std::map<TempPlace, C> tempCards; // See fieldZones comments.
+	std::map<TempPlace, C> tempCards; // See zoneCards comments.
 
 	// Moves a single card from one place to another. Deals with overlays
 	// and counters accordingly but does not update card sequential
@@ -334,7 +334,7 @@ Pile<C>& DuelBoard<C>::GetPile(uint32_t controller, uint32_t location)
 	switch(location)
 	{
 #define X(name, enums) case enums: {return name[controller]; break;}
-		LOCATIONS();
+		DUEL_PILES();
 #undef X
 	}
 	throw std::exception();
@@ -352,7 +352,7 @@ C& DuelBoard<C>::GetCard(const Place& place)
 	if(IsPile(place))
 		return GetPile(place)[std::get<2>(place)];
 	else
-		return fieldZones[place];
+		return zoneCards[place];
 }
 
 template<typename C>
@@ -374,23 +374,23 @@ C& DuelBoard<C>::MoveSingle(const Place& from, const Place& to)
 	else if(IsPile(from) && !IsPile(to))
 	{
 		auto& fromPile = GetPile(from);
-		fieldZones[to] = std::move(fromPile[std::get<2>(from)]);
+		zoneCards[to] = std::move(fromPile[std::get<2>(from)]);
 		fromPile.erase(fromPile.begin() + std::get<2>(from));
-		return ClearAllCounters(fieldZones[to]);
+		return ClearAllCounters(zoneCards[to]);
 	}
 	else if(!IsPile(from) && IsPile(to))
 	{
 		auto& toPile = GetPile(to);
 		toPile.emplace(toPile.begin() + std::get<2>(to),
-		               std::move(fieldZones[from]));
-		fieldZones.erase(from);
+		               std::move(zoneCards[from]));
+		zoneCards.erase(from);
 		return ClearAllCounters(toPile[std::get<2>(to)]);
 	}
 	else // (!IsPile(from) && !IsPile(to))
 	{
-		fieldZones[to] = std::move(fieldZones[from]);
-		fieldZones.erase(from);
-		return fieldZones[to];
+		zoneCards[to] = std::move(zoneCards[from]);
+		zoneCards.erase(from);
+		return zoneCards[to];
 	}
 }
 
@@ -500,13 +500,13 @@ if(advancing)
 	if(realtime && IsPile(place))
 	{
 		auto& pile = GetPile(place);
-		C& card = *pile.emplace(pile.begin() + std::get<2>(place), C{});
+		C& card = *pile.emplace(pile.begin() + std::get<2>(place));
 		card.code.AddOrNext(realtime, cardInfo.code());
 		card.pos.AddOrNext(realtime, cardInfo.position());
 	}
 	else if (realtime && !IsPile(place))
 	{
-		auto p = fieldZones.emplace(place, C{});
+		auto p = zoneCards.emplace(place);
 		C& card = (*p.first).second;
 		card.code.AddOrNext(realtime, cardInfo.code());
 		card.pos.AddOrNext(realtime, cardInfo.position());
@@ -525,7 +525,7 @@ if(advancing)
 	else // (!realtime && !IsPile(place))
 	{
 		auto t = std::tuple_cat(std::tie(state), place);
-		auto p = fieldZones.emplace(place, std::move(tempCards[t]));
+		auto p = zoneCards.emplace(place, std::move(tempCards[t]));
 		tempCards.erase(t);
 		C& card = (*p.first).second;
 		card.code.AddOrNext(realtime, cardInfo.code());
@@ -548,12 +548,12 @@ else
 	}
 	else
 	{
-		auto& card = fieldZones[place];
+		auto& card = zoneCards[place];
 		card.code.Prev();
 		card.pos.Prev();
 		tempCards.emplace(std::tuple_cat(std::tie(state), place),
 		                  std::move(card));
-		fieldZones.erase(place);
+		zoneCards.erase(place);
 	}
 }
 }
@@ -575,8 +575,8 @@ if(advancing)
 	else
 	{
 		tempCards.emplace(std::tuple_cat(std::tie(state), place),
-		                  std::move(fieldZones[place]));
-		fieldZones.erase(place);
+		                  std::move(zoneCards[place]));
+		zoneCards.erase(place);
 	}
 }
 else
@@ -594,7 +594,7 @@ else
 	else // (!realtime && !IsPile(place))
 	{
 		auto t = std::tuple_cat(std::tie(state), place);
-		fieldZones.emplace(place, std::move(tempCards[t]));
+		zoneCards.emplace(place, std::move(tempCards[t]));
 		tempCards.erase(t);
 	}
 }
@@ -640,8 +640,8 @@ if(IsPile(card1Place))
 }
 else
 {
-	tmp = std::move(fieldZones[card1Place]);
-	fieldZones.erase(card1Place);
+	tmp = std::move(zoneCards[card1Place]);
+	zoneCards.erase(card1Place);
 }
 MoveSingle(card2Place, card1Place);
 if(IsPile(card2Place))
@@ -651,7 +651,7 @@ if(IsPile(card2Place))
 }
 else
 {
-	fieldZones[card2Place] = std::move(tmp);
+	zoneCards[card2Place] = std::move(tmp);
 }
 }
 
@@ -691,7 +691,7 @@ if(advancing)
 {
 	for(int i = 0; i < cardsPrevious.size(); i++)
 	{
-		auto& c = fieldZones[PlaceFromPbCardInfo(cardsPrevious[i])];
+		auto& c = zoneCards[PlaceFromPbCardInfo(cardsPrevious[i])];
 		if(!cardsCurrent.empty())
 		{
 			auto& currentInfo = cardsCurrent[i];
@@ -707,7 +707,7 @@ else
 {
 	for(int i = 0; i < cardsPrevious.size(); i++)
 	{
-		auto& c = fieldZones[PlaceFromPbCardInfo(cardsPrevious[i])];
+		auto& c = zoneCards[PlaceFromPbCardInfo(cardsPrevious[i])];
 		c.code.Prev();
 		c.pos.Prev();
 	}
