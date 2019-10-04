@@ -148,26 +148,28 @@ public:
 	}
 	
 	// Advance game state once.
-	void Forward()
+	bool Forward()
 	{
 		if(msgs.size() == 0 || state > msgs.size() - 1)
-			return;
+			return false;
 		if((realtime = IsRealtime()))
 			processedState++;
 		advancing = true;
 		InterpretMsg(msgs[state]);
 		state++;
+		return true;
 	}
 	
 	// Regress game state once.
-	void Backward()
+	bool Backward()
 	{
 		if(state == 0)
-			return;
+			return false;
 		realtime = false;
 		advancing = false;
 		state--;
 		InterpretMsg(msgs[state]);
+		return true;
 	}
 	
 	// Fill given pile with face-down cards.
