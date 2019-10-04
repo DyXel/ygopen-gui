@@ -22,7 +22,7 @@ namespace State
 	X(LoadBkgs)
 
 #define X(func) \
-	int TASK_##func(void* voidData) \
+	static int TASK_##func(void* voidData) \
 	{ \
 		auto loading = static_cast<Loading*>(voidData); \
 		SDL_LockMutex(loading->taskMtx); \

@@ -7,7 +7,7 @@
 namespace YGOpen
 {
 
-bool GetDisplayIndexFromWindow(SDL_Window* window, int* displayIndex)
+static bool GetDisplayIndexFromWindow(SDL_Window* window, int* displayIndex)
 {
 	// NOTE: not checking number of displays because its assumed a display
 	// exist if window creation succeeded.
@@ -74,9 +74,11 @@ GameInstance::GameInstance(const Drawing::Backend backend) :
 		SDL_SetWindowSize(window, DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
 	}
 #endif // #ifndef __ANDROID__
+	// Clear renderer before showing window (avoids transparent window)
 	renderer->UpdateExtent(&data.canvasWidth, &data.canvasHeight);
 	renderer->Clear();
 	renderer->Present();
+	// Set window title before showing window
 	SDL_SetWindowTitle(window, DEFAULT_WINDOW_TITLE);
 	SDL_ShowWindow(window);
 	state = std::make_shared<State::Loading>(*this, data, renderer);
@@ -84,9 +86,7 @@ GameInstance::GameInstance(const Drawing::Backend backend) :
 }
 
 GameInstance::~GameInstance()
-{
-	state.reset();
-}
+{}
 
 bool GameInstance::IsExiting() const
 {
