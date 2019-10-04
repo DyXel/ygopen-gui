@@ -10,26 +10,26 @@ namespace GUI
 
 Environment::Environment(Drawing::Renderer renderer, TextSmith& font,
                          const float& elapsed) :
-	renderer(std::move(renderer)), font(font), elapsed(elapsed)
+	renderer(renderer), font(font), elapsed(elapsed)
 {}
 
-void Environment::Add(const Element& ele)
+void Environment::Add(Element ele)
 {
 	elements.insert(ele);
 }
 
-void Environment::Remove(const Element& ele)
+void Environment::Remove(Element ele)
 {
 	elements.erase(ele);
 }
 
-void Environment::AddToTickSet(const Element& ele)
+void Environment::AddToTickSet(Element ele)
 {
 	if(focused == ele || (elements.count(ele) != 0u))
 		tickset.insert(ele);
 }
 
-void Environment::RemoveFromTickSet(const Element& ele)
+void Environment::RemoveFromTickSet(Element ele)
 {
 	if(tickset.count(ele) != 0u)
 		ticksetToRemove.push(ele);
@@ -54,7 +54,7 @@ void Environment::Draw()
 		focused->Draw();
 }
 
-bool Environment::Focus(const Element& ele)
+bool Environment::Focus(Element ele)
 {
 	if(focused != ele && (elements.count(ele) != 0u))
 	{

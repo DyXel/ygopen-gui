@@ -22,18 +22,18 @@ public:
 
 	Environment(Drawing::Renderer renderer, TextSmith& font,
 	            const float& elapsed);
-	void Add(const Element& ele);
-	void Remove(const Element& ele);
+	void Add(Element ele);
+	void Remove(Element ele);
 	
-	void AddToTickSet(const Element& ele);
-	void RemoveFromTickSet(const Element& ele);
+	void AddToTickSet(Element ele);
+	void RemoveFromTickSet(Element ele);
 	
 	void Tick();
 	void Draw();
 	
 	// Focus a element (and unfocus previous element, if it exists)
 	// returns false if the element was not focused.
-	bool Focus(const Element& ele);
+	bool Focus(Element ele);
 	
 	// Propagate a event to the managed elements. Starting always from the
 	// focused element.
