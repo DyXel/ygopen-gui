@@ -170,7 +170,7 @@ void CButton::Tick()
 	if(brightness <= 1.0f)
 	{
 		brightness = 1.0f;
-		env.RemoveFromTickSet(IElement::shared_from_this());
+		env.RemoveFromTickSet(shared_from_this());
 	}
 	SetBrightness(brightness);
 }
@@ -184,7 +184,7 @@ void CButton::OnFocus(bool gained)
 	}
 	else
 	{
-		env.AddToTickSet(IElement::shared_from_this());
+		env.AddToTickSet(shared_from_this());
 	}
 }
 
@@ -195,7 +195,7 @@ bool CButton::OnEvent(const SDL_Event& e)
 		SDL_Point p = {e.motion.x, e.motion.y};
 		if(SDL_PointInRect(&p, &r) != 0u)
 		{
-			auto ele = IElement::shared_from_this();
+			auto ele = shared_from_this();
 			env.RemoveFromTickSet(ele);
 			env.Focus(ele);
 			return true;
