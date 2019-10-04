@@ -28,6 +28,10 @@ using Place = std::tuple<uint32_t /*controller*/,
                          uint32_t /*location*/,
                          uint32_t /*sequence*/,
                          int32_t /*overlay_sequence*/>;
+#define CON(t)  std::get<0>(t)
+#define LOC(t)  std::get<1>(t)
+#define SEQ(t)  std::get<2>(t)
+#define OSEQ(t) std::get<3>(t)
 
 // NOTE: Temp as in Temporal
 using TempPlace = std::tuple<uint32_t /*state*/,
@@ -47,7 +51,7 @@ inline bool IsPile(const uint32_t location)
 
 inline bool IsPile(const Place& place)
 {
-	return IsPile(std::get<1>(place));
+	return IsPile(LOC(place));
 }
 
 inline Place PlaceFromPbPlace(const Core::Data::Place& p)
@@ -343,14 +347,14 @@ Pile<C>& DuelBoard<C>::GetPile(uint32_t controller, uint32_t location)
 template<typename C>
 Pile<C>& DuelBoard<C>::GetPile(const Place& place)
 {
-	return GetPile(std::get<0>(place), std::get<1>(place));
+	return GetPile(CON(place), LOC(place));
 }
 
 template<typename C>
 C& DuelBoard<C>::GetCard(const Place& place)
 {
 	if(IsPile(place))
-		return GetPile(place)[std::get<2>(place)];
+		return GetPile(place)[SEQ(place)];
 	else
 		return zoneCards[place];
 }
@@ -365,26 +369,25 @@ C& DuelBoard<C>::MoveSingle(const Place& from, const Place& to)
 	{
 		auto& fromPile = GetPile(from);
 		auto& toPile = GetPile(to);
-		toPile.emplace(toPile.begin() + std::get<2>(to),
-		               std::move(fromPile[std::get<2>(from)]));
-		fromPile.erase(fromPile.begin() + std::get<2>(from));
-		return toPile[std::get<2>(to)];
+		toPile.emplace(toPile.begin() + SEQ(to),
+		               std::move(fromPile[SEQ(from)]));
+		fromPile.erase(fromPile.begin() + SEQ(from));
+		return toPile[SEQ(to)];
 	}
 	// TODO: when moving overlays, overlay_sequence balancing is required
 	else if(IsPile(from) && !IsPile(to))
 	{
 		auto& fromPile = GetPile(from);
-		zoneCards[to] = std::move(fromPile[std::get<2>(from)]);
-		fromPile.erase(fromPile.begin() + std::get<2>(from));
+		zoneCards[to] = std::move(fromPile[SEQ(from)]);
+		fromPile.erase(fromPile.begin() + SEQ(from));
 		return ClearAllCounters(zoneCards[to]);
 	}
 	else if(!IsPile(from) && IsPile(to))
 	{
 		auto& toPile = GetPile(to);
-		toPile.emplace(toPile.begin() + std::get<2>(to),
-		               std::move(zoneCards[from]));
+		toPile.emplace(toPile.begin() + SEQ(to), std::move(zoneCards[from]));
 		zoneCards.erase(from);
-		return ClearAllCounters(toPile[std::get<2>(to)]);
+		return ClearAllCounters(toPile[SEQ(to)]);
 	}
 	else // (!IsPile(from) && !IsPile(to))
 	{
@@ -398,21 +401,19 @@ template<typename C>
 void DuelBoard<C>::AddCounter(const Place& place, const Counter& counter)
 {
 	C& card = GetCard(place);
-	auto result = card.counters.find(std::get<0>(counter));
+	auto result = card.counters.find(CON(counter));
 	if(result != card.counters.end())
 	{
-		result->second.AddOrNext(realtime, result->second() +
-		                         std::get<1>(counter));
+		result->second.AddOrNext(realtime, result->second() + LOC(counter));
 		return;
 	}
-	card.counters[std::get<0>(counter)].AddOrNext(realtime,
-	                                              std::get<1>(counter));
+	card.counters[CON(counter)].AddOrNext(realtime, LOC(counter));
 }
 
 template<typename C>
 void DuelBoard<C>::RemoveCounter(const Place& place, const Counter& counter)
 {
-	GetCard(place).counters[std::get<0>(counter)].Prev();
+	GetCard(place).counters[CON(counter)].Prev();
 }
 
 template<typename C>
@@ -500,7 +501,7 @@ if(advancing)
 	if(realtime && IsPile(place))
 	{
 		auto& pile = GetPile(place);
-		C& card = *pile.emplace(pile.begin() + std::get<2>(place));
+		C& card = *pile.emplace(pile.begin() + SEQ(place));
 		card.code.AddOrNext(realtime, cardInfo.code());
 		card.pos.AddOrNext(realtime, cardInfo.position());
 	}
@@ -516,7 +517,7 @@ if(advancing)
 	{
 		auto& pile = GetPile(place);
 		auto t = std::tuple_cat(std::tie(state), place);
-		C& card = *pile.emplace(pile.begin() + std::get<2>(place),
+		C& card = *pile.emplace(pile.begin() + SEQ(place),
 		                        std::move(tempCards[t]));
 		tempCards.erase(t);
 		card.code.AddOrNext(realtime, cardInfo.code());
@@ -539,12 +540,12 @@ else
 	if(IsPile(place))
 	{
 		auto& pile = GetPile(place);
-		auto& card = pile[std::get<2>(place)];
+		auto& card = pile[SEQ(place)];
 		card.code.Prev();
 		card.pos.Prev();
 		tempCards.emplace(std::tuple_cat(std::tie(state), place),
-		                  std::move(card));
-		pile.erase(pile.begin() + std::get<2>(place));
+		                                 std::move(card));
+		pile.erase(pile.begin() + SEQ(place));
 	}
 	else
 	{
@@ -552,7 +553,7 @@ else
 		card.code.Prev();
 		card.pos.Prev();
 		tempCards.emplace(std::tuple_cat(std::tie(state), place),
-		                  std::move(card));
+		                                 std::move(card));
 		zoneCards.erase(place);
 	}
 }
@@ -569,13 +570,13 @@ if(advancing)
 	{
 		auto& pile = GetPile(place);
 		tempCards.emplace(std::tuple_cat(std::tie(state), place),
-		                  std::move(pile[std::get<2>(place)]));
-		pile.erase(pile.begin() + std::get<2>(place));
+		                                 std::move(pile[SEQ(place)]));
+		pile.erase(pile.begin() + SEQ(place));
 	}
 	else
 	{
 		tempCards.emplace(std::tuple_cat(std::tie(state), place),
-		                  std::move(zoneCards[place]));
+		                                 std::move(zoneCards[place]));
 		zoneCards.erase(place);
 	}
 }
@@ -587,8 +588,7 @@ else
 	{
 		auto& pile = GetPile(place);
 		auto t = std::tuple_cat(std::tie(state), place);
-		pile.emplace(pile.begin() + std::get<2>(place),
-		             std::move(tempCards[t]));
+		pile.emplace(pile.begin() + SEQ(place), std::move(tempCards[t]));
 		tempCards.erase(t);
 	}
 	else // (!realtime && !IsPile(place))
@@ -635,8 +635,8 @@ C tmp;
 if(IsPile(card1Place))
 {
 	auto& pile = GetPile(card1Place);
-	tmp = std::move(pile[std::get<2>(card1Place)]);
-	pile.erase(pile.begin() + std::get<2>(card1Place));
+	tmp = std::move(pile[SEQ(card1Place)]);
+	pile.erase(pile.begin() + SEQ(card1Place));
 }
 else
 {
@@ -647,7 +647,7 @@ MoveSingle(card2Place, card1Place);
 if(IsPile(card2Place))
 {
 	auto& pile = GetPile(card2Place);
-	pile.emplace(pile.begin() + std::get<2>(card2Place), std::move(tmp));
+	pile.emplace(pile.begin() + SEQ(card2Place), std::move(tmp));
 }
 else
 {
