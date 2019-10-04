@@ -195,13 +195,11 @@ protected:
 	// 2) Moving from and onto these piles is handled by MoveSingle.
 	// 3) Start of index (0) means bottom card.
 	// 4) Start of index (0) means leftmost card in hand.
-	// 5) Cards on index 5-6 mean extra monster zone monsters in mZone.
-	// 6) Cards on index 5 in sZone are field cards.
 #define DUEL_PILES() \
-	X(deck, LOCATION_DECK); \
-	X(hand, LOCATION_HAND); \
+	X(deck , LOCATION_DECK); \
+	X(hand , LOCATION_HAND); \
 	X(grave, LOCATION_GRAVE); \
-	X(rmp, LOCATION_REMOVED); \
+	X(rmp  , LOCATION_REMOVED); \
 	X(eDeck, LOCATION_EXTRA)
 #define X(name, enums) std::array<Pile<C>, 2> name
 	DUEL_PILES();
@@ -215,6 +213,8 @@ protected:
 	// 4) When adding or removing cards from the field (mostly tokens), the
 	// cards will be moved onto the tempCards container, along with their
 	// state tag for retrieval when going backwards.
+	// 5) Cards on index 5-6 mean extra monster zone monsters in mZone.
+	// 6) Cards on index 5 in sZone are field zone cards.
 	std::map<Place, C> zoneCards;
 	
 	// Holds which fields are blocked due to card effects.
