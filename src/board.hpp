@@ -401,19 +401,21 @@ template<typename C>
 void DuelBoard<C>::AddCounter(const Place& place, const Counter& counter)
 {
 	C& card = GetCard(place);
-	auto result = card.counters.find(CON(counter));
+	auto result = card.counters.find(std::get<0>(counter));
 	if(result != card.counters.end())
 	{
-		result->second.AddOrNext(realtime, result->second() + LOC(counter));
+		const auto newAmount = result->second() + std::get<1>(counter);
+		result->second.AddOrNext(realtime, newAmount);
 		return;
 	}
-	card.counters[CON(counter)].AddOrNext(realtime, LOC(counter));
+	auto& c = card.counters[std::get<0>(counter)];
+	c.AddOrNext(realtime, std::get<1>(counter));
 }
 
 template<typename C>
 void DuelBoard<C>::RemoveCounter(const Place& place, const Counter& counter)
 {
-	GetCard(place).counters[CON(counter)].Prev();
+	GetCard(place).counters[std::get<0>(counter)].Prev();
 }
 
 template<typename C>
