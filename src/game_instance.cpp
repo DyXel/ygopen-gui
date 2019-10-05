@@ -94,9 +94,9 @@ void GameInstance::Run()
 	while(!exiting)
 	{
 		while(SDL_PollEvent(&e) != 0)
-			PropagateEvent(e);
-		TickOnce();
-		DrawOnce();
+			OnEvent(e);
+		Tick();
+		Draw();
 	}
 }
 
@@ -105,7 +105,7 @@ void GameInstance::Exit()
 	exiting = true;
 }
 
-void GameInstance::PropagateEvent(const SDL_Event& e)
+void GameInstance::OnEvent(const SDL_Event& e)
 {
 	const auto eType = e.type;
 	if(eType == SDL_QUIT)
@@ -123,7 +123,7 @@ void GameInstance::PropagateEvent(const SDL_Event& e)
 		state->OnEvent(e);
 }
 
-void GameInstance::TickOnce()
+void GameInstance::Tick()
 {
 	if(recording != 0u)
 		now += 1000u / recording;
@@ -134,7 +134,7 @@ void GameInstance::TickOnce()
 	then = now;
 }
 
-void GameInstance::DrawOnce()
+void GameInstance::Draw() const
 {
 	state->Draw();
 }

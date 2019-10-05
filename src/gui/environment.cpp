@@ -35,6 +35,15 @@ void Environment::RemoveFromTickSet(Element ele)
 		ticksetToRemove.push(ele);
 }
 
+void Environment::OnEvent(const SDL_Event& e)
+{
+	if(focused && focused->OnEvent(e))
+		return;
+	for(auto& ele : elements)
+		if(ele->OnEvent(e))
+			break;
+}
+
 void Environment::Tick()
 {
 	for(auto& ele : tickset)
@@ -69,15 +78,6 @@ bool Environment::Focus(Element ele)
 		return true;
 	}
 	return false;
-}
-
-void Environment::PropagateEvent(const SDL_Event& e)
-{
-	if(focused && focused->OnEvent(e))
-		return;
-	for(auto& ele : elements)
-		if(ele->OnEvent(e))
-			break;
 }
 
 float Environment::GetTimeElapsed() const

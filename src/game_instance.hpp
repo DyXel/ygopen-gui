@@ -36,9 +36,9 @@ private:
 	unsigned now{0u}, then{0u};
 	unsigned recording{0u}; // if non 0. Framerate being recorded at.
 	
-	void PropagateEvent(const SDL_Event& e);
-	void TickOnce();
-	void DrawOnce();
+	void OnEvent(const SDL_Event& e);
+	void Tick();
+	void Draw() const;
 };
 
 } // YGOpen

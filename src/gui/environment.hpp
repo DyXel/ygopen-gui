@@ -28,16 +28,15 @@ public:
 	void AddToTickSet(Element ele);
 	void RemoveFromTickSet(Element ele);
 	
+	// Propagate a event to the managed elements. Starting always from the
+	// focused element.
+	void OnEvent(const SDL_Event& e);
 	void Tick();
 	void Draw();
 	
 	// Focus a element (and unfocus previous element, if it exists)
 	// returns false if the element was not focused.
 	bool Focus(Element ele);
-	
-	// Propagate a event to the managed elements. Starting always from the
-	// focused element.
-	void PropagateEvent(const SDL_Event& e);
 	
 	float GetTimeElapsed() const;
 private:

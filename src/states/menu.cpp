@@ -47,7 +47,7 @@ void Menu::OnEvent(const SDL_Event& e)
 	{
 		OnResize();
 	}
-	env.PropagateEvent(e);
+	env.OnEvent(e);
 }
 
 void Menu::Tick()
