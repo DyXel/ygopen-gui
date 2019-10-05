@@ -24,11 +24,9 @@ public:
 	GameInstance& operator=(const GameInstance&) = delete;
 	GameInstance& operator=(GameInstance&&) = delete;
 	
-	bool IsExiting() const;
+	void Run();
+	
 	void Exit();
-	void PropagateEvent(const SDL_Event& e);
-	void TickOnce();
-	void DrawOnce();
 	void SetState(std::shared_ptr<State::IState> newState);
 private:
 	GameData data;
@@ -37,6 +35,10 @@ private:
 	
 	unsigned now{0u}, then{0u};
 	unsigned recording{0u}; // if non 0. Framerate being recorded at.
+	
+	void PropagateEvent(const SDL_Event& e);
+	void TickOnce();
+	void DrawOnce();
 };
 
 } // YGOpen

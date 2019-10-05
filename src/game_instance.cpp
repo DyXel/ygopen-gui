@@ -88,9 +88,16 @@ GameInstance::GameInstance(const Drawing::Backend backend) :
 GameInstance::~GameInstance()
 {}
 
-bool GameInstance::IsExiting() const
+void GameInstance::Run()
 {
-	return exiting;
+	SDL_Event e;
+	while(!exiting)
+	{
+		while(SDL_PollEvent(&e) != 0)
+			PropagateEvent(e);
+		TickOnce();
+		DrawOnce();
+	}
 }
 
 void GameInstance::Exit()

@@ -12,7 +12,6 @@ static constexpr Drawing::Backend DEFAULT_BACKEND = Drawing::OPENGL_CORE;
 extern "C" int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 {
 	int exitCode = 0;
-	SDL_Event e;
 	std::unique_ptr<YGOpen::GameInstance> gi;
 	if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
 	{
@@ -53,13 +52,7 @@ extern "C" int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 		exitCode = 4;
 		goto quit;
 	}
-	while(!gi->IsExiting())
-	{
-		while(SDL_PollEvent(&e) != 0)
-			gi->PropagateEvent(e);
-		gi->TickOnce();
-		gi->DrawOnce();
-	}
+	gi->Run();
 quit:
 	gi.reset();
 	TTF_Quit();
