@@ -321,15 +321,13 @@ private:
 			case Core::Information::kCardHint:
 			case Core::Information::kPlayerHint:
 			{
-				printf("NON-critical message (%i)\n", info.Information_case());
 				return;
 			}
 			default:
 			{
-				// TODO: probably print a warning
+				return;
 			}
 		}
-		printf("Critical message (%i)\n", info.Information_case());
 	}
 };
 
