@@ -8,7 +8,6 @@
 #include <tuple>
 #include <array>
 #include <vector>
-#include <list>
 #include <type_traits>
 
 #include "enums/location.hpp"
@@ -75,23 +74,23 @@ inline Counter CounterFromPbCounter(const Core::Data::Counter& c)
 template<typename T, T def = std::is_signed<T>::value ? -1 : 0>
 class Sequential
 {
-	std::list<T> l;
-	typename std::list<T>::iterator it;
+	std::vector<T> vec;
+	typename std::vector<T>::size_type pos;
 public:
-	Sequential() : l(1, def), it(l.begin()) {}
-	void AddOrNext(bool add, const T& v)
+	Sequential() : vec(1, def), pos(0) {}
+	void AddOrNext(bool add, const T& value)
 	{
 		if(add)
-			l.emplace_back(v);
-		it++;
+			vec.emplace_back(value);
+		pos++;
 	}
 	void Prev()
 	{
-		it--;
+		pos--;
 	}
 	const T& operator()()
 	{
-		return *it;
+		return vec[pos];
 	}
 };
 
