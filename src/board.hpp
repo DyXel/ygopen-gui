@@ -511,7 +511,7 @@ if(advancing)
 	}
 	else if (realtime && !IsPile(place))
 	{
-		auto p = zoneCards.emplace(place);
+		auto p = zoneCards.emplace(place, C{});
 		C& card = (*p.first).second;
 		card.code.AddOrNext(realtime, cardInfo.code());
 		card.pos.AddOrNext(realtime, cardInfo.position());
