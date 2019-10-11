@@ -104,10 +104,9 @@ void Renderer::Present()
 	SDL_GL_SwapWindow(sdlWindow);
 }
 
-void Renderer::UpdateExtent(int* w, int* h)
+void Renderer::SetViewport(int x, int y, int width, int height)
 {
-	SDL_GL_GetDrawableSize(sdlWindow, w, h);
-	glViewport(0, 0, *w, *h);
+	glViewport(x, y, width, height);
 }
 
 Drawing::Texture Renderer::NewTexture()

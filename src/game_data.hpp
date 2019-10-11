@@ -22,8 +22,7 @@ struct GameData
 	~GameData();
 	// Values updated by GameInstance
 	float elapsed; // Time elapsed since last draw call.
-	int canvasWidth{DEFAULT_WINDOW_WIDTH}; // Canvas width in pixels
-	int canvasHeight{DEFAULT_WINDOW_HEIGHT}; // Canvas height in pixels
+	SDL_Rect canvas{}; // Region in pixels where draw can occur.
 	float dpi{}; // DPI of the screen, may be overriden by user settings
 	bool powerSaving{false};
 	

@@ -75,7 +75,7 @@ GameInstance::GameInstance(const Drawing::Backend backend) :
 	}
 #endif // #ifndef __ANDROID__
 	// Clear renderer before showing window (avoids transparent window)
-	renderer->UpdateExtent(&data.canvasWidth, &data.canvasHeight);
+	UpdateCanvas();
 	renderer->Clear();
 	renderer->Present();
 	// Set window title before showing window
@@ -116,7 +116,7 @@ void GameInstance::OnEvent(const SDL_Event& e)
 	if(eType == SDL_WINDOWEVENT &&
 	   e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
 	{
-		renderer->UpdateExtent(&data.canvasWidth, &data.canvasHeight);
+		UpdateCanvas();
 	}
 	
 	if(eType != SDL_SYSWMEVENT)
@@ -144,5 +144,9 @@ void GameInstance::SetState(std::shared_ptr<State::IState> newState)
 	state = std::move(newState);
 }
 
+inline void GameInstance::UpdateCanvas()
+{
+	SDL_GL_GetDrawableSize(window, &data.canvas.w, &data.canvas.h);
+}
 
 } // namespace YGOpen

@@ -65,11 +65,12 @@ void Menu::Draw()
 
 void Menu::OnResize()
 {
-	const int& w = data.canvasWidth;
-	const int& h = data.canvasHeight;
+	const int& w = data.canvas.w;
+	const int& h = data.canvas.h;
 	const int bkgW = data.menuBkg->GetWidth();
 	SDL_Rect bCanvas;
-	Drawing::Matrix proj = Drawing::Get2DProjMatrix(w, h);
+	glm::mat4 proj = Drawing::Get2DProjMatrix(w, h);
+	renderer->SetViewport(0, 0, w, h);
 	if(w >= h)
 	{
 		bCanvas.w = w / 5;

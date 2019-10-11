@@ -25,7 +25,7 @@ public:
 	
 	void Clear() override;
 	void Present() override;
-	void UpdateExtent(int* w, int* h) override;
+	void SetViewport(int x, int y, int width, int height) override;
 	
 	Drawing::Texture NewTexture() override;
 	

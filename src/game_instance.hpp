@@ -39,6 +39,8 @@ private:
 	void OnEvent(const SDL_Event& e);
 	void Tick();
 	void Draw() const;
+	
+	inline void UpdateCanvas();
 };
 
 } // YGOpen
