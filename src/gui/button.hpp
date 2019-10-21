@@ -10,17 +10,10 @@ namespace YGOpen
 namespace GUI
 {
 
-class CButton final : public IElement,
-                      public std::enable_shared_from_this<CButton>
+ELEMENT_DECLARATION(CButton)
 {
 public:
-	template<typename... Args>
-	static std::shared_ptr<CButton> New(Args&&... args)
-	{
-		return std::shared_ptr<CButton>(
-			new CButton(std::forward<Args>(args)...)
-		);
-	}
+	ELEMENT_IMPLEMENT_New_METHOD(CButton)
 	void Resize(const glm::mat4& mat, const SDL_Rect& rect) override;
 	void Draw() override;
 	using Callback = std::function<void(void)>;

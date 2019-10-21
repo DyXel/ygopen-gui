@@ -17,9 +17,10 @@ public:
 	virtual void Resize(const glm::mat4& mat, const SDL_Rect& rect) = 0;
 	virtual void Draw() = 0;
 protected:
-	IElement(Environment& env) : env(env) {}
 	friend Environment;
 	Environment& env;
+
+	IElement(Environment& env) : env(env) {}
 
 	virtual void Tick() {}
 
@@ -32,6 +33,18 @@ protected:
 };
 
 using Element = std::shared_ptr<IElement>;
+
+#define ELEMENT_DECLARATION(type) \
+	class type final : public GUI::IElement, \
+	                   public std::enable_shared_from_this<type>
+#define ELEMENT_IMPLEMENT_New_METHOD(type) \
+	template<typename... Args> \
+	static std::shared_ptr<type> New(Args&&... args) \
+	{ \
+		return std::shared_ptr<type>( \
+			new type(std::forward<Args>(args)...) \
+		); \
+	}
 
 } // GUI
 
