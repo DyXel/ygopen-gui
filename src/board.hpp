@@ -113,6 +113,12 @@ struct Card
 	Sequential<uint32_t> rscale; // Right pendulum scale
 	Sequential<uint32_t> links;  // Link arrows
 	std::map<uint32_t /*type*/, Sequential<uint32_t /*count*/>> counters;
+	
+	Card() = default;
+	Card(const Card&) = delete;
+	Card(Card&&) = default;
+	Card& operator=(const Card&) = delete;
+	Card& operator=(Card&&) = default;
 };
 
 template<typename C>
