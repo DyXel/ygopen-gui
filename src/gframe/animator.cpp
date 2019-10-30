@@ -12,19 +12,27 @@ void Animator::Push(std::shared_ptr<IAnimation> animation)
 
 void Animator::Tick(float elapsed)
 {
-	if(!IsAnimating())
+	if(animations.empty())
 		return;
 	if(animations.front()->Tick(elapsed * speed))
-		animations.pop();
-}
-
-void Animator::SkipAll()
-{
-	while(IsAnimating())
 	{
 		animations.front()->Skip();
 		animations.pop();
 	}
+}
+
+void Animator::FinishAll()
+{
+	while(!animations.empty())
+	{
+		animations.front()->Skip();
+		animations.pop();
+	}
+}
+
+void Animator::SkipAll()
+{
+	animations = {};
 }
 
 void Animator::SetSpeed(float spd)

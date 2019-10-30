@@ -13,7 +13,7 @@ class Animator
 public:
 	void Push(std::shared_ptr<IAnimation> animation);
 	void Tick(float elapsed);
-	// Finish all remaining animations instantaneously
+	void FinishAll(); // Finish all remaining animations instantaneously
 	void SkipAll(); // Animations get King Crimson'd
 	void SetSpeed(float spd);
 	bool IsAnimating() const;
