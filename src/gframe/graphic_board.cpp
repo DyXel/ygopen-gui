@@ -1,8 +1,5 @@
 #include "graphic_board.hpp"
 
-#include <variant>
-#include <queue>
-
 #include <SDL_image.h>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/euler_angles.hpp>
@@ -98,6 +95,7 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 		glm::mat4 vp{1.0f};
 	}cam;
 
+	uint32_t targetState{};
 	Animator ani;
 
 	AnswerCallback acb; // TODO: find a better name
@@ -334,6 +332,13 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 	void Tick(float elapsed)
 	{
 		ani.Tick(elapsed);
+		if(!ani.IsAnimating())
+		{
+			if(targetState > state)
+				Forward();
+			else if (targetState < state)
+				Backward();
+		}
 	}
 	
 	void Draw()
@@ -361,7 +366,7 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 	{
 		if(!DuelBoard<GraphicCard>::Forward())
 			return false;
-		AnimateMsg(msgs[state]);
+		AnimateMsg(msgs[state - 1]);
 		return true;
 	}
 	
@@ -399,7 +404,7 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 		}
 	}
 	
-	void AnimateInfoMsg(int player, const Core::Information& msg)
+	void AnimateInfoMsg(int player, const Core::Information& info)
 	{
 // 		switch(msg.Information_case())
 // 		{
@@ -407,7 +412,7 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 // 		}
 	}
 	
-	void AnimateRequestMsg(const Core::Request& msg)
+	void AnimateRequestMsg(const Core::Request& request)
 	{
 		
 	}
@@ -586,14 +591,27 @@ void CGraphicBoard::AppendMsg(const Core::AnyMsg& msg)
 	pimpl->AppendMsg(msg);
 }
 
-bool CGraphicBoard::Forward()
+uint32_t CGraphicBoard::GetState() const
 {
-	return pimpl->Forward();
+	return pimpl->state;
 }
 
-bool CGraphicBoard::Backward()
+uint32_t CGraphicBoard::GetStatesCount() const
 {
-	return pimpl->Backward();
+	return pimpl->msgs.size();
+}
+
+uint32_t CGraphicBoard::GetTargetState() const
+{
+	return pimpl->targetState;
+}
+
+bool CGraphicBoard::SetTargetState(uint32_t tState)
+{
+	if(tState >= pimpl->msgs.size())
+		return false;
+	pimpl->targetState = tState;
+	return true;
 }
 
 void CGraphicBoard::FillPile(uint32_t controller, uint32_t location, int num)
