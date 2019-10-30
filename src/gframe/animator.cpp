@@ -14,10 +14,15 @@ void Animator::Tick(float elapsed)
 {
 	if(animations.empty())
 		return;
-	if(animations.front()->Tick(elapsed * speed))
+	float distance = animations.front()->Tick(elapsed * speed);
+	while(distance > 0.0f)
 	{
 		animations.front()->Skip();
 		animations.pop();
+		if(!animations.empty())
+			distance = animations.front()->Tick(distance / speed);
+		else
+			break;
 	}
 }
 

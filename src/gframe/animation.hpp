@@ -8,9 +8,9 @@ class IAnimation
 {
 public:
 	IAnimation(float duration);
-// 	float GetDuration() const;
-	// When the animation is done this function will return true.
-	virtual bool Tick(float elapsed) = 0;
+	// Returns the time distance needed to finish the animation (negative)
+	// or surplus time when the animation is finished (positive)
+	virtual float Tick(float elapsed) = 0;
 	// Should call Tick with elapsed == duration
 	// Needed to skip stuff such as playing audio.
 	// Called by SkipAll
@@ -19,7 +19,7 @@ protected:
 	const float duration;
 	float progress{0.0f};
 	
-	bool IsDone() const;
+	float Distance() const;
 };
 
 } // namespace YGOpen
