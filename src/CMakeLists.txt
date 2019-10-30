@@ -45,6 +45,12 @@ target_sources(ygopen-gui PRIVATE
 	${CSR}/drawing/gl_shared/shader.hpp
 	${CSR}/drawing/gl_shared/texture.cpp
 	${CSR}/drawing/gl_shared/texture.hpp
+	${CSR}/gframe/animation.cpp
+	${CSR}/gframe/animation.hpp
+	${CSR}/gframe/animator.cpp
+	${CSR}/gframe/animator.hpp
+	${CSR}/gframe/graphic_board.cpp
+	${CSR}/gframe/graphic_board.hpp
 	${CSR}/gui/button.cpp
 	${CSR}/gui/button.hpp
 	${CSR}/gui/common.hpp
