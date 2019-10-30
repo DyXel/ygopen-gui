@@ -257,8 +257,8 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 	{
 		auto UpdatePos = [this](const Place& place, GraphicCard& card)
 		{
-			card.loc = GetCardSpatialLocation(place);
-			card.rot = GetCardSpatialRotation(place, card.pos());
+			card.loc = GetLocXYZ(place);
+			card.rot = GetRotXYZ(place, card.pos());
 			const auto mvp = cam.vp * GetModel(card.loc, card.rot);
 			card.front->SetMatrix(mvp);
 			card.cover->SetMatrix(mvp);
@@ -416,7 +416,7 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 		
 	}
 	
-	const glm::vec3 GetHandCardSpatialLocation(const Place& p, int count) const
+	const glm::vec3 GetHandLocXYZ(const Place& p, int count) const
 	{
 		glm::vec3 loc = {0.0f, 0.0f, 0.0f};
 		const float cardWidth = glm::abs(CARD_VERTICES[0].x) * 2.0f;
@@ -434,12 +434,12 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 		return loc;
 	}
 	
-	const glm::vec3 GetCardSpatialLocation(const Place& p) const
+	const glm::vec3 GetLocXYZ(const Place& p) const
 	{
 		glm::vec3 loc = {0.0f, 0.0f, 0.0f};
 		if(LOC(p) & LOCATION_HAND)
 		{
-			loc = GetHandCardSpatialLocation(p, hand[CON(p)].size());
+			loc = GetHandLocXYZ(p, hand[CON(p)].size());
 		}
 		else if(IsPile(p))
 		{
@@ -485,7 +485,7 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 		return loc;
 	}
 	
-	const glm::vec3 GetCardSpatialRotation(const Place& p, uint32_t pos) const
+	const glm::vec3 GetRotXYZ(const Place& p, uint32_t pos) const
 	{
 		glm::vec3 rot = {0.0f, 0.0f, 0.0f};
 		if(LOC(p) & LOCATION_HAND)
@@ -618,8 +618,8 @@ void CGraphicBoard::FillPile(uint32_t controller, uint32_t location, int num)
 		const Place p = {controller, location, seq, -1};
 		c.front = pimpl->NewCardFrontPrim();
 		c.cover = pimpl->NewCardCoverPrim();
-		c.loc = pimpl->GetCardSpatialLocation(p);
-		c.rot = pimpl->GetCardSpatialRotation(p, c.pos());
+		c.loc = pimpl->GetLocXYZ(p);
+		c.rot = pimpl->GetRotXYZ(p, c.pos());
 		seq++;
 	}
 }
