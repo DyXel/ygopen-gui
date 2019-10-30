@@ -412,24 +412,30 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 		
 	}
 	
+	const glm::vec3 GetHandCardSpatialLocation(const Place& p, int count) const
+	{
+		glm::vec3 loc = {0.0f, 0.0f, 0.0f};
+		const float cardWidth = glm::abs(CARD_VERTICES[0].x) * 2.0f;
+		// Card centered sequence
+		const float cenSeq = SEQ(p) - glm::floor(count * 0.5f) +
+		                     (!(count & 1) * 0.5f);
+		// Translation vector, flipped if player is 1
+		const auto tVec = glm::vec3(cardWidth, 0.0f, 0.0f) *
+		                  ((CON(p)) ? -1.0f : 1.0f);
+		const glm::vec3 offset = tVec * cenSeq;
+		const auto search = locations.find({CON(p), LOCATION_HAND, 0});
+		if(search == locations.end())
+			throw std::exception();
+		loc = search->second + offset;
+		return loc;
+	}
+	
 	const glm::vec3 GetCardSpatialLocation(const Place& p) const
 	{
 		glm::vec3 loc = {0.0f, 0.0f, 0.0f};
 		if(LOC(p) & LOCATION_HAND)
 		{
-			const std::size_t count = hand[CON(p)].size();
-			const float cardWidth = glm::abs(CARD_VERTICES[0].x) * 2.0f;
-			// Card centered sequence
-			const float cenSeq = SEQ(p) - glm::floor(count * 0.5f) +
-			                     (!(count & 1) * 0.5f);
-			// Translation vector, flipped if player is 1
-			const auto tVec = glm::vec3(cardWidth, 0.0f, 0.0f) *
-			                  ((CON(p)) ? -1.0f : 1.0f);
-			const glm::vec3 offset = tVec * cenSeq;
-			const auto search = locations.find({CON(p), LOCATION_HAND, 0});
-			if(search == locations.end())
-				throw std::exception();
-			loc = search->second + offset;
+			loc = GetHandCardSpatialLocation(p, hand[CON(p)].size());
 		}
 		else if(IsPile(p))
 		{
@@ -558,16 +564,6 @@ void CGraphicBoard::SetCameraPosition(const glm::vec3& cPos)
 void CGraphicBoard::UpdateHitboxes()
 {
 	pimpl->UpdateHitboxes();
-}
-
-// void CGraphicBoard::UpdateAllCards()
-// {
-// 	pimpl->UpdateAllCards();
-// }
-
-void CGraphicBoard::SetParentCanvas(const SDL_Rect& parent)
-{
-	pimpl->cam.pCan = parent;
 }
 
 void CGraphicBoard::SetAnswerCallback(AnswerCallback answerCallback)
