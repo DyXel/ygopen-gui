@@ -33,8 +33,6 @@ public:
 	
 	void SetCameraPosition(const glm::vec3& cPos);
 	void UpdateHitboxes();
-// 	void UpdateAllCards();
-	void SetParentCanvas(const SDL_Rect& parent);
 	void SetAnswerCallback(AnswerCallback answerCallback);
 	void Resize(const SDL_Rect& parent, const SDL_Rect& rect);
 	
@@ -43,8 +41,10 @@ public:
 	
 	// DuelBoard overrides / calls forwarding
 	void AppendMsg(const Core::AnyMsg& msg);
-	bool Forward();
-	bool Backward();
+	uint32_t GetState() const;
+	uint32_t GetStatesCount() const;
+	uint32_t GetTargetState() const;
+	bool SetTargetState(uint32_t state);
 	void FillPile(uint32_t controller, uint32_t location, int num);
 private:
 	class impl;
