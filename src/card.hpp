@@ -27,6 +27,10 @@ public:
 	{
 		return vec[pos];
 	}
+	const T& operator()(const int offset)
+	{
+		return vec[pos + offset];
+	}
 };
 
 struct Card
