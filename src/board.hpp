@@ -71,33 +71,11 @@ inline Counter CounterFromPbCounter(const Core::Data::Counter& c)
 	return {c.type(), c.count()};
 }
 
-// TODO: change operator[] to .at() and add other meaningful exceptions
-
 template<typename C>
 class DuelBoard
 {
 	static_assert(std::is_base_of<Card, C>::value, "C must be based off Card");
 public:
-	uint32_t GetTotalStates() const
-	{
-		return msgs.size();
-	}
-	
-	uint32_t GetProcessedStates() const
-	{
-		return processedState;
-	}
-	
-	uint32_t GetCurrentState() const
-	{
-		return state;
-	}
-	
-	bool IsRealtime() const
-	{
-		return state == processedState;
-	}
-	
 	// Add a message at the end of the message list.
 	void AppendMsg(const Core::AnyMsg& msg)
 	{
@@ -109,7 +87,7 @@ public:
 	{
 		if(msgs.size() == 0 || state > msgs.size() - 1)
 			return false;
-		if((realtime = IsRealtime()))
+		if((realtime = (state == processedState)))
 			processedState++;
 		advancing = true;
 		InterpretMsg(msgs[state]);
@@ -144,10 +122,18 @@ public:
 		playerLP[controller].AddOrNext(true, lp);
 	}
 protected:
+	bool realtime{}; // Controls if a new message appends new info or forwards.
+	bool advancing{}; // Are we going forward or going backward?
+	uint32_t state{};
+	uint32_t processedState{};
+	std::vector<Core::AnyMsg> msgs;
+	
 	uint32_t turn{}; // Current turn.
 	std::array<Sequential<uint32_t>, 2> playerLP; // Both player LP.
 	Sequential<uint32_t> turnPlayer; // Player of the current turn.
 	Sequential<uint32_t> phase; // Current game phase.
+
+	std::map<TempPlace, C> tempCards; // See zoneCards comments.
 	
 	// Holds cards that are in "piles" (this includes hand).
 	// 1) To get a pile, use GetPile.
@@ -217,14 +203,6 @@ protected:
 	Pile<C>& GetPile(const Place& place);
 	C& GetCard(const Place& place);
 // 	bool DoesCardHaveCounters(const C& card) const;
-private:
-	bool realtime{}; // Controls if a new message appends new info or forwards.
-	bool advancing{}; // Are we going forward or going backward?
-	uint32_t state{};
-	uint32_t processedState{};
-	std::vector<Core::AnyMsg> msgs;
-
-	std::map<TempPlace, C> tempCards; // See zoneCards comments.
 
 	// Moves a single card from one place to another. Deals with overlays
 	// and counters accordingly but does not update card sequential
