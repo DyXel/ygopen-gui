@@ -51,6 +51,8 @@ target_sources(ygopen-gui PRIVATE
 	${CSR}/gframe/animator.hpp
 	${CSR}/gframe/graphic_board.cpp
 	${CSR}/gframe/graphic_board.hpp
+	${CSR}/gframe/animations/move_card.cpp
+	${CSR}/gframe/animations/move_card.hpp
 	${CSR}/gui/button.cpp
 	${CSR}/gui/button.hpp
 	${CSR}/gui/common.hpp

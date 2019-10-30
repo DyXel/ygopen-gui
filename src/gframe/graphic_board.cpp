@@ -1,8 +1,6 @@
 #include "graphic_board.hpp"
 
 #include <SDL_image.h>
-#include <glm/gtx/transform.hpp>
-#include <glm/gtx/euler_angles.hpp>
 
 #if defined(_DEBUG) || defined(DEBUG)
 #define DEBUG_HITBOXES
@@ -15,6 +13,7 @@
 #include "animator.hpp"
 #include "constants.hpp"
 #include "graphic_card.hpp"
+#include "animations/move_card.hpp"
 #include "../board.hpp"
 #include "../sdl_utility.hpp"
 #include "../drawing/renderer.hpp"
@@ -544,11 +543,6 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 		prim->SetTexCoords({{1.0f, 0.0f}, {0.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f}});
 		prim->SetTexture(cover);
 		return prim;
-	}
-	
-	inline const glm::mat4 GetModel(const glm::vec3& loc, const glm::vec3& rot)
-	{
-		return glm::translate(loc) * glm::eulerAngleXYZ(rot.x, rot.y, rot.z);
 	}
 };
 

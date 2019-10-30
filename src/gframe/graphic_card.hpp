@@ -1,6 +1,8 @@
 #ifndef GRAPHIC_BOARD_CARD_HPP
 #define GRAPHIC_BOARD_CARD_HPP
 #include <glm/vec3.hpp>
+#include <glm/gtx/transform.hpp>
+#include <glm/gtx/euler_angles.hpp>
 #include "../card.hpp"
 #include "../drawing/types.hpp"
 
@@ -28,6 +30,11 @@ struct GraphicCard : public Card
 	GraphicCard& operator=(const GraphicCard&) = delete;
 	GraphicCard& operator=(GraphicCard&&) = default;
 };
+
+inline const glm::mat4 GetModel(const glm::vec3& loc, const glm::vec3& rot)
+{
+	return glm::translate(loc) * glm::eulerAngleXYZ(rot.x, rot.y, rot.z);
+}
 
 } // namespace YGOpen
 
