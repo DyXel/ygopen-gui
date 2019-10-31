@@ -384,6 +384,12 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 		return true;
 	}
 	
+	template<typename T, typename... Args>
+	inline void PushAnimation(Args&&... args)
+	{
+		ani.Push(std::make_shared<T>(std::forward<Args>(args)...));
+	}
+	
 	void AnimateMsg(const Core::AnyMsg& msg)
 	{
 		if(msg.AnyMsg_case() == Core::AnyMsg::kSpecific)

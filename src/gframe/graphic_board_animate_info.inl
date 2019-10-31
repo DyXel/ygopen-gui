@@ -8,7 +8,7 @@ if(reason == Core::Msg::UpdateCard::REASON_DECK_TOP)
 {
 	auto& pile = GetPile(PlaceFromPbCardInfo(previousInfo));
 	auto& card = *(pile.rbegin() - previousInfo.sequence());
-	ani.Push(std::make_shared<Animation::SetCardImage>(card, ctm));
+	PushAnimation<Animation::SetCardImage>(card, ctm);
 	// TODO
 }
 // REASON_MOVE or REASON_POS_CHANGE or REASON_SET
@@ -28,8 +28,8 @@ else if(advancing)
 	};
 // 	if(updateCard.core_reason() & 0x1) // REASON_DESTROY
 // 		ani.Push(/*destroy sound*/);
-	ani.Push(std::make_shared<Animation::SetCardImage>(card, ctm));
-	ani.Push(std::make_shared<Animation::MoveCard>(cam.vp, mcd));
+	PushAnimation<Animation::SetCardImage>(card, ctm);
+	PushAnimation<Animation::MoveCard>(cam.vp, mcd);
 }
 else
 {
@@ -45,8 +45,8 @@ else
 		GetLocXYZ(previous),
 		GetRotXYZ(previous, card.pos())
 	};
-	ani.Push(std::make_shared<Animation::MoveCard>(cam.vp, mcd));
-	ani.Push(std::make_shared<Animation::SetCardImage>(card, ctm));
+	PushAnimation<Animation::MoveCard>(cam.vp, mcd);
+	PushAnimation<Animation::SetCardImage>(card, ctm);
 }
 break;
 }
@@ -75,8 +75,8 @@ if(advancing)
 		GetLocXYZ(place),
 		GetRotXYZ(place, card.pos())
 	};
-	ani.Push(std::make_shared<Animation::SetCardImage>(card, ctm));
-	ani.Push(std::make_shared<Animation::MoveCard>(cam.vp, mcd));
+	PushAnimation<Animation::SetCardImage>(card, ctm);
+	PushAnimation<Animation::MoveCard>(cam.vp, mcd);
 }
 else
 {
@@ -89,8 +89,8 @@ else
 		FAR_AWAY_LOCATION,
 		FAR_AWAY_ROTATION,
 	};
-	ani.Push(std::make_shared<Animation::MoveCard>(cam.vp, mcd));
-	ani.Push(std::make_shared<Animation::SetCardImage>(card, ctm));
+	PushAnimation<Animation::MoveCard>(cam.vp, mcd);
+	PushAnimation<Animation::SetCardImage>(card, ctm);
 }
 break;
 }
@@ -112,7 +112,7 @@ if(advancing)
 		FAR_AWAY_LOCATION,
 		FAR_AWAY_ROTATION,
 	};
-	ani.Push(std::make_shared<Animation::MoveCard>(cam.vp, mcd));
+	PushAnimation<Animation::MoveCard>(cam.vp, mcd);
 }
 else
 {
@@ -125,7 +125,7 @@ else
 		GetLocXYZ(place),
 		GetRotXYZ(place, card.pos())
 	};
-	ani.Push(std::make_shared<Animation::MoveCard>(cam.vp, mcd));
+	PushAnimation<Animation::MoveCard>(cam.vp, mcd);
 }
 break;
 }
@@ -158,7 +158,7 @@ if(advancing)
 		};
 		cards.push_back(mcd);
 	}
-	ani.Push(std::make_shared<Animation::MoveCards>(cam.vp, cards));
+	PushAnimation<Animation::MoveCards>(cam.vp, cards);
 	// Animate moved cards
 	for(int i = 0; i < drawCount; i++)
 	{
@@ -175,8 +175,8 @@ if(advancing)
 			GetRotXYZ(endP, card.pos())
 		};
 // 		ani.Push(/*draw sound*/);
-		ani.Push(std::make_shared<Animation::SetCardImage>(card, ctm));
-		ani.Push(std::make_shared<Animation::MoveCard>(cam.vp, mcd));
+		PushAnimation<Animation::SetCardImage>(card, ctm);
+		PushAnimation<Animation::MoveCard>(cam.vp, mcd);
 	}
 }
 else
@@ -195,8 +195,8 @@ else
 			GetLocXYZ(endP),
 			GetRotXYZ(endP, card.pos())
 		};
-		ani.Push(std::make_shared<Animation::MoveCard>(cam.vp, mcd));
-		ani.Push(std::make_shared<Animation::SetCardImage>(card, ctm));
+		PushAnimation<Animation::MoveCard>(cam.vp, mcd);
+		PushAnimation<Animation::SetCardImage>(card, ctm);
 	}
 	// Animate cards left in hand
 	std::vector<Animation::MoveCardData> cards;
@@ -214,7 +214,7 @@ else
 		};
 		cards.push_back(mcd);
 	}
-	ani.Push(std::make_shared<Animation::MoveCards>(cam.vp, cards));
+	PushAnimation<Animation::MoveCards>(cam.vp, cards);
 }
 break;
 }
