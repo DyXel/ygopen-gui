@@ -62,8 +62,8 @@ inline Place PlaceFromPbPlace(const Core::Data::Place& p)
 
 inline Place PlaceFromPbCardInfo(const Core::Data::CardInfo& cd)
 {
-	return {cd.controller(), cd.location(), cd.sequence(),
-	        (cd.location() & LOCATION_OVERLAY) ? cd.overlay_sequence() : -1}; // TODO: handle at encoder level?
+	return {cd.controller(), cd.location(),
+	        cd.sequence(), cd.overlay_sequence()};
 }
 
 inline Counter CounterFromPbCounter(const Core::Data::Counter& c)
