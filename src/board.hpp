@@ -35,11 +35,11 @@ using Place = std::tuple<uint32_t /*controller*/,
 #define OSEQ(t) std::get<3>(t)
 
 // NOTE: Temp as in Temporal
-using TempPlace = std::tuple<uint32_t /*state*/,
-                             uint32_t /*controller*/,
+using TempPlace = std::tuple<uint32_t /*controller*/,
                              uint32_t /*location*/,
                              uint32_t /*sequence*/,
-                             int32_t /*overlay_sequence*/>;
+                             int32_t /*overlay_sequence*/,
+                             uint32_t /*state*/>;
 
 using Counter = std::tuple<uint32_t /*type*/, uint32_t /*count*/>;
 
@@ -132,8 +132,6 @@ protected:
 	std::array<Sequential<uint32_t>, 2> playerLP; // Both player LP.
 	Sequential<uint32_t> turnPlayer; // Player of the current turn.
 	Sequential<uint32_t> phase; // Current game phase.
-
-	std::map<TempPlace, C> tempCards; // See zoneCards comments.
 	
 	// Holds cards that are in "piles" (this includes hand).
 	// 1) To get a pile, use GetPile.
@@ -161,6 +159,7 @@ protected:
 	// 5) Cards on index 5-6 mean extra monster zone monsters in mZone.
 	// 6) Cards on index 5 in sZone are field zone cards.
 	std::map<Place, C> zoneCards;
+	std::map<TempPlace, C> tempCards; // Holds card that are on the limbo
 	
 	// Holds which fields are blocked due to card effects.
 	// 1) Initialized with all the zones that can be blocked. Ranges:

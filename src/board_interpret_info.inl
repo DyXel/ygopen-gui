@@ -81,7 +81,7 @@ if(advancing)
 	else if(!realtime && IsPile(place))
 	{
 		auto& pile = GetPile(place);
-		auto t = std::tuple_cat(std::tie(state), place);
+		const auto t = std::tuple_cat(place, std::tie(state));
 		C& card = *pile.emplace(pile.begin() + SEQ(place),
 		                        std::move(tempCards[t]));
 		tempCards.erase(t);
@@ -90,7 +90,7 @@ if(advancing)
 	}
 	else // (!realtime && !IsPile(place))
 	{
-		auto t = std::tuple_cat(std::tie(state), place);
+		const auto t = std::tuple_cat(place, std::tie(state));
 		auto p = zoneCards.emplace(place, std::move(tempCards[t]));
 		tempCards.erase(t);
 		C& card = (*p.first).second;
@@ -108,7 +108,7 @@ else
 		auto& card = pile[SEQ(place)];
 		card.code.Prev();
 		card.pos.Prev();
-		tempCards.emplace(std::tuple_cat(std::tie(state), place),
+		tempCards.emplace(std::tuple_cat(place, std::tie(state)),
 		                                 std::move(card));
 		pile.erase(pile.begin() + SEQ(place));
 	}
@@ -117,7 +117,7 @@ else
 		auto& card = zoneCards[place];
 		card.code.Prev();
 		card.pos.Prev();
-		tempCards.emplace(std::tuple_cat(std::tie(state), place),
+		tempCards.emplace(std::tuple_cat(place, std::tie(state)),
 		                                 std::move(card));
 		zoneCards.erase(place);
 	}
@@ -135,13 +135,13 @@ if(advancing)
 	if(IsPile(place))
 	{
 		auto& pile = GetPile(place);
-		tempCards.emplace(std::tuple_cat(std::tie(state), place),
+		tempCards.emplace(std::tuple_cat(place, std::tie(state)),
 		                                 std::move(pile[SEQ(place)]));
 		pile.erase(pile.begin() + SEQ(place));
 	}
 	else
 	{
-		tempCards.emplace(std::tuple_cat(std::tie(state), place),
+		tempCards.emplace(std::tuple_cat(place, std::tie(state)),
 		                                 std::move(zoneCards[place]));
 		zoneCards.erase(place);
 	}
@@ -152,13 +152,13 @@ else
 	if(IsPile(place))
 	{
 		auto& pile = GetPile(place);
-		auto t = std::tuple_cat(std::tie(state), place);
+		const auto t = std::tuple_cat(place, std::tie(state));
 		pile.emplace(pile.begin() + SEQ(place), std::move(tempCards[t]));
 		tempCards.erase(t);
 	}
 	else // (!realtime && !IsPile(place))
 	{
-		auto t = std::tuple_cat(std::tie(state), place);
+		const auto t = std::tuple_cat(place, std::tie(state));
 		zoneCards.emplace(place, std::move(tempCards[t]));
 		tempCards.erase(t);
 	}
