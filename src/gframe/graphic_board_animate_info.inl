@@ -95,6 +95,41 @@ else
 break;
 }
 
+case Core::Information::kRemoveCard:
+{
+const auto& removeCard = info.remove_card();
+const auto place = PlaceFromPbCardInfo(removeCard.card());
+static const glm::vec3 FAR_AWAY_LOCATION = {0.0f, 0.0f, 100.0f};
+static const glm::vec3 FAR_AWAY_ROTATION = {0.0f, 0.0f, 0.0f};
+if(advancing)
+{
+	auto& card = tempCards[std::tuple_cat(place, std::tie(state))];
+	Animation::MoveCardData mcd =
+	{
+		card,
+		GetLocXYZ(place),
+		GetRotXYZ(place, card.pos()),
+		FAR_AWAY_LOCATION,
+		FAR_AWAY_ROTATION,
+	};
+	ani.Push(std::make_shared<Animation::MoveCard>(cam.vp, mcd));
+}
+else
+{
+	auto& card = GetCard(place);
+	Animation::MoveCardData mcd =
+	{
+		card,
+		FAR_AWAY_LOCATION,
+		FAR_AWAY_ROTATION,
+		GetLocXYZ(place),
+		GetRotXYZ(place, card.pos())
+	};
+	ani.Push(std::make_shared<Animation::MoveCard>(cam.vp, mcd));
+}
+break;
+}
+
 case Core::Information::kDraw:
 {
 const auto& draw = info.draw();
