@@ -50,6 +50,8 @@ target_sources(ygopen-gui PRIVATE
 	${CSR}/gframe/animation.hpp
 	${CSR}/gframe/animator.cpp
 	${CSR}/gframe/animator.hpp
+	${CSR}/gframe/card_texture_manager.cpp
+	${CSR}/gframe/card_texture_manager.hpp
 	${CSR}/gframe/constants.hpp
 	${CSR}/gframe/graphic_board_animate_info.inl
 	${CSR}/gframe/graphic_board.cpp
@@ -57,6 +59,8 @@ target_sources(ygopen-gui PRIVATE
 	${CSR}/gframe/graphic_card.hpp
 	${CSR}/gframe/animations/move_card.cpp
 	${CSR}/gframe/animations/move_card.hpp
+	${CSR}/gframe/animations/set_card_image.cpp
+	${CSR}/gframe/animations/set_card_image.hpp
 	${CSR}/gui/button.cpp
 	${CSR}/gui/button.hpp
 	${CSR}/gui/common.hpp

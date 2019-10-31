@@ -43,6 +43,7 @@ if(advancing)
 			GetRotXYZ(endP, card.pos())
 		};
 // 		ani.Push(/*draw sound*/);
+		ani.Push(std::make_shared<Animation::SetCardImage>(card, ctm));
 		ani.Push(std::make_shared<Animation::MoveCard>(cam.vp, mcd));
 	}
 }
@@ -63,6 +64,7 @@ else
 			GetRotXYZ(endP, card.pos())
 		};
 		ani.Push(std::make_shared<Animation::MoveCard>(cam.vp, mcd));
+		ani.Push(std::make_shared<Animation::SetCardImage>(card, ctm));
 	}
 	// Animate cards left in hand
 	std::vector<Animation::MoveCardData> cards;

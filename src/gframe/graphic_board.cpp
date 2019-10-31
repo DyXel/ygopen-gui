@@ -11,9 +11,11 @@
 // #undef DEBUG_MOUSE_POS
 
 #include "animator.hpp"
+#include "card_texture_manager.hpp"
 #include "constants.hpp"
 #include "graphic_card.hpp"
 #include "animations/move_card.hpp"
+#include "animations/set_card_image.hpp"
 #include "../board.hpp"
 #include "../sdl_utility.hpp"
 #include "../drawing/renderer.hpp"
@@ -76,7 +78,7 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 	// ************************
 	Drawing::Renderer renderer;
 	Drawing::Texture cover;
-	Drawing::Texture unknown;
+	CardTextureManager ctm;
 	// ************************ TODO: Move to own structure (perhaps `gfx`)
 	std::map<LitePlace, glm::vec3> locations;
 	std::map<LitePlace, Zone> zones;
@@ -103,10 +105,9 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 	Drawing::Primitive mousePrim;
 #endif // defined(DEBUG_MOUSE_POS)
 	impl(Drawing::Renderer renderer, int flags) :
-		renderer(renderer)
+		renderer(renderer), ctm(renderer)
 	{
 		cover = TextureFromPath(renderer, "TEMP/cover.png");
-		unknown = TextureFromPath(renderer, "TEMP/unknown.jpg");
 		// zones textures
 		auto zTex = TextureFromPath(renderer, "TEMP/zone.png");
 		InitLocations(flags);
@@ -522,13 +523,13 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 		return rot;
 	}
 	
-	Drawing::Primitive NewCardFrontPrim() const
+	Drawing::Primitive NewCardFrontPrim()
 	{
 		auto prim = renderer->NewPrimitive();
 		prim->SetDrawMode(Drawing::GetQuadDrawMode());
 		prim->SetVertices(CARD_VERTICES);
 		prim->SetTexCoords(Drawing::GetQuadTexCoords());
-		prim->SetTexture(unknown);
+		prim->SetTexture(ctm.GetCardTextureByCode(0u));
 		return prim;
 	}
 	
