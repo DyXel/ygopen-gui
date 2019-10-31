@@ -1,11 +1,16 @@
 #ifndef MOVE_CARD_ANIMATION_HPP
 #define MOVE_CARD_ANIMATION_HPP
 #include <vector>
+
+#include <glm/vec3.hpp>
+#include <glm/mat4x4.hpp>
+
 #include "../animation.hpp"
-#include "../../gframe/graphic_card.hpp"
 
 namespace YGOpen
 {
+
+struct GraphicCard; // Forward declare
 
 namespace Animation
 {

@@ -2,6 +2,7 @@
 
 #include <glm/gtx/compatibility.hpp>
 
+#include "../graphic_card.hpp"
 #include "../../drawing/primitive.hpp"
 
 namespace YGOpen
