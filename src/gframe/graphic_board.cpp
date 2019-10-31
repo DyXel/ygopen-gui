@@ -428,9 +428,8 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 		                  ((CON(p)) ? -1.0f : 1.0f);
 		const glm::vec3 offset = tVec * cenSeq;
 		const auto search = locations.find({CON(p), LOCATION_HAND, 0});
-		if(search == locations.end())
-			throw std::exception();
-		loc = search->second + offset;
+		if(search != locations.end())
+			loc = search->second + offset;
 		return loc;
 	}
 	
@@ -447,9 +446,8 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 			                    glm::vec3(0.0f, 0.0f, CARD_THICKNESS);
 			LitePlace lp = {CON(p), LOC(p), 0};
 			const auto search = locations.find(lp);
-			if(search == locations.end())
-				throw std::exception();
-			loc = search->second + offset;
+			if(search != locations.end())
+				loc = search->second + offset;
 		}
 		else
 		{
@@ -469,9 +467,8 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 				SEQ(lp) = SEQ(p);
 			}
 			const auto search = locations.find(lp);
-			if(search == locations.end())
-				throw std::exception();
-			loc = search->second;
+			if(search != locations.end())
+				loc = search->second;
 			if(LOC(p) & LOCATION_OVERLAY)
 			{
 				const auto offset = static_cast<float>(OSEQ(p)) *
