@@ -1,3 +1,56 @@
+case Core::Information::kUpdateCard:
+{
+const auto& updateCard = info.update_card();
+const auto& previousInfo = updateCard.previous();
+const auto& currentInfo = updateCard.current();
+const auto reason = updateCard.reason();
+if(reason == Core::Msg::UpdateCard::REASON_DECK_TOP)
+{
+	auto& pile = GetPile(PlaceFromPbCardInfo(previousInfo));
+	auto& card = *(pile.rbegin() - previousInfo.sequence());
+	ani.Push(std::make_shared<Animation::SetCardImage>(card, ctm));
+	// TODO
+}
+// REASON_MOVE or REASON_POS_CHANGE or REASON_SET
+else if(advancing)
+{
+	auto previous = PlaceFromPbCardInfo(previousInfo);
+	auto current = (reason == Core::Msg::UpdateCard::REASON_MOVE) ?
+	               PlaceFromPbCardInfo(currentInfo) : previous;
+	auto& card = GetCard(current);
+	Animation::MoveCardData mcd =
+	{
+		card,
+		GetLocXYZ(previous),
+		GetRotXYZ(previous, card.pos(-1)),
+		GetLocXYZ(current),
+		GetRotXYZ(current, card.pos())
+	};
+// 	if(updateCard.core_reason() & 0x1) // REASON_DESTROY
+// 		ani.Push(/*destroy sound*/);
+	ani.Push(std::make_shared<Animation::SetCardImage>(card, ctm));
+	ani.Push(std::make_shared<Animation::MoveCard>(cam.vp, mcd));
+}
+else
+{
+	auto previous = PlaceFromPbCardInfo(previousInfo);
+	auto current = (reason == Core::Msg::UpdateCard::REASON_MOVE) ?
+	               PlaceFromPbCardInfo(currentInfo) : previous;
+	auto& card = GetCard(previous);
+	Animation::MoveCardData mcd =
+	{
+		card,
+		GetLocXYZ(current),
+		GetRotXYZ(current, card.pos(1)),
+		GetLocXYZ(previous),
+		GetRotXYZ(previous, card.pos())
+	};
+	ani.Push(std::make_shared<Animation::MoveCard>(cam.vp, mcd));
+	ani.Push(std::make_shared<Animation::SetCardImage>(card, ctm));
+}
+break;
+}
+
 case Core::Information::kDraw:
 {
 const auto& draw = info.draw();
