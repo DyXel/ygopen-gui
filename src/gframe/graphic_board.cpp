@@ -395,7 +395,7 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 		if(msg.AnyMsg_case() == Core::AnyMsg::kSpecific)
 		{
 			const auto& specific = msg.specific();
-			if(state != msgs.size() - 1u &&
+			if(state != msgs.size() &&
 			   specific.Specific_case() == Core::Specific::kRequest)
 			{
 				// Skip request message if it can't be answered
@@ -612,7 +612,7 @@ uint32_t CGraphicBoard::GetTargetState() const
 
 bool CGraphicBoard::SetTargetState(uint32_t tState)
 {
-	if(tState >= pimpl->msgs.size())
+	if(tState > pimpl->msgs.size())
 		return false;
 	pimpl->targetState = tState;
 	return true;
