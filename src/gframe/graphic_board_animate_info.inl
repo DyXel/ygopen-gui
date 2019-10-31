@@ -38,7 +38,7 @@ if(advancing)
 		{
 			card,
 			GetLocXYZ(startP),
-			GetRotXYZ(startP, card.pos(-1)),
+			GetRotXYZ(startP, card.pos()),
 			GetLocXYZ(endP),
 			GetRotXYZ(endP, card.pos())
 		};
@@ -57,8 +57,8 @@ else
 		Animation::MoveCardData mcd =
 		{
 			card,
-			GetHandLocXYZ(startP, handSz + drawCount),
-			GetRotXYZ(startP, card.pos(1)),
+			GetHandLocXYZ(startP, handSz + drawCount + 1),
+			GetRotXYZ(startP, card.pos()),
 			GetLocXYZ(endP),
 			GetRotXYZ(endP, card.pos())
 		};
