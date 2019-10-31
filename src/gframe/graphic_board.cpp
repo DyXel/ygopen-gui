@@ -337,12 +337,13 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 	void Tick(float elapsed)
 	{
 		ani.Tick(elapsed);
-		if(!ani.IsAnimating())
+		if(!ani.IsAnimating() && targetState != state)
 		{
 			if(targetState > state)
 				Forward();
 			else if (targetState < state)
 				Backward();
+			ani.Tick(elapsed);
 		}
 	}
 	
