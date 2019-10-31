@@ -218,3 +218,33 @@ else
 }
 break;
 }
+
+case Core::Information::kSwapCards:
+{
+const auto& swapCards = info.swap_cards();
+const auto card1Place = PlaceFromPbCardInfo(swapCards.card1());
+const auto card2Place = PlaceFromPbCardInfo(swapCards.card2());
+auto& card1 = GetCard(card1Place);
+auto& card2 = GetCard(card2Place);
+std::vector<Animation::MoveCardData> cards;
+Animation::MoveCardData mcd1 =
+{
+	card1,
+	GetLocXYZ(card1Place),
+	GetRotXYZ(card1Place, card1.pos()),
+	GetLocXYZ(card2Place),
+	GetRotXYZ(card2Place, card1.pos())
+};
+Animation::MoveCardData mcd2 =
+{
+	card2,
+	GetLocXYZ(card2Place),
+	GetRotXYZ(card2Place, card2.pos()),
+	GetLocXYZ(card1Place),
+	GetRotXYZ(card1Place, card2.pos())
+};
+cards.push_back(mcd1);
+cards.push_back(mcd2);
+PushAnimation<Animation::MoveCards>(cam.vp, cards);
+break;
+}
