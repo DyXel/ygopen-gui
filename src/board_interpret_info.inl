@@ -11,6 +11,7 @@ if(advancing)
 		auto& pile = GetPile(PlaceFromPbCardInfo(previousInfo));
 		auto& card = *(pile.rbegin() - previousInfo.sequence());
 		card.code.AddOrNext(realtime, currentInfo.code());
+		card.pos.AddOrNext(realtime, card.pos()); // copy
 	}
 	else if(reason == Core::Msg::UpdateCard::REASON_MOVE)
 	{
@@ -34,6 +35,7 @@ else
 		auto& pile = GetPile(PlaceFromPbCardInfo(previousInfo));
 		auto& card = *(pile.rbegin() - previousInfo.sequence());
 		card.code.Prev();
+		card.pos.Prev();
 	}
 	else if(reason == Core::Msg::UpdateCard::REASON_MOVE)
 	{
