@@ -405,10 +405,10 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 	
 	void AnimateInfoMsg(const Core::Information& info)
 	{
-// 		switch(msg.Information_case())
-// 		{
-// 			
-// 		}
+		switch(info.Information_case())
+		{
+#include "graphic_board_animate_info.inl"
+		}
 	}
 	
 	void AnimateRequestMsg(const Core::Request& request)
