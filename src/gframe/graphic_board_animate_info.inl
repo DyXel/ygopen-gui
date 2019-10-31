@@ -14,9 +14,9 @@ if(reason == Core::Msg::UpdateCard::REASON_DECK_TOP)
 // REASON_MOVE or REASON_POS_CHANGE or REASON_SET
 else if(advancing)
 {
-	auto previous = PlaceFromPbCardInfo(previousInfo);
-	auto current = (reason == Core::Msg::UpdateCard::REASON_MOVE) ?
-	               PlaceFromPbCardInfo(currentInfo) : previous;
+	const auto previous = PlaceFromPbCardInfo(previousInfo);
+	const auto current = (reason == Core::Msg::UpdateCard::REASON_MOVE) ?
+	                     PlaceFromPbCardInfo(currentInfo) : previous;
 	auto& card = GetCard(current);
 	Animation::MoveCardData mcd =
 	{
@@ -33,9 +33,9 @@ else if(advancing)
 }
 else
 {
-	auto previous = PlaceFromPbCardInfo(previousInfo);
-	auto current = (reason == Core::Msg::UpdateCard::REASON_MOVE) ?
-	               PlaceFromPbCardInfo(currentInfo) : previous;
+	const auto previous = PlaceFromPbCardInfo(previousInfo);
+	const auto current = (reason == Core::Msg::UpdateCard::REASON_MOVE) ?
+	                     PlaceFromPbCardInfo(currentInfo) : previous;
 	auto& card = GetCard(previous);
 	Animation::MoveCardData mcd =
 	{
