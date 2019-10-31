@@ -51,6 +51,50 @@ else
 break;
 }
 
+case Core::Information::kAddCard:
+{
+const auto& addCard = info.add_card();
+const auto& cardInfo = addCard.card();
+const auto place = PlaceFromPbCardInfo(cardInfo);
+if(realtime) // Set Card Data
+{
+	auto& card = GetCard(place);
+	card.front = NewCardFrontPrim();
+	card.cover = NewCardCoverPrim();
+}
+static const glm::vec3 FAR_AWAY_LOCATION = {0.0f, 0.0f, 100.0f};
+static const glm::vec3 FAR_AWAY_ROTATION = {0.0f, 0.0f, 0.0f};
+if(advancing)
+{
+	auto& card = GetCard(place);
+	Animation::MoveCardData mcd =
+	{
+		card,
+		FAR_AWAY_LOCATION,
+		FAR_AWAY_ROTATION,
+		GetLocXYZ(place),
+		GetRotXYZ(place, card.pos())
+	};
+	ani.Push(std::make_shared<Animation::SetCardImage>(card, ctm));
+	ani.Push(std::make_shared<Animation::MoveCard>(cam.vp, mcd));
+}
+else
+{
+	auto& card = tempCards[std::tuple_cat(place, std::tie(state))];
+	Animation::MoveCardData mcd =
+	{
+		card,
+		GetLocXYZ(place),
+		GetRotXYZ(place, card.pos()),
+		FAR_AWAY_LOCATION,
+		FAR_AWAY_ROTATION,
+	};
+	ani.Push(std::make_shared<Animation::MoveCard>(cam.vp, mcd));
+	ani.Push(std::make_shared<Animation::SetCardImage>(card, ctm));
+}
+break;
+}
+
 case Core::Information::kDraw:
 {
 const auto& draw = info.draw();
