@@ -390,7 +390,7 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 			}
 			else if(specific.Specific_case() == Core::Specific::kInformation)
 			{
-				AnimateInfoMsg(specific.player(), specific.information());
+				AnimateInfoMsg(specific.information());
 			}
 			else // (specific.Specific_case() == Core::Specific::kRequest)
 			{
@@ -399,11 +399,11 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 		}
 		else // (msg.AnyMsg_case() == Core::AnyMsg::kInformation)
 		{
-			AnimateInfoMsg(-1, msg.information());
+			AnimateInfoMsg(msg.information());
 		}
 	}
 	
-	void AnimateInfoMsg(int player, const Core::Information& info)
+	void AnimateInfoMsg(const Core::Information& info)
 	{
 // 		switch(msg.Information_case())
 // 		{

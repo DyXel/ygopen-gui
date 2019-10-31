@@ -10,36 +10,34 @@ namespace YGOpen
 namespace Animation
 {
 
+struct MoveCardData
+{
+	GraphicCard& gc;
+	const glm::vec3 startLoc, startRot, endLoc, endRot;
+};
+
 class MoveCard : public IAnimation
 {
 public:
-	MoveCard(GraphicCard& card, const glm::mat4& vp,
-	         const glm::vec3& startLoc, const glm::vec3& startRot,
-	         const glm::vec3& endLoc, const glm::vec3& endRot);
+	MoveCard(const glm::mat4& vp, const MoveCardData& card);
 	virtual ~MoveCard() = default;
 	float Tick(float elapsed) override;
 	void Skip() override;
 private:
-	GraphicCard& card;
 	const glm::mat4& vp;
-	const glm::vec3 startLoc, startRot, endLoc, endRot;
+	const MoveCardData card;
 };
 
 class MoveCards : public IAnimation
 {
 public:
-	struct CardToMove
-	{
-		GraphicCard& gc;
-		const glm::vec3 startLoc, startRot, endLoc, endRot;
-	};
-	MoveCards(const glm::mat4& vp, const std::vector<CardToMove>& cards);
+	MoveCards(const glm::mat4& vp, const std::vector<MoveCardData>& cards);
 	virtual ~MoveCards() = default;
 	float Tick(float elapsed) override;
 	void Skip() override;
 private:
 	const glm::mat4& vp;
-	std::vector<CardToMove> cards;
+	const std::vector<MoveCardData> cards;
 };
 
 
