@@ -15,8 +15,8 @@ if(advancing)
 	}
 	else if(reason == Core::Msg::UpdateCard::REASON_MOVE)
 	{
-		auto previous = PlaceFromPbCardInfo(previousInfo);
-		auto current = PlaceFromPbCardInfo(currentInfo);
+		const auto previous = PlaceFromPbCardInfo(previousInfo);
+		const auto current = PlaceFromPbCardInfo(currentInfo);
 		auto& card = MoveSingle(previous, current);
 		card.code.AddOrNext(realtime, currentInfo.code());
 		card.pos.AddOrNext(realtime, currentInfo.position());
@@ -39,8 +39,8 @@ else
 	}
 	else if(reason == Core::Msg::UpdateCard::REASON_MOVE)
 	{
-		auto previous = PlaceFromPbCardInfo(previousInfo);
-		auto current = PlaceFromPbCardInfo(currentInfo);
+		const auto previous = PlaceFromPbCardInfo(previousInfo);
+		const auto current = PlaceFromPbCardInfo(currentInfo);
 		auto& card = GetCard(current);
 		card.code.Prev();
 		card.pos.Prev();
@@ -128,9 +128,9 @@ break;
 case Core::Information::kRemoveCard:
 {
 const auto& removeCard = info.remove_card();
+const auto place = PlaceFromPbCardInfo(removeCard.card());
 if(advancing)
 {
-	auto place = PlaceFromPbCardInfo(removeCard.card());
 	// Move into the temporal
 	if(IsPile(place))
 	{
@@ -148,7 +148,6 @@ if(advancing)
 }
 else
 {
-	auto place = PlaceFromPbCardInfo(removeCard.card());
 	// Move out of the temporal
 	if(IsPile(place))
 	{
