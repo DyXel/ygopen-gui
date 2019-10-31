@@ -319,6 +319,11 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 			answer.set_number(PHASE_END);
 			acb(answer);
 		}
+		else if(e.type == SDL_KEYDOWN && !e.key.repeat &&
+		        e.key.keysym.scancode == SDL_SCANCODE_END)
+		{
+			ani.FinishAll();
+		}
 		return false;
 	}
 	
