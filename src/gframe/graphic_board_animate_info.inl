@@ -139,6 +139,10 @@ auto& pHand = hand[player];
 auto& pDeck = deck[player];
 const auto handSz = pHand.size();
 const auto deckSz = pDeck.size();
+auto HitboxUpdateWrapper = [&, player]()
+{
+	UpdateHandHitboxes(player);
+};
 if(advancing)
 {
 	const int range = handSz - drawCount;
@@ -178,6 +182,7 @@ if(advancing)
 		PushAnimation<Animation::SetCardImage>(card, ctm);
 		PushAnimation<Animation::MoveCard>(cam.vp, mcd);
 	}
+	PushAnimation<Animation::Call>(HitboxUpdateWrapper);
 }
 else
 {
@@ -215,6 +220,7 @@ else
 		cards.push_back(mcd);
 	}
 	PushAnimation<Animation::MoveCards>(cam.vp, cards);
+	PushAnimation<Animation::Call>(HitboxUpdateWrapper);
 }
 break;
 }
