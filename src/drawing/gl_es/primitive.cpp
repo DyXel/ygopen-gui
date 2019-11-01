@@ -85,6 +85,10 @@ void Primitive::SetTexture(const Drawing::Texture& texture)
 
 void Primitive::Draw()
 {
+	if(depthTest)
+		glEnable(GL_DEPTH_TEST);
+	else
+		glDisable(GL_DEPTH_TEST);
 	if(tex)
 	{
 		texProgram.Use();

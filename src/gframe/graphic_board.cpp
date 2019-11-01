@@ -91,6 +91,7 @@ public:
 			Zone& zone = zones.emplace(kv.first, Zone{}).first->second;
 			zone.model = glm::translate(kv.second + glm::vec3(0.0f, 0.0f, -0.001f));
 			zone.prim = renderer->NewPrimitive();
+			zone.prim->depthTest = true;
 			zone.prim->SetDrawMode(Drawing::GetQuadDrawMode());
 			zone.prim->SetVertices(ZONE_VERTICES);
 			zone.prim->SetTexCoords(Drawing::GetQuadTexCoords());
@@ -661,6 +662,7 @@ private:
 	Drawing::Primitive NewCardFrontPrim()
 	{
 		auto prim = renderer->NewPrimitive();
+		prim->depthTest = true;
 		prim->SetDrawMode(Drawing::GetQuadDrawMode());
 		prim->SetVertices(CARD_VERTICES);
 		prim->SetTexCoords(Drawing::GetQuadTexCoords());
@@ -671,6 +673,7 @@ private:
 	Drawing::Primitive NewCardCoverPrim() const
 	{
 		auto prim = renderer->NewPrimitive();
+		prim->depthTest = true;
 		prim->SetDrawMode(Drawing::GetQuadDrawMode());
 		prim->SetVertices(CARD_COVER_VERTICES);
 		prim->SetTexCoords({{1.0f, 0.0f}, {0.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f}});
