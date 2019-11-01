@@ -73,42 +73,11 @@ Drawing::Texture TextureFromPath(Drawing::Renderer ren, std::string_view path)
 
 // *********************************************************
 
-class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
+class CGraphicBoard final : public IGraphicBoard, public DuelBoard<GraphicCard>
 {
-	friend CGraphicBoard;
-	// ************************
-	Drawing::Renderer renderer;
-	Drawing::Texture cover;
-	CardTextureManager ctm;
-	// ************************ TODO: Move to own structure (perhaps `gfx`)
-	std::map<LitePlace, glm::vec3> locations;
-	std::map<LitePlace, Zone> zones;
-	std::map<LitePlace, Zone>::iterator selectedZone;
-	struct // Camera info
-	{
-		// Parent canvas, in pixels, represents the size of the drawable area.
-		SDL_Rect pCan{};
-		// Canvas, in pixels, where this graphic board is drawn.
-		SDL_Rect can{};
-		// Camera position on world coordinates
-		glm::vec3 pos{};
-		// View-Projection matrix.
-		// to be combined with Viewport and/or Model matrix for each object
-		glm::mat4 vp{1.0f};
-	}cam;
-
-	uint32_t targetState{};
-	Animator ani;
-
-	AnswerCallback acb; // TODO: find a better name
-	
-	std::map<Place, GraphicCard&> selectCards;
-
-#if defined(DEBUG_MOUSE_POS)
-	Drawing::Primitive mousePrim;
-#endif // defined(DEBUG_MOUSE_POS)
-	impl(Drawing::Renderer renderer, int flags) :
-		renderer(renderer), ctm(renderer)
+public:
+	CGraphicBoard(GUI::Environment& env, Drawing::Renderer renderer, int flags)
+		: IGraphicBoard(env), renderer(renderer), ctm(renderer)
 	{
 		cover = TextureFromPath(renderer, "TEMP/cover.png");
 		// zones textures
@@ -144,6 +113,205 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 #endif // defined(DEBUG_MOUSE_POS)
 	}
 	
+	/******************** IGraphicBoard overrides ********************/
+	void SetCameraPosition(const glm::vec3& pos) override
+	{
+		cam.pos = pos;
+	}
+	
+	void UpdateHitboxes() override
+	{
+		const glm::mat4 vvp = CalculateViewportMatrix() * cam.vp;
+		for(auto& kv : zones)
+		{
+			const glm::mat4 mvp = vvp * kv.second.model;
+			for(size_t i = 0; i < ZONE_HITBOX_VERTICES.size(); i++)
+			{
+				const glm::vec4 v4 = mvp * glm::vec4(ZONE_HITBOX_VERTICES[i], 1.0f);
+				kv.second.hitbox[i] = glm::vec3(v4) / v4.w;
+			}
+#if defined(DEBUG_HITBOXES)
+			kv.second.hitboxPrim->SetVertices(kv.second.hitbox);
+#endif // defined(_DEBUG)
+		}
+		UpdateHandHitboxes(0);
+		UpdateHandHitboxes(1);
+	}
+	
+	void SetAnswerCallback(AnswerCallback answerCb) override
+	{
+		acb = answerCb;
+	}
+	
+	void Resize(const SDL_Rect& parent, const SDL_Rect& rect) override
+	{
+		cam.pCan = parent;
+		cam.can = rect;
+		UpdateMatrices();
+	}
+	
+	void AddMsg(const Core::AnyMsg& msg) override
+	{
+		DuelBoard<GraphicCard>::AppendMsg(msg);
+	}
+	
+	uint32_t GetState() const override
+	{
+		return state;
+	}
+
+	uint32_t GetStatesCount() const override
+	{
+		return msgs.size();
+	}
+
+	uint32_t GetTargetState() const override
+	{
+		return targetState;
+	}
+
+	bool SetTargetState(uint32_t tState) override
+	{
+		if(tState > msgs.size())
+			return false;
+		targetState = tState;
+		return true;
+	}
+	
+	void FillPile(uint32_t controller, uint32_t location, int num) override
+	{
+		DuelBoard<GraphicCard>::FillPile(controller, location, num);
+		auto& pile = GetPile(controller, location);
+		uint32_t seq = 0;
+		for(auto& c : pile)
+		{
+			const Place p = {controller, location, seq, -1};
+			c.front = NewCardFrontPrim();
+			c.cover = NewCardCoverPrim();
+			c.loc = GetLocXYZ(p);
+			c.rot = GetRotXYZ(p, c.pos());
+			seq++;
+		}
+	}
+	/*****************************************************************/
+private:
+	// ************************
+	Drawing::Renderer renderer;
+	Drawing::Texture cover;
+	CardTextureManager ctm;
+	// ************************ TODO: Move to own structure (perhaps `gfx`)
+
+	std::map<LitePlace, glm::vec3> locations;
+	std::map<LitePlace, Zone> zones;
+	std::map<LitePlace, Zone>::iterator selectedZone;
+
+	struct // Camera info
+	{
+		// Parent canvas, in pixels, represents the size of the drawable area.
+		SDL_Rect pCan{};
+		// Canvas, in pixels, where this graphic board is drawn.
+		SDL_Rect can{};
+		// Camera position on world coordinates
+		glm::vec3 pos{};
+		// View-Projection matrix.
+		// to be combined with Viewport and/or Model matrix for each object
+		glm::mat4 vp{1.0f};
+	}cam;
+
+	uint32_t targetState{};
+
+	Animator ani;
+
+	AnswerCallback acb; // TODO: find a better name
+
+	std::map<Place, GraphicCard&> selectCards;
+
+#if defined(DEBUG_MOUSE_POS)
+	Drawing::Primitive mousePrim;
+#endif // defined(DEBUG_MOUSE_POS)
+	
+	/******************** IElement overrides ********************/
+	void Resize([[maybe_unused]] const glm::mat4& mat,
+	            [[maybe_unused]] const SDL_Rect& rect) override
+	{}
+	
+	void Draw() override
+	{
+		renderer->SetViewport(cam.can.x, cam.can.y, cam.can.w, cam.can.h);
+		for(const auto& kv : zones)
+			kv.second.prim->Draw();
+		ForAllCards([](GraphicCard& card)
+		{
+			card.front->Draw();
+			card.cover->Draw();
+		});
+#if defined(DEBUG_HITBOXES)
+		renderer->SetViewport(cam.pCan.x, cam.pCan.y, cam.pCan.w, cam.pCan.h);
+		for(const auto& kv : zones)
+			kv.second.hitboxPrim->Draw();
+		for(const auto& pile : hand)
+			for(const auto& card : pile)
+				if(card.hitbox)
+					card.hitbox->prim->Draw();
+#endif // defined(DEBUG_HITBOXES)
+#if defined(DEBUG_MOUSE_POS)
+		renderer->SetViewport(cam.pCan.x, cam.pCan.y, cam.pCan.w, cam.pCan.h);
+		mousePrim->Draw();
+#endif // defined(DEBUG_MOUSE_POS)
+	}
+	
+	void Tick() override
+	{
+		const float elapsed = env.GetTimeElapsed();
+		ani.Tick(elapsed);
+		if(!ani.IsAnimating() && targetState != state)
+		{
+			if(targetState > state)
+				Forward();
+			else if (targetState < state)
+				Backward();
+			ani.Tick(elapsed);
+		}
+	}
+	
+	bool OnEvent(const SDL_Event& e) override // IElement
+	{
+		if(e.type == SDL_MOUSEMOTION)
+		{
+			glm::vec3 mousePos{};
+			// Convert mouse coordinates to NDC
+			mousePos.x = e.motion.x / (cam.pCan.w * 0.5f) - 1.0f;
+			mousePos.y = -(e.motion.y / (cam.pCan.h * 0.5f) - 1.0f);
+#if defined(DEBUG_MOUSE_POS)
+			mousePrim->SetMatrix(glm::translate(mousePos));
+#endif // defined(DEBUG_MOUSE_POS)
+			// TODO: zone deselection
+			selectedZone = zones.end();
+			for(auto it = zones.begin(); it != zones.end(); ++it)
+			{
+				if(PointInPoly(mousePos, it->second.hitbox))
+				{
+					selectedZone = it;
+					return true;
+				}
+			}
+		}
+		else if(e.type == SDL_KEYDOWN && !e.key.repeat &&
+		        e.key.keysym.scancode == SDL_SCANCODE_SPACE)
+		{
+			Core::Answer answer;
+			answer.set_number(PHASE_END);
+			acb(answer);
+		}
+		else if(e.type == SDL_KEYDOWN && !e.key.repeat &&
+		        e.key.keysym.scancode == SDL_SCANCODE_END)
+		{
+			ani.FinishAll();
+		}
+		return false;
+	}
+	/************************************************************/
+
 	inline void InitLocations(int flags)
 	{
 #define LOCATION_ERASE(loc, seq) locations.erase({0, loc, seq})
@@ -271,26 +439,7 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 #endif // defined(DEBUG_HITBOXES)
 		}
 	}
-	
-	void UpdateHitboxes()
-	{
-		const glm::mat4 vvp = CalculateViewportMatrix() * cam.vp;
-		for(auto& kv : zones)
-		{
-			const glm::mat4 mvp = vvp * kv.second.model;
-			for(size_t i = 0; i < ZONE_HITBOX_VERTICES.size(); i++)
-			{
-				const glm::vec4 v4 = mvp * glm::vec4(ZONE_HITBOX_VERTICES[i], 1.0f);
-				kv.second.hitbox[i] = glm::vec3(v4) / v4.w;
-			}
-#if defined(DEBUG_HITBOXES)
-			kv.second.hitboxPrim->SetVertices(kv.second.hitbox);
-#endif // defined(_DEBUG)
-		}
-		UpdateHandHitboxes(0);
-		UpdateHandHitboxes(1);
-	}
-	
+
 	void UpdateAllCards()
 	{
 		auto UpdatePos = [this](const Place& place, GraphicCard& card)
@@ -320,93 +469,6 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 		}
 		for(auto& kv : zoneCards)
 			UpdatePos(kv.first, kv.second);
-	}
-	
-	void SetAnswerCallback(AnswerCallback answerCallback)
-	{
-		acb = answerCallback;
-	}
-	
-	bool OnEvent(const SDL_Event& e)
-	{
-		if(e.type == SDL_MOUSEMOTION)
-		{
-			glm::vec3 mousePos{};
-			// Convert mouse coordinates to NDC
-			mousePos.x = e.motion.x / (cam.pCan.w * 0.5f) - 1.0f;
-			mousePos.y = -(e.motion.y / (cam.pCan.h * 0.5f) - 1.0f);
-#if defined(DEBUG_MOUSE_POS)
-			mousePrim->SetMatrix(glm::translate(mousePos));
-#endif // defined(DEBUG_MOUSE_POS)
-			// TODO: zone deselection
-			selectedZone = zones.end();
-			for(auto it = zones.begin(); it != zones.end(); ++it)
-			{
-				if(PointInPoly(mousePos, it->second.hitbox))
-				{
-					selectedZone = it;
-					return true;
-				}
-			}
-		}
-		else if(e.type == SDL_KEYDOWN && !e.key.repeat &&
-		        e.key.keysym.scancode == SDL_SCANCODE_SPACE)
-		{
-			Core::Answer answer;
-			answer.set_number(PHASE_END);
-			acb(answer);
-		}
-		else if(e.type == SDL_KEYDOWN && !e.key.repeat &&
-		        e.key.keysym.scancode == SDL_SCANCODE_END)
-		{
-			ani.FinishAll();
-		}
-		return false;
-	}
-	
-	void Resize(const SDL_Rect& parent, const SDL_Rect& rect)
-	{
-		cam.pCan = parent;
-		cam.can = rect;
-		UpdateMatrices();
-	}
-	
-	void Tick(float elapsed)
-	{
-		ani.Tick(elapsed);
-		if(!ani.IsAnimating() && targetState != state)
-		{
-			if(targetState > state)
-				Forward();
-			else if (targetState < state)
-				Backward();
-			ani.Tick(elapsed);
-		}
-	}
-	
-	void Draw()
-	{
-		renderer->SetViewport(cam.can.x, cam.can.y, cam.can.w, cam.can.h);
-		for(const auto& kv : zones)
-			kv.second.prim->Draw();
-		ForAllCards([](GraphicCard& card)
-		{
-			card.front->Draw();
-			card.cover->Draw();
-		});
-#if defined(DEBUG_HITBOXES)
-		renderer->SetViewport(cam.pCan.x, cam.pCan.y, cam.pCan.w, cam.pCan.h);
-		for(const auto& kv : zones)
-			kv.second.hitboxPrim->Draw();
-		for(const auto& pile : hand)
-			for(const auto& card : pile)
-				if(card.hitbox)
-					card.hitbox->prim->Draw();
-#endif // defined(DEBUG_HITBOXES)
-#if defined(DEBUG_MOUSE_POS)
-		renderer->SetViewport(cam.pCan.x, cam.pCan.y, cam.pCan.w, cam.pCan.h);
-		mousePrim->Draw();
-#endif // defined(DEBUG_MOUSE_POS)
 	}
 	
 	void CancelRequestActions()
@@ -471,6 +533,10 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 		switch(info.Information_case())
 		{
 #include "graphic_board_animate_info.inl"
+		default:
+		{
+			break;
+		}
 		}
 	}
 	
@@ -479,6 +545,10 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 		switch(request.Request_case())
 		{
 #include "graphic_board_animate_request.inl"
+		default:
+		{
+			break;
+		}
 		}
 	}
 	
@@ -609,96 +679,11 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 	}
 };
 
-// *********************************************************
-
-CGraphicBoard::CGraphicBoard(GUI::Environment& env, Drawing::Renderer renderer, int flags) : 
-	IElement(env), pimpl(new impl(renderer, flags))
-{}
-
-CGraphicBoard::~CGraphicBoard()
-{}
-
-void CGraphicBoard::SetCameraPosition(const glm::vec3& cPos)
+std::shared_ptr<IGraphicBoard> IGraphicBoard::New(GUI::Environment& env,
+                                                  Drawing::Renderer renderer,
+                                                  int flags)
 {
-	pimpl->cam.pos = cPos;
-}
-
-void CGraphicBoard::UpdateHitboxes()
-{
-	pimpl->UpdateHitboxes();
-}
-
-void CGraphicBoard::SetAnswerCallback(AnswerCallback answerCallback)
-{
-	pimpl->SetAnswerCallback(answerCallback);
-}
-
-void CGraphicBoard::Resize(const SDL_Rect& parent, const SDL_Rect& rect)
-{
-	pimpl->Resize(parent, rect);
-}
-
-void CGraphicBoard::Draw()
-{
-	pimpl->Draw();
-}
-
-void CGraphicBoard::AppendMsg(const Core::AnyMsg& msg)
-{
-	pimpl->AppendMsg(msg);
-}
-
-uint32_t CGraphicBoard::GetState() const
-{
-	return pimpl->state;
-}
-
-uint32_t CGraphicBoard::GetStatesCount() const
-{
-	return pimpl->msgs.size();
-}
-
-uint32_t CGraphicBoard::GetTargetState() const
-{
-	return pimpl->targetState;
-}
-
-bool CGraphicBoard::SetTargetState(uint32_t tState)
-{
-	if(tState > pimpl->msgs.size())
-		return false;
-	pimpl->targetState = tState;
-	return true;
-}
-
-void CGraphicBoard::FillPile(uint32_t controller, uint32_t location, int num)
-{
-	pimpl->FillPile(controller, location, num);
-	auto& pile = pimpl->GetPile(controller, location);
-	uint32_t seq = 0;
-	for(auto& c : pile)
-	{
-		const Place p = {controller, location, seq, -1};
-		c.front = pimpl->NewCardFrontPrim();
-		c.cover = pimpl->NewCardCoverPrim();
-		c.loc = pimpl->GetLocXYZ(p);
-		c.rot = pimpl->GetRotXYZ(p, c.pos());
-		seq++;
-	}
-}
-
-void CGraphicBoard::Resize([[maybe_unused]] const glm::mat4& mat,
-                           [[maybe_unused]] const SDL_Rect& rect)
-{}
-
-void CGraphicBoard::Tick()
-{
-	pimpl->Tick(env.GetTimeElapsed());
-}
-
-bool CGraphicBoard::OnEvent(const SDL_Event& e)
-{
-	return pimpl->OnEvent(e);
+	return std::make_shared<CGraphicBoard>(env, renderer, flags);
 }
 
 } // namespace YGOpen

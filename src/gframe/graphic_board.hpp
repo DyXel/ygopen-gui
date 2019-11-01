@@ -24,40 +24,30 @@ struct GraphicBoardGfxData
 	Drawing::Texture unknownCard;
 };
 
-ELEMENT_DECLARATION(CGraphicBoard)
+class IGraphicBoard : public GUI::IElement
 {
 public:
-	ELEMENT_IMPLEMENT_New_METHOD(CGraphicBoard)
-	CGraphicBoard(GUI::Environment& env, Drawing::Renderer renderer, int flags);
-	~CGraphicBoard();
+	static std::shared_ptr<IGraphicBoard> New(GUI::Environment& env,
+	                                          Drawing::Renderer renderer,
+	                                          int flags);
 	
-	void SetCameraPosition(const glm::vec3& cPos);
-	void UpdateHitboxes();
-	void SetAnswerCallback(AnswerCallback answerCallback);
-	void Resize(const SDL_Rect& parent, const SDL_Rect& rect);
+	IGraphicBoard(GUI::Environment& env) : IElement(env)
+	{}
 	
-	// Element public overrides
-	void Draw() override;
+	virtual void SetCameraPosition(const glm::vec3& pos) = 0;
+	virtual void UpdateHitboxes() = 0;
+	virtual void SetAnswerCallback(AnswerCallback answerCb) = 0;
+	virtual void Resize(const SDL_Rect& parent, const SDL_Rect& rect) = 0;
 	
-	// DuelBoard overrides / calls forwarding
-	void AppendMsg(const Core::AnyMsg& msg);
-	uint32_t GetState() const;
-	uint32_t GetStatesCount() const;
-	uint32_t GetTargetState() const;
-	bool SetTargetState(uint32_t state);
-	void FillPile(uint32_t controller, uint32_t location, int num);
-private:
-	class impl;
-	std::unique_ptr<impl> pimpl;
-	
-	// Element private/protected overrides
-	void Resize(const glm::mat4& mat, const SDL_Rect& rect) override;
-	void Tick() override;
-// 	void OnFocus(bool gained) override;
-	bool OnEvent(const SDL_Event& e) override;
+	virtual void AddMsg(const Core::AnyMsg& msg) = 0;
+	virtual uint32_t GetState() const = 0;
+	virtual uint32_t GetStatesCount() const = 0;
+	virtual uint32_t GetTargetState() const = 0;
+	virtual bool SetTargetState(uint32_t state) = 0;
+	virtual void FillPile(uint32_t controller, uint32_t location, int num) = 0;
 };
 
-using GraphicBoard = std::shared_ptr<CGraphicBoard>;
+using GraphicBoard = std::shared_ptr<IGraphicBoard>;
 
 } // namespace YGOpen
 
