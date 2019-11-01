@@ -14,6 +14,7 @@
 #include "card_texture_manager.hpp"
 #include "constants.hpp"
 #include "graphic_card.hpp"
+#include "animations/call.hpp"
 #include "animations/move_card.hpp"
 #include "animations/set_card_image.hpp"
 #include "../board.hpp"
@@ -227,7 +228,7 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 		});
 	}
 	
-	void UpdateHitboxes()
+	inline glm::mat4 CalculateViewportMatrix()
 	{
 		glm::vec3 sVec{};
 		// NOTE: this works as long as can is smaller than pCan
@@ -238,8 +239,40 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 		const float canvasOriginY = cam.can.y + cam.can.h * 0.5f;
 		tVec.x = canvasOriginX / (cam.pCan.w * 0.5f) - 1.0f;
 		tVec.y = canvasOriginY / (cam.pCan.h * 0.5f) - 1.0f;
-		const glm::mat4 viewport = glm::scale(sVec) * glm::translate(tVec);
-		const glm::mat4 vvp = viewport * cam.vp;
+		return glm::scale(sVec) * glm::translate(tVec);
+	}
+	
+	void UpdateHandHitboxes(uint8_t player)
+	{
+		const glm::mat4 vvp = CalculateViewportMatrix() * cam.vp;
+		for(auto& card : hand[player])
+		{
+			if(!card.hitbox)
+			{
+				card.hitbox = std::make_unique<GraphicCard::HitboxData>();
+				card.hitbox->vertices = CARD_HITBOX_VERTICES;
+#if defined(DEBUG_HITBOXES)
+				card.hitbox->prim = renderer->NewPrimitive();
+				card.hitbox->prim->SetDrawMode(Drawing::PDM_LINE_LOOP);
+				const glm::vec4 RED = {1.0f, 0.0f, 0.0f, 1.0f};
+				card.hitbox->prim->SetColors({RED, RED, RED, RED, RED});
+#endif // defined(DEBUG_HITBOXES)
+			}
+			const glm::mat4 mvp = vvp * GetModel(card.loc, card.rot);
+			for(size_t i = 0; i < CARD_HITBOX_VERTICES.size(); i++)
+			{
+				const glm::vec4 v4 = mvp * glm::vec4(CARD_HITBOX_VERTICES[i], 1.0f);
+				card.hitbox->vertices[i] = glm::vec3(v4) / v4.w;
+			}
+#if defined(DEBUG_HITBOXES)
+			card.hitbox->prim->SetVertices(card.hitbox->vertices);
+#endif // defined(DEBUG_HITBOXES)
+		}
+	}
+	
+	void UpdateHitboxes()
+	{
+		const glm::mat4 vvp = CalculateViewportMatrix() * cam.vp;
 		for(auto& kv : zones)
 		{
 			const glm::mat4 mvp = vvp * kv.second.model;
@@ -252,6 +285,8 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 			kv.second.hitboxPrim->SetVertices(kv.second.hitbox);
 #endif // defined(_DEBUG)
 		}
+		UpdateHandHitboxes(0);
+		UpdateHandHitboxes(1);
 	}
 	
 	void UpdateAllCards()
@@ -361,6 +396,10 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 		renderer->SetViewport(cam.pCan.x, cam.pCan.y, cam.pCan.w, cam.pCan.h);
 		for(const auto& kv : zones)
 			kv.second.hitboxPrim->Draw();
+		for(const auto& pile : hand)
+			for(const auto& card : pile)
+				if(card.hitbox)
+					card.hitbox->prim->Draw();
 #endif // defined(DEBUG_HITBOXES)
 #if defined(DEBUG_MOUSE_POS)
 		renderer->SetViewport(cam.pCan.x, cam.pCan.y, cam.pCan.w, cam.pCan.h);

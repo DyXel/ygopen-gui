@@ -17,12 +17,21 @@ struct GraphicCard : public Card
 	glm::vec3 rot{}; // Rotation
 	Drawing::Primitive front;
 	Drawing::Primitive cover;
-	struct CSelectInfo
+	struct HitboxData
+	{
+		Drawing::Vertices vertices;
+#if defined(DEBUG_HITBOXES)
+		Drawing::Primitive prim;
+#endif // defined(DEBUG_HITBOXES)
+	};
+	// Information used for selections and actions
+	struct ActionData
 	{
 		std::map<Core::CardSelectionType, int> ts;
-		Drawing::Vertices hitbox;
+// 		int weight{0};
 	};
-	std::unique_ptr<CSelectInfo> cselectInfo;
+	std::unique_ptr<HitboxData> hitbox;
+	std::unique_ptr<ActionData> action;
 	
 	GraphicCard() = default;
 	GraphicCard(const GraphicCard&) = delete;
