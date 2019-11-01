@@ -101,6 +101,8 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 	Animator ani;
 
 	AnswerCallback acb; // TODO: find a better name
+	
+	std::map<Place, GraphicCard&> selectCards;
 
 #if defined(DEBUG_MOUSE_POS)
 	Drawing::Primitive mousePrim;
@@ -407,10 +409,18 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 #endif // defined(DEBUG_MOUSE_POS)
 	}
 	
+	void CancelRequestActions()
+	{
+		for(const auto& kv : selectCards)
+			kv.second.action.reset();
+		selectCards.clear();
+	}
+	
 	bool Forward()
 	{
 		if(!DuelBoard<GraphicCard>::Forward())
 			return false;
+		CancelRequestActions();
 		AnimateMsg(msgs[state - 1]);
 		return true;
 	}
@@ -419,6 +429,7 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 	{
 		if(!DuelBoard<GraphicCard>::Backward())
 			return false;
+		CancelRequestActions();
 		AnimateMsg(msgs[state]);
 		return true;
 	}
@@ -465,7 +476,10 @@ class CGraphicBoard::impl : protected DuelBoard<GraphicCard>
 	
 	void AnimateRequestMsg(const Core::Request& request)
 	{
-		
+		switch(request.Request_case())
+		{
+#include "graphic_board_animate_request.inl"
+		}
 	}
 	
 	const glm::vec3 GetHandLocXYZ(const Place& p, int count) const
