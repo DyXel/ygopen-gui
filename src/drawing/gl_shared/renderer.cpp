@@ -69,6 +69,9 @@ Renderer::Renderer(SDL_Window* sdlWindow) : sdlWindow(sdlWindow)
 	// Enable face culling
 	glEnable(GL_CULL_FACE);
 	
+	// Enable depth testing
+	glEnable(GL_DEPTH_TEST);
+	
 	// Enable additive blending
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
