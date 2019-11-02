@@ -76,12 +76,12 @@ Drawing::Texture TextureFromPath(Drawing::Renderer ren, std::string_view path)
 class CGraphicBoard final : public IGraphicBoard, public DuelBoard<GraphicCard>
 {
 public:
-	CGraphicBoard(GUI::Environment& env, Drawing::Renderer renderer, int flags)
-		: IGraphicBoard(env), renderer(renderer), ctm(renderer)
+	CGraphicBoard(GUI::Environment& env, int flags)
+		: IGraphicBoard(env), ctm(env.renderer)
 	{
-		cover = TextureFromPath(renderer, "TEMP/cover.png");
+		cover = TextureFromPath(env.renderer, "TEMP/cover.png");
 		// zones textures
-		auto zTex = TextureFromPath(renderer, "TEMP/zone.png");
+		auto zTex = TextureFromPath(env.renderer, "TEMP/zone.png");
 		InitLocations(flags);
 		for(const auto& kv : locations)
 		{
@@ -90,7 +90,7 @@ public:
 				continue;
 			Zone& zone = zones.emplace(kv.first, Zone{}).first->second;
 			zone.model = glm::translate(kv.second + glm::vec3(0.0f, 0.0f, -0.001f));
-			zone.prim = renderer->NewPrimitive();
+			zone.prim = env.renderer->NewPrimitive();
 			zone.prim->depthTest = true;
 			zone.prim->SetDrawMode(Drawing::GetQuadDrawMode());
 			zone.prim->SetVertices(ZONE_VERTICES);
@@ -98,7 +98,7 @@ public:
 			zone.prim->SetTexture(zTex);
 			zone.hitbox.resize(ZONE_HITBOX_VERTICES.size());
 #if defined(DEBUG_HITBOXES)
-			zone.hitboxPrim = renderer->NewPrimitive();
+			zone.hitboxPrim = env.renderer->NewPrimitive();
 			zone.hitboxPrim->SetDrawMode(Drawing::PDM_LINE_LOOP);
 			const glm::vec4 RED = {1.0f, 0.0f, 0.0f, 1.0f};
 			zone.hitboxPrim->SetColors({RED, RED, RED, RED, RED});
@@ -106,7 +106,7 @@ public:
 		}
 		selectedZone = zones.end();
 #if defined(DEBUG_MOUSE_POS)
-		mousePrim = renderer->NewPrimitive();
+		mousePrim = env.renderer->NewPrimitive();
 		mousePrim->SetDrawMode(Drawing::PDM_LINE_LOOP);
 		mousePrim->SetVertices(MOUSE_POS_VERTICES);
 		const glm::vec4 BLUE = {0.0f, 1.0f, 0.0f, 0.5f};
@@ -197,7 +197,6 @@ public:
 	/*****************************************************************/
 private:
 	// ************************
-	Drawing::Renderer renderer;
 	Drawing::Texture cover;
 	CardTextureManager ctm;
 	// ************************ TODO: Move to own structure (perhaps `gfx`)
@@ -238,7 +237,7 @@ private:
 	
 	void Draw() override
 	{
-		renderer->SetViewport(cam.can.x, cam.can.y, cam.can.w, cam.can.h);
+		env.renderer->SetViewport(cam.can.x, cam.can.y, cam.can.w, cam.can.h);
 		for(const auto& kv : zones)
 			kv.second.prim->Draw();
 		ForAllCards([](GraphicCard& card)
@@ -247,7 +246,7 @@ private:
 			card.cover->Draw();
 		});
 #if defined(DEBUG_HITBOXES)
-		renderer->SetViewport(cam.pCan.x, cam.pCan.y, cam.pCan.w, cam.pCan.h);
+		env.renderer->SetViewport(cam.pCan.x, cam.pCan.y, cam.pCan.w, cam.pCan.h);
 		for(const auto& kv : zones)
 			kv.second.hitboxPrim->Draw();
 		for(const auto& pile : hand)
@@ -256,7 +255,7 @@ private:
 					card.hitbox->prim->Draw();
 #endif // defined(DEBUG_HITBOXES)
 #if defined(DEBUG_MOUSE_POS)
-		renderer->SetViewport(cam.pCan.x, cam.pCan.y, cam.pCan.w, cam.pCan.h);
+		env.renderer->SetViewport(cam.pCan.x, cam.pCan.y, cam.pCan.w, cam.pCan.h);
 		mousePrim->Draw();
 #endif // defined(DEBUG_MOUSE_POS)
 	}
@@ -423,7 +422,7 @@ private:
 				card.hitbox = std::make_unique<GraphicCard::HitboxData>();
 				card.hitbox->vertices = CARD_HITBOX_VERTICES;
 #if defined(DEBUG_HITBOXES)
-				card.hitbox->prim = renderer->NewPrimitive();
+				card.hitbox->prim = env.renderer->NewPrimitive();
 				card.hitbox->prim->SetDrawMode(Drawing::PDM_LINE_LOOP);
 				const glm::vec4 RED = {1.0f, 0.0f, 0.0f, 1.0f};
 				card.hitbox->prim->SetColors({RED, RED, RED, RED, RED});
@@ -661,7 +660,7 @@ private:
 	
 	Drawing::Primitive NewCardFrontPrim()
 	{
-		auto prim = renderer->NewPrimitive();
+		auto prim = env.renderer->NewPrimitive();
 		prim->depthTest = true;
 		prim->SetDrawMode(Drawing::GetQuadDrawMode());
 		prim->SetVertices(CARD_VERTICES);
@@ -672,7 +671,7 @@ private:
 	
 	Drawing::Primitive NewCardCoverPrim() const
 	{
-		auto prim = renderer->NewPrimitive();
+		auto prim = env.renderer->NewPrimitive();
 		prim->depthTest = true;
 		prim->SetDrawMode(Drawing::GetQuadDrawMode());
 		prim->SetVertices(CARD_COVER_VERTICES);
@@ -682,11 +681,9 @@ private:
 	}
 };
 
-std::shared_ptr<IGraphicBoard> IGraphicBoard::New(GUI::Environment& env,
-                                                  Drawing::Renderer renderer,
-                                                  int flags)
+std::shared_ptr<IGraphicBoard> IGraphicBoard::New(GUI::Environment& env, int flags)
 {
-	return std::make_shared<CGraphicBoard>(env, renderer, flags);
+	return std::make_shared<CGraphicBoard>(env, flags);
 }
 
 } // namespace YGOpen

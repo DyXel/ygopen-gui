@@ -27,9 +27,7 @@ struct GraphicBoardGfxData
 class IGraphicBoard : public GUI::IElement
 {
 public:
-	static std::shared_ptr<IGraphicBoard> New(GUI::Environment& env,
-	                                          Drawing::Renderer renderer,
-	                                          int flags);
+	static std::shared_ptr<IGraphicBoard> New(GUI::Environment& env, int flags);
 	
 	IGraphicBoard(GUI::Environment& env) : IElement(env)
 	{}
