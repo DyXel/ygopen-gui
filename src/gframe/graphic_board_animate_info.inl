@@ -205,7 +205,7 @@ else
 	}
 	// Animate cards left in hand
 	std::vector<Animation::MoveCardData> cards;
-	for(int i = 0; i < handSz; i++)
+	for(std::size_t i = 0; i < handSz; i++)
 	{
 		GraphicCard& card = pHand[i];
 		Place p = {player, LOCATION_HAND, i, -1};
