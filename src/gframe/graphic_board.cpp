@@ -38,6 +38,12 @@ struct Zone
 #if defined(DEBUG_HITBOXES)
 	Drawing::Primitive hitboxPrim;
 #endif // defined(DEBUG_HITBOXES)
+	
+	Zone() = default;
+	Zone(const Zone&) = delete;
+	Zone(Zone&&) = default;
+	Zone& operator=(const Zone&) = delete;
+	Zone& operator=(Zone&&) = default;
 };
 
 // TODO: ****************** ORGANIZE THIS ******************
