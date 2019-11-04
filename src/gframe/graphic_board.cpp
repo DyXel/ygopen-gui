@@ -209,11 +209,10 @@ private:
 	Drawing::Texture cover;
 	CardTextureManager ctm;
 	// ************************ TODO: Move to own structure (perhaps `gfx`)
-
-	std::map<LitePlace, glm::vec3> locations;
-	std::map<LitePlace, Zone> zones;
-	std::map<LitePlace, Zone>::iterator selectedZone;
-
+#if defined(DEBUG_MOUSE_POS)
+	Drawing::Primitive mousePrim;
+#endif // defined(DEBUG_MOUSE_POS)
+	
 	struct // Camera info
 	{
 		// Parent canvas, in pixels, represents the size of the drawable area.
@@ -226,18 +225,32 @@ private:
 		// to be combined with Viewport and/or Model matrix for each object
 		glm::mat4 vp{1.0f};
 	}cam;
-
-	uint32_t targetState{};
-
 	Animator ani;
-
+	
+	uint32_t targetState{};
+	std::map<LitePlace, glm::vec3> locations;
+	std::map<LitePlace, Zone> zones;
+	
+	using ZoneMapIter = std::map<LitePlace, Zone>::iterator;
+	ZoneMapIter selectedZone;
+	GraphicCard* selectedCard{nullptr};
+	
+	//*********************************
+	
+	// Card selection
+	bool multiSelect;
+	std::vector<std::reference_wrapper<GraphicCard>> selectedCards;
+	std::map<Place, GraphicCard&> cardsWithAction;
+	// Zone selection
+	unsigned zoneSelectCount; // total number of zones needed to select
+	using ZoneIterSet = std::set<ZoneMapIter, std::equal_to<ZoneMapIter>>;
+	ZoneIterSet selectedZones;
+	ZoneIterSet selectableZones;
+	
 	AnswerCallback acb; // TODO: find a better name
-
-	std::map<Place, GraphicCard&> selectCards;
-
-#if defined(DEBUG_MOUSE_POS)
-	Drawing::Primitive mousePrim;
-#endif // defined(DEBUG_MOUSE_POS)
+	
+	
+	//*********************************
 	
 	/******************** IElement overrides ********************/
 	void Resize([[maybe_unused]] const glm::mat4& mat,
@@ -481,9 +494,11 @@ private:
 	
 	void CancelRequestActions()
 	{
-		for(const auto& kv : selectCards)
-			kv.second.action.reset();
-		selectCards.clear();
+		for(const auto& kv : cardsWithAction)
+			kv.second.action.reset(nullptr);
+		cardsWithAction.clear();
+		selectedZones.clear();
+		selectableZones.clear();
 	}
 	
 	bool Forward()
