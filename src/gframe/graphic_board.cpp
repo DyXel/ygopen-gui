@@ -161,6 +161,7 @@ public:
 	
 	void AddMsg(const Core::AnyMsg& msg) override
 	{
+		targetState += targetState == msgs.size();
 		DuelBoard<GraphicCard>::AppendMsg(msg);
 	}
 	
