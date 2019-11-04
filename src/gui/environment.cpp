@@ -37,10 +37,10 @@ void Environment::RemoveFromTickSet(Element ele)
 
 void Environment::OnEvent(const SDL_Event& e)
 {
-	if(focused && focused->OnEvent(e))
+	if(focused && focused->visible && focused->OnEvent(e))
 		return;
 	for(auto& ele : elements)
-		if(ele->OnEvent(e))
+		if(ele->visible && ele->OnEvent(e))
 			break;
 }
 
@@ -58,8 +58,9 @@ void Environment::Tick()
 void Environment::Draw()
 {
 	for(auto& ele : elements)
-		ele->Draw();
-	if(focused)
+		if(ele->visible)
+			ele->Draw();
+	if(focused && focused->visible)
 		focused->Draw();
 }
 

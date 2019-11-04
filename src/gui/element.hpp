@@ -13,6 +13,7 @@ class Environment;
 class IElement
 {
 public:
+	bool visible{true};
 	virtual ~IElement() = default;
 	virtual void Resize(const glm::mat4& mat, const SDL_Rect& rect) = 0;
 	virtual void Draw() = 0;
