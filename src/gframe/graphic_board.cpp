@@ -143,8 +143,8 @@ public:
 			kv.second.hitboxPrim->SetVertices(kv.second.hitbox);
 #endif // defined(_DEBUG)
 		}
-		UpdateHandHitboxes(0);
-		UpdateHandHitboxes(1);
+		HandHitbox(0);
+		HandHitbox(1);
 	}
 	
 	void SetAnswerCallback(AnswerCallback answerCb) override
@@ -421,22 +421,21 @@ private:
 		return glm::scale(sVec) * glm::translate(tVec);
 	}
 	
-	void UpdateHandHitboxes(uint8_t player)
+	// Refreshes the hitboxes for the cards in hand.
+	void HandHitbox(uint8_t player)
 	{
 		const glm::mat4 vvp = CalculateViewportMatrix() * cam.vp;
 		for(auto& card : hand[player])
 		{
 			if(!card.hitbox)
-			{
 				card.hitbox = std::make_unique<GraphicCard::HitboxData>();
-				card.hitbox->vertices = CARD_HITBOX_VERTICES;
+			card.hitbox->vertices = CARD_HITBOX_VERTICES;
 #if defined(DEBUG_HITBOXES)
-				card.hitbox->prim = env.renderer->NewPrimitive();
-				card.hitbox->prim->SetDrawMode(Drawing::PDM_LINE_LOOP);
-				const glm::vec4 RED = {1.0f, 0.0f, 0.0f, 1.0f};
-				card.hitbox->prim->SetColors({RED, RED, RED, RED, RED});
+			card.hitbox->prim = env.renderer->NewPrimitive();
+			card.hitbox->prim->SetDrawMode(Drawing::PDM_LINE_LOOP);
+			const glm::vec4 BLU = {0.0f, 0.0f, 1.0f, 1.0f};
+			card.hitbox->prim->SetColors({BLU, BLU, BLU, BLU, BLU});
 #endif // defined(DEBUG_HITBOXES)
-			}
 			const glm::mat4 mvp = vvp * GetModel(card.loc, card.rot);
 			for(size_t i = 0; i < CARD_HITBOX_VERTICES.size(); i++)
 			{
@@ -542,10 +541,7 @@ private:
 		switch(info.Information_case())
 		{
 #include "graphic_board_animate_info.inl"
-		default:
-		{
-			break;
-		}
+		default: break;
 		}
 	}
 	
@@ -554,10 +550,7 @@ private:
 		switch(request.Request_case())
 		{
 #include "graphic_board_animate_request.inl"
-		default:
-		{
-			break;
-		}
+		default: break;
 		}
 	}
 	
@@ -661,8 +654,8 @@ private:
 				rot.z = glm::radians(180.0f);
 			if(!(LOC(p) & LOCATION_OVERLAY) && (pos & POS_FACEDOWN))
 				rot.y = glm::radians(180.0f);
-			if(!IsPile(p) && (pos & POS_DEFENSE))
-				rot.z += glm::radians(90.0f); // NOTE: Addition
+			if(pos & POS_DEFENSE)
+				rot.z -= glm::radians(90.0f); // NOTE: Substraction
 		}
 		return rot;
 	}

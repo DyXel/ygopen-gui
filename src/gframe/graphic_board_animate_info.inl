@@ -4,49 +4,133 @@ const auto& updateCard = info.update_card();
 const auto& previousInfo = updateCard.previous();
 const auto& currentInfo = updateCard.current();
 const auto reason = updateCard.reason();
-if(reason == Core::Msg::UpdateCard::REASON_DECK_TOP)
+switch(reason)
+{
+case Core::Msg::UpdateCard::REASON_DECK_TOP:
 {
 	auto& pile = GetPile(PlaceFromPbCardInfo(previousInfo));
 	auto& card = *(pile.rbegin() - previousInfo.sequence());
 	PushAnimation<Animation::SetCardImage>(card, ctm);
-	// TODO
+	// TODO: Animate
+	break;
 }
-// REASON_MOVE or REASON_POS_CHANGE or REASON_SET
-else if(advancing)
+case Core::Msg::UpdateCard::REASON_POS_CHANGE:
+case Core::Msg::UpdateCard::REASON_SET:
 {
 	const auto previous = PlaceFromPbCardInfo(previousInfo);
-	const auto current = (reason == Core::Msg::UpdateCard::REASON_MOVE) ?
-	                     PlaceFromPbCardInfo(currentInfo) : previous;
-	auto& card = GetCard(current);
-	Animation::MoveCardData mcd =
-	{
-		card,
-		GetLocXYZ(previous),
-		GetRotXYZ(previous, card.pos(-1)),
-		GetLocXYZ(current),
-		GetRotXYZ(current, card.pos())
-	};
-// 	if(updateCard.core_reason() & 0x1) // REASON_DESTROY
-// 		ani.Push(/*destroy sound*/);
-	PushAnimation<Animation::SetCardImage>(card, ctm);
-	PushAnimation<Animation::MoveCard>(cam.vp, mcd);
-}
-else
-{
-	const auto previous = PlaceFromPbCardInfo(previousInfo);
-	const auto current = (reason == Core::Msg::UpdateCard::REASON_MOVE) ?
-	                     PlaceFromPbCardInfo(currentInfo) : previous;
+	const auto locVec = GetLocXYZ(previous);
 	auto& card = GetCard(previous);
 	Animation::MoveCardData mcd =
 	{
 		card,
-		GetLocXYZ(current),
-		GetRotXYZ(current, card.pos(1)),
-		GetLocXYZ(previous),
+		locVec,
+		GetRotXYZ(previous, card.pos((advancing) ? -1 : 1)),
+		locVec,
 		GetRotXYZ(previous, card.pos())
 	};
 	PushAnimation<Animation::MoveCard>(cam.vp, mcd);
+	break;
+}
+case Core::Msg::UpdateCard::REASON_MOVE:
+{
+	const auto previous = PlaceFromPbCardInfo(previousInfo);
+	const auto current = PlaceFromPbCardInfo(currentInfo);
+	std::vector<Animation::MoveCardData> cards;
+	int handNetChange[2] = {0}; // Used to check if hand cards must be animated
+	// Calculate net change of hands
+	if(LOC(previous) & LOCATION_HAND)
+	{
+		if(advancing)
+			handNetChange[CON(previous)]--;
+		else
+			handNetChange[CON(previous)]++;
+	}
+	if(LOC(current) & LOCATION_HAND)
+	{
+		if(advancing)
+			handNetChange[CON(current)]++;
+		else
+			handNetChange[CON(current)]--;
+	}
+	auto RefreshHand = [&](const uint8_t p)
+	{
+		uint32_t i = 0u;
+		const auto& is = (advancing) ? current : previous;
+		const auto& was = (advancing) ? previous : current;
+		Place startP = {p, LOCATION_HAND, 0, -1};
+		Place endP = {p, LOCATION_HAND, 0, -1};
+		for(auto& card : hand[p])
+		{
+			SEQ(startP) = SEQ(endP) = i;
+			// Make gap if card was moved from the hand
+			SEQ(startP) += LOC(was) & LOCATION_HAND && i >= SEQ(was);
+			// Remove gap if card was moved to the hand
+			SEQ(startP) -= LOC(is) & LOCATION_HAND && i >= SEQ(is);
+			Animation::MoveCardData mcd =
+			{
+				card,
+				GetHandLocXYZ(startP, hand[p].size() - handNetChange[p]),
+				GetRotXYZ(startP, card.pos()),
+				GetLocXYZ(endP),
+				GetRotXYZ(endP, card.pos())
+			};
+			cards.push_back(mcd);
+			i++;
+		}
+	};
+	// Only run the animations if there was an actual net change
+	// A card should not be able to move to a different part of the hand
+	// except by shuffling (which actually does not move any card client side)
+	if(handNetChange[0] != 0)
+		RefreshHand(0);
+	if(handNetChange[1] != 0)
+		RefreshHand(1);
+	// Gets the right location taking into consideration hand movement
+	auto GetFixedLoc = [&](const Place& place) -> glm::vec3
+	{
+		const auto phdc = handNetChange[CON(place)];
+		if(LOC(place) & LOCATION_HAND && phdc != 0)
+			return GetHandLocXYZ(place, hand[CON(place)].size() - phdc);
+		return GetLocXYZ(place);
+	};
+	// Animate actual moved card
+	auto& card = GetCard((advancing) ? current : previous);
+	if(advancing)
+	{
+		Animation::MoveCardData mcd =
+		{
+			card,
+			GetFixedLoc(previous),
+			GetRotXYZ(previous, card.pos(-1)),
+			GetLocXYZ(current),
+			GetRotXYZ(current, card.pos())
+		};
+		cards.push_back(mcd);
+	}
+	else
+	{
+		Animation::MoveCardData mcd =
+		{
+			card,
+			GetFixedLoc(current),
+			GetRotXYZ(current, card.pos(1)),
+			GetLocXYZ(previous),
+			GetRotXYZ(previous, card.pos())
+		};
+		cards.push_back(mcd);
+	}
+// 	if(updateCard.core_reason() & 0x1 && advancing) // REASON_DESTROY
+// 		ani.Push(/*destroy sound*/);
 	PushAnimation<Animation::SetCardImage>(card, ctm);
+	PushAnimation<Animation::MoveCards>(cam.vp, cards);
+	// Update hand hitboxes if there was any net change
+	if(handNetChange[0] != 0)
+		PushAnimation<Animation::Call>(std::bind(&CGraphicBoard::HandHitbox, this, 0));
+	if(handNetChange[1] != 0)
+		PushAnimation<Animation::Call>(std::bind(&CGraphicBoard::HandHitbox, this, 1));
+	break;
+}
+default: break;
 }
 break;
 }
@@ -64,6 +148,7 @@ if(realtime) // Set Card Data
 }
 static const glm::vec3 FAR_AWAY_LOCATION = {0.0f, 0.0f, 100.0f};
 static const glm::vec3 FAR_AWAY_ROTATION = {0.0f, 0.0f, 0.0f};
+// TODO: handle hand animation
 if(advancing)
 {
 	auto& card = GetCard(place);
@@ -101,6 +186,7 @@ const auto& removeCard = info.remove_card();
 const auto place = PlaceFromPbCardInfo(removeCard.card());
 static const glm::vec3 FAR_AWAY_LOCATION = {0.0f, 0.0f, 100.0f};
 static const glm::vec3 FAR_AWAY_ROTATION = {0.0f, 0.0f, 0.0f};
+// TODO: handle hand animation
 if(advancing)
 {
 	auto& card = tempCards[std::tuple_cat(place, std::tie(state))];
@@ -139,10 +225,6 @@ auto& pHand = hand[player];
 auto& pDeck = deck[player];
 const auto handSz = pHand.size();
 const auto deckSz = pDeck.size();
-auto HitboxUpdateWrapper = [&, player]()
-{
-	UpdateHandHitboxes(player);
-};
 if(advancing)
 {
 	const int range = handSz - drawCount;
@@ -182,7 +264,7 @@ if(advancing)
 		PushAnimation<Animation::SetCardImage>(card, ctm);
 		PushAnimation<Animation::MoveCard>(cam.vp, mcd);
 	}
-	PushAnimation<Animation::Call>(HitboxUpdateWrapper);
+	PushAnimation<Animation::Call>(std::bind(&CGraphicBoard::HandHitbox, this, player));
 }
 else
 {
@@ -220,7 +302,7 @@ else
 		cards.push_back(mcd);
 	}
 	PushAnimation<Animation::MoveCards>(cam.vp, cards);
-	PushAnimation<Animation::Call>(HitboxUpdateWrapper);
+	PushAnimation<Animation::Call>(std::bind(&CGraphicBoard::HandHitbox, this, player));
 }
 break;
 }
@@ -252,5 +334,6 @@ Animation::MoveCardData mcd2 =
 cards.push_back(mcd1);
 cards.push_back(mcd2);
 PushAnimation<Animation::MoveCards>(cam.vp, cards);
+// TODO: update hand hitboxes if swapped cards had anything to do with hand
 break;
 }
