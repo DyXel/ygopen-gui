@@ -9,10 +9,9 @@ auto X = [&](Core::CardSelectionType type, const auto& container)
 		const auto place = PlaceFromPbCardInfo(cardInfo);
 		auto& card = GetCard(place);
 		if(!card.action)
-			card.action = std::make_unique<GraphicCard::ActionData>();
-		card.action->ts.emplace(type, i);
-		if(!selectCards.count(place))
-			selectCards.emplace(place, card);
+			card.action.reset(new GraphicCard::ActionData());
+		card.action->ts[type] = i;
+		cardsWithAction.emplace(place, card);
 		i++;
 	}
 };
@@ -23,5 +22,19 @@ X(Core::CSELECT_SPSUMMONABLE, selectCmd.cards_spsummonable());
 X(Core::CSELECT_REPOSITIONABLE, selectCmd.cards_repositionable());
 X(Core::CSELECT_MSETABLE, selectCmd.cards_msetable());
 X(Core::CSELECT_SSETABLE, selectCmd.cards_ssetable());
+multiSelect = false;
+break;
+}
+
+case Core::Request::kSelectPlaces:
+{
+const auto& selectPlaces = request.select_places();
+zoneSelectCount = selectPlaces.min();
+const auto& places = selectPlaces.places();
+for(auto& pbp : places)
+{
+	const LitePlace lp = {pbp.controller(), pbp.location(), pbp.sequence()};
+	selectableZones.insert(zones.find(lp));
+}
 break;
 }
