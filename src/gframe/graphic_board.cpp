@@ -120,6 +120,8 @@ public:
 #endif // defined(DEBUG_MOUSE_POS)
 	}
 	
+	virtual ~CGraphicBoard() = default;
+	
 	/******************** IGraphicBoard overrides ********************/
 	void SetCameraPosition(const glm::vec3& pos) override
 	{
