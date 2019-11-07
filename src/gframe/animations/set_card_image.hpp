@@ -2,11 +2,12 @@
 #define SET_CARD_IMAGE_ANIMATION_HPP
 #include <cstdint>
 #include "../animation.hpp"
+// Cannot forward declare due to SetCardImages
+#include "../graphic_card.hpp"
 
 namespace YGOpen
 {
 
-struct GraphicCard;
 class CardTextureManager;
 
 namespace Animation
@@ -15,13 +16,26 @@ namespace Animation
 class SetCardImage : public IAnimation
 {
 public:
-	SetCardImage(GraphicCard& card, CardTextureManager& ctm);
+	SetCardImage(CardTextureManager& ctm, GraphicCard& card);
 	virtual ~SetCardImage() = default;
 	float Tick(float elapsed) override;
 	void Skip() override;
 private:
-	GraphicCard& card;
 	CardTextureManager& ctm;
+	GraphicCard& card;
+};
+
+class SetCardImages : public IAnimation
+{
+public:
+	using Container = std::vector<std::reference_wrapper<GraphicCard>>;
+	SetCardImages(CardTextureManager& ctm, Container&& card);
+	virtual ~SetCardImages() = default;
+	float Tick(float elapsed) override;
+	void Skip() override;
+private:
+	CardTextureManager& ctm;
+	const Container cards;
 };
 
 } // namespace Animation

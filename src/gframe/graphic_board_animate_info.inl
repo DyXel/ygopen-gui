@@ -10,7 +10,7 @@ case Core::Msg::UpdateCard::REASON_DECK_TOP:
 {
 	auto& pile = GetPile(PlaceFromPbCardInfo(previousInfo));
 	auto& card = *(pile.rbegin() - previousInfo.sequence());
-	PushAnimation<Animation::SetCardImage>(card, ctm);
+	PushAnimation<Animation::SetCardImage>(ctm, card);
 	// TODO: Animate
 	break;
 }
@@ -35,8 +35,8 @@ case Core::Msg::UpdateCard::REASON_MOVE:
 {
 	const auto previous = PlaceFromPbCardInfo(previousInfo);
 	const auto current = PlaceFromPbCardInfo(currentInfo);
-	std::vector<Animation::MoveCardData> cards;
-	int handNetChange[2] = {0}; // Used to check if hand cards must be animated
+	Animation::MoveCards::Container cards;
+	int handNetChange[2] = {0};
 	// Calculate net change of hands
 	if(LOC(previous) & LOCATION_HAND)
 	{
@@ -121,8 +121,8 @@ case Core::Msg::UpdateCard::REASON_MOVE:
 	}
 // 	if(updateCard.core_reason() & 0x1 && advancing) // REASON_DESTROY
 // 		ani.Push(/*destroy sound*/);
-	PushAnimation<Animation::SetCardImage>(card, ctm);
-	PushAnimation<Animation::MoveCards>(cam.vp, cards);
+	PushAnimation<Animation::SetCardImage>(ctm, card);
+	PushAnimation<Animation::MoveCards>(cam.vp, std::move(cards));
 	// Update hand hitboxes if there was any net change
 	if(handNetChange[0] != 0)
 		PushAnimation<Animation::Call>(std::bind(&CGraphicBoard::HandHitbox, this, 0));
@@ -160,7 +160,7 @@ if(advancing)
 		GetLocXYZ(place),
 		GetRotXYZ(place, card.pos())
 	};
-	PushAnimation<Animation::SetCardImage>(card, ctm);
+	PushAnimation<Animation::SetCardImage>(ctm, card);
 	PushAnimation<Animation::MoveCard>(cam.vp, mcd);
 }
 else
@@ -175,7 +175,7 @@ else
 		FAR_AWAY_ROTATION,
 	};
 	PushAnimation<Animation::MoveCard>(cam.vp, mcd);
-	PushAnimation<Animation::SetCardImage>(card, ctm);
+	PushAnimation<Animation::SetCardImage>(ctm, card);
 }
 break;
 }
@@ -229,7 +229,7 @@ if(advancing)
 {
 	const int range = handSz - drawCount;
 	// Animate cards already in hand
-	std::vector<Animation::MoveCardData> cards;
+	Animation::MoveCards::Container cards;
 	for(int i = 0; i < range; i++)
 	{
 		GraphicCard& card = pHand[i];
@@ -244,7 +244,7 @@ if(advancing)
 		};
 		cards.push_back(mcd);
 	}
-	PushAnimation<Animation::MoveCards>(cam.vp, cards);
+	PushAnimation<Animation::MoveCards>(cam.vp, std::move(cards));
 	// Animate moved cards
 	for(int i = 0; i < drawCount; i++)
 	{
@@ -261,7 +261,7 @@ if(advancing)
 			GetRotXYZ(endP, card.pos())
 		};
 // 		ani.Push(/*draw sound*/);
-		PushAnimation<Animation::SetCardImage>(card, ctm);
+		PushAnimation<Animation::SetCardImage>(ctm, card);
 		PushAnimation<Animation::MoveCard>(cam.vp, mcd);
 	}
 	PushAnimation<Animation::Call>(std::bind(&CGraphicBoard::HandHitbox, this, player));
@@ -283,10 +283,10 @@ else
 			GetRotXYZ(endP, card.pos())
 		};
 		PushAnimation<Animation::MoveCard>(cam.vp, mcd);
-		PushAnimation<Animation::SetCardImage>(card, ctm);
+		PushAnimation<Animation::SetCardImage>(ctm, card);
 	}
 	// Animate cards left in hand
-	std::vector<Animation::MoveCardData> cards;
+	Animation::MoveCards::Container cards;
 	for(std::size_t i = 0; i < handSz; i++)
 	{
 		GraphicCard& card = pHand[i];
@@ -301,7 +301,7 @@ else
 		};
 		cards.push_back(mcd);
 	}
-	PushAnimation<Animation::MoveCards>(cam.vp, cards);
+	PushAnimation<Animation::MoveCards>(cam.vp, std::move(cards));
 	PushAnimation<Animation::Call>(std::bind(&CGraphicBoard::HandHitbox, this, player));
 }
 break;
@@ -314,7 +314,7 @@ const auto card1Place = PlaceFromPbCardInfo(swapCards.card1());
 const auto card2Place = PlaceFromPbCardInfo(swapCards.card2());
 auto& card1 = GetCard(card1Place);
 auto& card2 = GetCard(card2Place);
-std::vector<Animation::MoveCardData> cards;
+Animation::MoveCards::Container cards;
 Animation::MoveCardData mcd1 =
 {
 	card1,
@@ -333,7 +333,7 @@ Animation::MoveCardData mcd2 =
 };
 cards.push_back(mcd1);
 cards.push_back(mcd2);
-PushAnimation<Animation::MoveCards>(cam.vp, cards);
+PushAnimation<Animation::MoveCards>(cam.vp, std::move(cards));
 // TODO: update hand hitboxes if swapped cards had anything to do with hand
 break;
 }

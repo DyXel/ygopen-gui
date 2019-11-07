@@ -45,9 +45,8 @@ void MoveCard::Skip()
 
 /*** MoveCards ***/
 
-MoveCards::MoveCards(const glm::mat4& vp,
-                     const std::vector<MoveCardData>& cards)
-	: IAnimation(DURATION), vp(vp), cards(cards)
+MoveCards::MoveCards(const glm::mat4& vp, Container&& cards)
+	: IAnimation(DURATION), vp(vp), cards(std::move(cards))
 {}
 
 float MoveCards::Tick(float elapsed)

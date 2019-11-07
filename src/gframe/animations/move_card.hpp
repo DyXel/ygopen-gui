@@ -36,13 +36,14 @@ private:
 class MoveCards : public IAnimation
 {
 public:
-	MoveCards(const glm::mat4& vp, const std::vector<MoveCardData>& cards);
+	using Container = std::vector<MoveCardData>;
+	MoveCards(const glm::mat4& vp, Container&& cards);
 	virtual ~MoveCards() = default;
 	float Tick(float elapsed) override;
 	void Skip() override;
 private:
 	const glm::mat4& vp;
-	const std::vector<MoveCardData> cards;
+	const Container cards;
 };
 
 

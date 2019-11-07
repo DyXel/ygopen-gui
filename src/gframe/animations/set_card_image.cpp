@@ -1,6 +1,5 @@
 #include "set_card_image.hpp"
 
-#include "../graphic_card.hpp"
 #include "../card_texture_manager.hpp"
 #include "../../drawing/primitive.hpp"
 
@@ -10,8 +9,8 @@ namespace YGOpen
 namespace Animation
 {
 
-SetCardImage::SetCardImage(GraphicCard& card, CardTextureManager& ctm) :
-	IAnimation(0.0f), card(card), ctm(ctm)
+SetCardImage::SetCardImage(CardTextureManager& ctm, GraphicCard& card) :
+	IAnimation(0.0f), ctm(ctm), card(card)
 {}
 
 float SetCardImage::Tick(float elapsed)
@@ -21,6 +20,27 @@ float SetCardImage::Tick(float elapsed)
 }
 
 void SetCardImage::Skip()
+{
+	Tick(0.0f);
+}
+
+/*** MoveCards ***/
+
+SetCardImages::SetCardImages(CardTextureManager& ctm, Container&& cards) :
+	IAnimation(0.0f), ctm(ctm), cards(std::move(cards))
+{}
+
+float SetCardImages::Tick(float elapsed)
+{
+	for(auto& rcard : cards)
+	{
+		GraphicCard& card = rcard.get();
+		card.front->SetTexture(ctm.GetCardTextureByCode(card.code()));
+	}
+	return elapsed;
+}
+
+void SetCardImages::Skip()
 {
 	Tick(0.0f);
 }
