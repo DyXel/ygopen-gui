@@ -24,7 +24,7 @@ void SetCardImage::Skip()
 	Tick(0.0f);
 }
 
-/*** MoveCards ***/
+/*** SetCardImages ***/
 
 SetCardImages::SetCardImages(CardTextureManager& ctm, Container&& cards) :
 	IAnimation(0.0f), ctm(ctm), cards(std::move(cards))
