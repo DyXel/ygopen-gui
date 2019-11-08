@@ -85,10 +85,59 @@ public:
 	CGraphicBoard(GUI::Environment& env, int flags)
 		: IGraphicBoard(env), ctm(env.renderer)
 	{
+#define LOCATION_ERASE(loc, seq) locations.erase({0, loc, seq})
+#define LOCATION_X(loc, seq, am) locations[{0, loc, seq}].x += am
+#define LOCATION_Y(loc, seq, am) locations[{0, loc, seq}].y += am
+		locations = BASE_LOCATIONS;
+		if(flags & DUEL_SPEED)
+		{
+			LOCATION_ERASE(LOCATION_MZONE, 0);
+			LOCATION_ERASE(LOCATION_MZONE, 4);
+			LOCATION_ERASE(LOCATION_SZONE, 0);
+			LOCATION_ERASE(LOCATION_SZONE, 4);
+			// Shift zone locations
+			LOCATION_X(LOCATION_SZONE  , 5,  0.4f);
+			LOCATION_X(LOCATION_PZONE  , 0,  0.4f);
+			LOCATION_X(LOCATION_PZONE  , 1, -0.4f);
+			LOCATION_X(LOCATION_DECK   , 0, -0.4f);
+			LOCATION_X(LOCATION_EXTRA  , 0,  0.4f);
+			LOCATION_X(LOCATION_GRAVE  , 0, -0.4f);
+			LOCATION_X(LOCATION_REMOVED, 0, -0.4f);
+		}
+		if(!(flags & DUEL_PZONE) || !(flags & DUEL_SEPARATE_PZONE))
+		{
+			LOCATION_ERASE(LOCATION_PZONE, 0);
+			LOCATION_ERASE(LOCATION_PZONE, 1);
+			// Shift zone locations
+			LOCATION_Y(LOCATION_SZONE  , 5, -0.4f);
+			LOCATION_Y(LOCATION_GRAVE  , 0, -0.4f);
+			LOCATION_X(LOCATION_REMOVED, 0, -0.4f);
+		}
+		// Mirror all locations for player 1
+		{
+			// 180 Degrees rotation on Z-axis matrix
+			static const glm::mat4 ROT_180_Z = glm::rotate(glm::radians(180.0f),
+			                                   glm::vec3(0.0f, 0.0f, 1.0f));
+			std::map<LitePlace, glm::vec3> p1locations;
+			for(const auto& kv : locations)
+			{
+				std::pair<LitePlace, glm::vec3> kvc = kv;
+				CON(kvc.first) = 1;
+				kvc.second = glm::vec3(ROT_180_Z * glm::vec4(kvc.second, 1.0f));
+				p1locations.emplace(std::move(kvc));
+			}
+			locations.insert(p1locations.begin(), p1locations.end());
+		}
+		// Insert Extra Monster Zones
+		// NOTE: they are only inserted once for player 0.
+		if(flags & DUEL_EMZONE)
+			locations.insert(EMZ_LOCATIONS.begin(), EMZ_LOCATIONS.end());
+#undef LOCATION_ERASE
+#undef LOCATION_X
+#undef LOCATION_Y
 		cover = TextureFromPath(env.renderer, "TEMP/cover.png");
 		// zones textures
 		auto zTex = TextureFromPath(env.renderer, "TEMP/zone.png");
-		InitLocations(flags);
 		for(const auto& kv : locations)
 		{
 			// Dont add hand locations
@@ -334,58 +383,15 @@ private:
 	}
 	/************************************************************/
 
-	inline void InitLocations(int flags)
 	{
-#define LOCATION_ERASE(loc, seq) locations.erase({0, loc, seq})
-#define LOCATION_X(loc, seq, am) locations[{0, loc, seq}].x += am
-#define LOCATION_Y(loc, seq, am) locations[{0, loc, seq}].y += am
-		locations = BASE_LOCATIONS;
-		if(flags & DUEL_SPEED)
 		{
-			LOCATION_ERASE(LOCATION_MZONE, 0);
-			LOCATION_ERASE(LOCATION_MZONE, 4);
-			LOCATION_ERASE(LOCATION_SZONE, 0);
-			LOCATION_ERASE(LOCATION_SZONE, 4);
-			// Shift zone locations
-			LOCATION_X(LOCATION_SZONE  , 5,  0.4f);
-			LOCATION_X(LOCATION_PZONE  , 0,  0.4f);
-			LOCATION_X(LOCATION_PZONE  , 1, -0.4f);
-			LOCATION_X(LOCATION_DECK   , 0, -0.4f);
-			LOCATION_X(LOCATION_EXTRA  , 0,  0.4f);
-			LOCATION_X(LOCATION_GRAVE  , 0, -0.4f);
-			LOCATION_X(LOCATION_REMOVED, 0, -0.4f);
 		}
-		if(!(flags & DUEL_PZONE) || !(flags & DUEL_SEPARATE_PZONE))
 		{
-			LOCATION_ERASE(LOCATION_PZONE, 0);
-			LOCATION_ERASE(LOCATION_PZONE, 1);
-			// Shift zone locations
-			LOCATION_Y(LOCATION_SZONE  , 5, -0.4f);
-			LOCATION_Y(LOCATION_GRAVE  , 0, -0.4f);
-			LOCATION_X(LOCATION_REMOVED, 0, -0.4f);
 		}
-		// Mirror all locations for player 1
 		{
-			// 180 Degrees rotation on Z-axis matrix
-			static const glm::mat4 ROT_180_Z = glm::rotate(glm::radians(180.0f),
-			                                   glm::vec3(0.0f, 0.0f, 1.0f));
-			std::map<LitePlace, glm::vec3> p1locations;
-			for(const auto& kv : locations)
 			{
-				std::pair<LitePlace, glm::vec3> kvc = kv;
-				CON(kvc.first) = 1;
-				kvc.second = glm::vec3(ROT_180_Z * glm::vec4(kvc.second, 1.0f));
-				p1locations.emplace(std::move(kvc));
 			}
-			locations.insert(p1locations.begin(), p1locations.end());
 		}
-		// Insert Extra Monster Zones
-		// NOTE: they are only inserted once for player 0.
-		if(flags & DUEL_EMZONE)
-			locations.insert(EMZ_LOCATIONS.begin(), EMZ_LOCATIONS.end());
-#undef LOCATION_ERASE
-#undef LOCATION_X
-#undef LOCATION_Y
 	}
 	
 	template<typename DoFunc>
