@@ -179,7 +179,7 @@ public:
 	
 	void UpdateHitboxes() override
 	{
-		const glm::mat4 vvp = CalculateViewportMatrix() * cam.vp;
+		const glm::mat4 vvp = CalcVpMatrix() * cam.vp;
 		for(auto& kv : zones)
 		{
 			const glm::mat4 mvp = vvp * kv.second.model;
@@ -242,13 +242,12 @@ public:
 		DuelBoard<GraphicCard>::FillPile(controller, location, num);
 		auto& pile = GetPile(controller, location);
 		uint32_t seq = 0;
-		for(auto& c : pile)
+		for(auto& card : pile)
 		{
 			const Place p = {controller, location, seq, -1};
-			c.front = NewCardFrontPrim();
-			c.cover = NewCardCoverPrim();
-			c.loc = GetLocXYZ(p);
-			c.rot = GetRotXYZ(p, c.pos());
+			InitializeGraphicCard(card);
+			card.loc = GetLocXYZ(p);
+			card.rot = GetRotXYZ(p, card.pos());
 			seq++;
 		}
 	}
@@ -299,7 +298,70 @@ private:
 	AnswerCallback acb; // TODO: find a better name
 	
 	
-	//*********************************
+	/**********************************************************************/
+	template<typename DoFunc>
+	inline void ForAllCards(DoFunc Do)
+	{
+		for(uint8_t player = 0; player < 2; player++)
+		{
+#define X(name, enums) for(auto& card : name[player]) { Do(card); }
+			DUEL_PILES();
+#undef X
+		}
+		for(auto& kv : zoneCards)
+			Do(kv.second);
+	}
+	
+	template<typename T, typename... Args>
+	inline void PushAnimation(Args&&... args)
+	{
+		ani.Push(std::make_shared<T>(std::forward<Args>(args)...));
+	}
+	
+	inline glm::mat4 CalcVpMatrix()
+	{
+		glm::vec3 sVec{};
+		// NOTE: this works as long as can is smaller than pCan
+		sVec.x = static_cast<float>(cam.can.w) / cam.pCan.w;
+		sVec.y = static_cast<float>(cam.can.h) / cam.pCan.h;
+		glm::vec3 tVec{};
+		const float canvasOriginX = cam.can.x + cam.can.w * 0.5f;
+		const float canvasOriginY = cam.can.y + cam.can.h * 0.5f;
+		tVec.x = canvasOriginX / (cam.pCan.w * 0.5f) - 1.0f;
+		tVec.y = canvasOriginY / (cam.pCan.h * 0.5f) - 1.0f;
+		return glm::scale(sVec) * glm::translate(tVec);
+	}
+	
+	inline void InitializeGraphicCard(GraphicCard& card)
+	{
+		// Front face (Card picture)
+		card.front = env.renderer->NewPrimitive();
+		card.front->depthTest = true;
+		card.front->SetDrawMode(Drawing::GetQuadDrawMode());
+		card.front->SetVertices(CARD_VERTICES);
+		card.front->SetTexCoords(Drawing::GetQuadTexCoords());
+		card.front->SetTexture(ctm.GetCardTextureByCode(0u));
+		// Back face (Cover image)
+		card.cover = env.renderer->NewPrimitive();
+		card.cover->depthTest = true;
+		card.cover->SetDrawMode(Drawing::GetQuadDrawMode());
+		card.cover->SetVertices(CARD_COVER_VERTICES);
+		card.cover->SetTexCoords({{1.0f, 0.0f}, {0.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f}});
+		card.cover->SetTexture(cover);
+	}
+	
+	inline void CancelRequestActions()
+	{
+		for(int i = Core::CSELECT_W_EFFECT; i <= Core::CSELECT_SSETABLE; i++)
+			actBtn[i]->visible = false;
+		for(const auto& kv : cardsWithAction)
+			kv.second.action.reset(nullptr);
+		cardsWithAction.clear();
+		selectedZones.clear();
+		selectableZones.clear();
+	}
+	
+	/**********************************************************************/
 	
 	/******************** IElement overrides ********************/
 	void Resize([[maybe_unused]] const glm::mat4& mat,
@@ -316,8 +378,8 @@ private:
 			card.front->Draw();
 			card.cover->Draw();
 		});
-#if defined(DEBUG_HITBOXES)
 		env.renderer->SetViewport(cam.pCan.x, cam.pCan.y, cam.pCan.w, cam.pCan.h);
+#if defined(DEBUG_HITBOXES)
 		for(const auto& kv : zones)
 			kv.second.hitboxPrim->Draw();
 		for(const auto& pile : hand)
@@ -326,7 +388,6 @@ private:
 					card.hitbox->prim->Draw();
 #endif // defined(DEBUG_HITBOXES)
 #if defined(DEBUG_MOUSE_POS)
-		env.renderer->SetViewport(cam.pCan.x, cam.pCan.y, cam.pCan.w, cam.pCan.h);
 		mousePrim->Draw();
 #endif // defined(DEBUG_MOUSE_POS)
 	}
@@ -382,198 +443,6 @@ private:
 		return false;
 	}
 	/************************************************************/
-
-	{
-		{
-		}
-		{
-		}
-		{
-			{
-			}
-		}
-	}
-	
-	template<typename DoFunc>
-	inline void ForAllCards(DoFunc Do)
-	{
-		for(uint8_t player = 0; player < 2; player++)
-		{
-#define X(name, enums) for(auto& card : name[player]) { Do(card); }
-			DUEL_PILES();
-#undef X
-		}
-		for(auto& kv : zoneCards)
-			Do(kv.second);
-	}
-	
-	void UpdateMatrices()
-	{
-		// Recalculate View-Projection matrix
-		const auto aspectRatio = static_cast<float>(cam.can.w) / cam.can.h;
-		const auto proj = glm::perspective(1.0f, aspectRatio, 0.1f, 10.0f);
-		const auto view = glm::lookAt(cam.pos, {0.0f, 0.0f, 0.0f},
-		                              {0.0f, 1.0f, 0.0f});
-		cam.vp = proj * view;
-		// Apply matrix to all elements
-		for(auto& kv : zones)
-			kv.second.prim->SetMatrix(cam.vp * kv.second.model);
-		ForAllCards([this](GraphicCard& card)
-		{
-			const auto mvp = cam.vp * GetModel(card.loc, card.rot);
-			card.front->SetMatrix(mvp);
-			card.cover->SetMatrix(mvp);
-		});
-	}
-	
-	inline glm::mat4 CalculateViewportMatrix()
-	{
-		glm::vec3 sVec{};
-		// NOTE: this works as long as can is smaller than pCan
-		sVec.x = static_cast<float>(cam.can.w) / cam.pCan.w;
-		sVec.y = static_cast<float>(cam.can.h) / cam.pCan.h;
-		glm::vec3 tVec{};
-		const float canvasOriginX = cam.can.x + cam.can.w * 0.5f;
-		const float canvasOriginY = cam.can.y + cam.can.h * 0.5f;
-		tVec.x = canvasOriginX / (cam.pCan.w * 0.5f) - 1.0f;
-		tVec.y = canvasOriginY / (cam.pCan.h * 0.5f) - 1.0f;
-		return glm::scale(sVec) * glm::translate(tVec);
-	}
-	
-	// Refreshes the hitboxes for the cards in hand.
-	void HandHitbox(uint8_t player)
-	{
-		const glm::mat4 vvp = CalculateViewportMatrix() * cam.vp;
-		for(auto& card : hand[player])
-		{
-			if(!card.hitbox)
-				card.hitbox = std::make_unique<GraphicCard::HitboxData>();
-			card.hitbox->vertices = CARD_HITBOX_VERTICES;
-#if defined(DEBUG_HITBOXES)
-			card.hitbox->prim = env.renderer->NewPrimitive();
-			card.hitbox->prim->SetDrawMode(Drawing::PDM_LINE_LOOP);
-			const glm::vec4 BLU = {0.0f, 0.0f, 1.0f, 1.0f};
-			card.hitbox->prim->SetColors({BLU, BLU, BLU, BLU, BLU});
-#endif // defined(DEBUG_HITBOXES)
-			const glm::mat4 mvp = vvp * GetModel(card.loc, card.rot);
-			for(size_t i = 0; i < CARD_HITBOX_VERTICES.size(); i++)
-			{
-				const glm::vec4 v4 = mvp * glm::vec4(CARD_HITBOX_VERTICES[i], 1.0f);
-				card.hitbox->vertices[i] = glm::vec3(v4) / v4.w;
-			}
-#if defined(DEBUG_HITBOXES)
-			card.hitbox->prim->SetVertices(card.hitbox->vertices);
-#endif // defined(DEBUG_HITBOXES)
-		}
-	}
-
-	void UpdateAllCards()
-	{
-		auto UpdatePos = [this](const Place& place, GraphicCard& card)
-		{
-			card.loc = GetLocXYZ(place);
-			card.rot = GetRotXYZ(place, card.pos());
-			const auto mvp = cam.vp * GetModel(card.loc, card.rot);
-			card.front->SetMatrix(mvp);
-			card.cover->SetMatrix(mvp);
-		};
-		Place place = {0, 0, 0, -1};
-		for(uint8_t player = 0; player < 2; player++)
-		{
-			CON(place) = player;
-			for(auto location : {LOCATION_DECK, LOCATION_HAND, LOCATION_GRAVE,
-			                     LOCATION_REMOVED, LOCATION_EXTRA})
-			{
-				LOC(place) = location;
-				int i = 0;
-				for(auto& card : GetPile(CON(place), LOC(place)))
-				{
-					SEQ(place) = i;
-					UpdatePos(place, card);
-					i++;
-				}
-			}
-		}
-		for(auto& kv : zoneCards)
-			UpdatePos(kv.first, kv.second);
-	}
-	
-	void CancelRequestActions()
-	{
-		for(const auto& kv : cardsWithAction)
-			kv.second.action.reset(nullptr);
-		cardsWithAction.clear();
-		selectedZones.clear();
-		selectableZones.clear();
-	}
-	
-	bool Forward()
-	{
-		if(!DuelBoard<GraphicCard>::Forward())
-			return false;
-		CancelRequestActions();
-		AnimateMsg(msgs[state - 1]);
-		return true;
-	}
-	
-	bool Backward()
-	{
-		if(!DuelBoard<GraphicCard>::Backward())
-			return false;
-		CancelRequestActions();
-		AnimateMsg(msgs[state]);
-		return true;
-	}
-	
-	template<typename T, typename... Args>
-	inline void PushAnimation(Args&&... args)
-	{
-		ani.Push(std::make_shared<T>(std::forward<Args>(args)...));
-	}
-	
-	void AnimateMsg(const Core::AnyMsg& msg)
-	{
-		if(msg.AnyMsg_case() == Core::AnyMsg::kSpecific)
-		{
-			const auto& specific = msg.specific();
-			if((state != msgs.size() || !advancing) &&
-			   specific.Specific_case() == Core::Specific::kRequest)
-			{
-				// Skip request message if it can't be answered
-				return;
-			}
-			else if(specific.Specific_case() == Core::Specific::kInformation)
-			{
-				AnimateInfoMsg(specific.information());
-			}
-			else // (specific.Specific_case() == Core::Specific::kRequest)
-			{
-				AnimateRequestMsg(specific.request());
-			}
-		}
-		else // (msg.AnyMsg_case() == Core::AnyMsg::kInformation)
-		{
-			AnimateInfoMsg(msg.information());
-		}
-	}
-	
-	void AnimateInfoMsg(const Core::Information& info)
-	{
-		switch(info.Information_case())
-		{
-#include "graphic_board_animate_info.inl"
-		default: break;
-		}
-	}
-	
-	void AnimateRequestMsg(const Core::Request& request)
-	{
-		switch(request.Request_case())
-		{
-#include "graphic_board_animate_request.inl"
-		default: break;
-		}
-	}
 	
 	const glm::vec3 GetHandLocXYZ(const Place& p, int count) const
 	{
@@ -591,7 +460,7 @@ private:
 			loc = search->second + offset;
 		return loc;
 	}
-	
+
 	const glm::vec3 GetLocXYZ(const Place& p) const
 	{
 		glm::vec3 loc = {0.0f, 0.0f, 0.0f};
@@ -675,32 +544,149 @@ private:
 				rot.z = glm::radians(180.0f);
 			if(!(LOC(p) & LOCATION_OVERLAY) && (pos & POS_FACEDOWN))
 				rot.y = glm::radians(180.0f);
-			if(pos & POS_DEFENSE)
+			if(pos & POS_DEFENSE && !(LOC(p) & LOCATION_SZONE))
 				rot.z -= glm::radians(90.0f); // NOTE: Substraction
 		}
 		return rot;
 	}
 	
-	Drawing::Primitive NewCardFrontPrim()
+	void UpdateMatrices()
 	{
-		auto prim = env.renderer->NewPrimitive();
-		prim->depthTest = true;
-		prim->SetDrawMode(Drawing::GetQuadDrawMode());
-		prim->SetVertices(CARD_VERTICES);
-		prim->SetTexCoords(Drawing::GetQuadTexCoords());
-		prim->SetTexture(ctm.GetCardTextureByCode(0u));
-		return prim;
+		// Recalculate View-Projection matrix
+		const auto aspectRatio = static_cast<float>(cam.can.w) / cam.can.h;
+		const auto proj = glm::perspective(1.0f, aspectRatio, 0.1f, 10.0f);
+		const auto view = glm::lookAt(cam.pos, {0.0f, 0.0f, 0.0f},
+		                              {0.0f, 1.0f, 0.0f});
+		cam.vp = proj * view;
+		// Apply matrix to all elements
+		for(auto& kv : zones)
+			kv.second.prim->SetMatrix(cam.vp * kv.second.model);
+		ForAllCards([this](GraphicCard& card)
+		{
+			const auto mvp = cam.vp * GetModel(card.loc, card.rot);
+			card.front->SetMatrix(mvp);
+			card.cover->SetMatrix(mvp);
+		});
 	}
 	
-	Drawing::Primitive NewCardCoverPrim() const
+	// Refreshes the hitboxes for the cards in hand.
+	void HandHitbox(uint8_t player)
 	{
-		auto prim = env.renderer->NewPrimitive();
-		prim->depthTest = true;
-		prim->SetDrawMode(Drawing::GetQuadDrawMode());
-		prim->SetVertices(CARD_COVER_VERTICES);
-		prim->SetTexCoords({{1.0f, 0.0f}, {0.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f}});
-		prim->SetTexture(cover);
-		return prim;
+		const glm::mat4 vvp = CalcVpMatrix() * cam.vp;
+		for(auto& card : hand[player])
+		{
+			if(!card.hitbox)
+				card.hitbox = std::make_unique<GraphicCard::HitboxData>();
+			card.hitbox->vertices = CARD_HITBOX_VERTICES;
+#if defined(DEBUG_HITBOXES)
+			card.hitbox->prim = env.renderer->NewPrimitive();
+			card.hitbox->prim->SetDrawMode(Drawing::PDM_LINE_LOOP);
+			const glm::vec4 BLU = {0.0f, 0.0f, 1.0f, 1.0f};
+			card.hitbox->prim->SetColors({BLU, BLU, BLU, BLU, BLU});
+#endif // defined(DEBUG_HITBOXES)
+			const glm::mat4 mvp = vvp * GetModel(card.loc, card.rot);
+			for(size_t i = 0; i < CARD_HITBOX_VERTICES.size(); i++)
+			{
+				const glm::vec4 v4 = mvp * glm::vec4(CARD_HITBOX_VERTICES[i], 1.0f);
+				card.hitbox->vertices[i] = glm::vec3(v4) / v4.w;
+			}
+#if defined(DEBUG_HITBOXES)
+			card.hitbox->prim->SetVertices(card.hitbox->vertices);
+#endif // defined(DEBUG_HITBOXES)
+		}
+	}
+
+	void UpdateAllCards()
+	{
+		auto UpdatePos = [this](const Place& place, GraphicCard& card)
+		{
+			card.loc = GetLocXYZ(place);
+			card.rot = GetRotXYZ(place, card.pos());
+			const auto mvp = cam.vp * GetModel(card.loc, card.rot);
+			card.front->SetMatrix(mvp);
+			card.cover->SetMatrix(mvp);
+		};
+		Place place = {0, 0, 0, -1};
+		for(uint8_t player = 0; player < 2; player++)
+		{
+			CON(place) = player;
+			for(auto location : {LOCATION_DECK, LOCATION_HAND, LOCATION_GRAVE,
+			                     LOCATION_REMOVED, LOCATION_EXTRA})
+			{
+				LOC(place) = location;
+				int i = 0;
+				for(auto& card : GetPile(CON(place), LOC(place)))
+				{
+					SEQ(place) = i;
+					UpdatePos(place, card);
+					i++;
+				}
+			}
+		}
+		for(auto& kv : zoneCards)
+			UpdatePos(kv.first, kv.second);
+	}
+	
+	bool Forward()
+	{
+		if(!DuelBoard<GraphicCard>::Forward())
+			return false;
+		CancelRequestActions();
+		AnimateMsg(msgs[state - 1]);
+		return true;
+	}
+	
+	bool Backward()
+	{
+		if(!DuelBoard<GraphicCard>::Backward())
+			return false;
+		CancelRequestActions();
+		AnimateMsg(msgs[state]);
+		return true;
+	}
+	
+	void AnimateMsg(const Core::AnyMsg& msg)
+	{
+		if(msg.AnyMsg_case() == Core::AnyMsg::kSpecific)
+		{
+			const auto& specific = msg.specific();
+			if((state != msgs.size() || !advancing) &&
+			   specific.Specific_case() == Core::Specific::kRequest)
+			{
+				// Skip request message if it can't be answered
+				return;
+			}
+			else if(specific.Specific_case() == Core::Specific::kInformation)
+			{
+				AnimateInfoMsg(specific.information());
+			}
+			else // (specific.Specific_case() == Core::Specific::kRequest)
+			{
+				AnimateRequestMsg(specific.request());
+			}
+		}
+		else // (msg.AnyMsg_case() == Core::AnyMsg::kInformation)
+		{
+			AnimateInfoMsg(msg.information());
+		}
+	}
+	
+	void AnimateInfoMsg(const Core::Information& info)
+	{
+		switch(info.Information_case())
+		{
+#include "graphic_board_animate_info.inl"
+		default: break;
+		}
+	}
+	
+	void AnimateRequestMsg(const Core::Request& request)
+	{
+		switch(request.Request_case())
+		{
+#include "graphic_board_animate_request.inl"
+		default: break;
+		}
 	}
 };
 

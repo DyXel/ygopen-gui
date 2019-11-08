@@ -143,8 +143,7 @@ const auto place = PlaceFromPbCardInfo(cardInfo);
 if(realtime) // Set Card Data
 {
 	auto& card = GetCard(place);
-	card.front = NewCardFrontPrim();
-	card.cover = NewCardCoverPrim();
+	InitializeGraphicCard(card);
 }
 static const glm::vec3 FAR_AWAY_LOCATION = {0.0f, 0.0f, 100.0f};
 static const glm::vec3 FAR_AWAY_ROTATION = {0.0f, 0.0f, 0.0f};
