@@ -336,3 +336,52 @@ PushAnimation<Animation::MoveCards>(cam.vp, std::move(cards));
 // TODO: update hand hitboxes if swapped cards had anything to do with hand
 break;
 }
+
+case Core::Information::kShuffleLocation:
+{
+const auto& shuffleLocation = info.shuffle_location();
+const auto player = shuffleLocation.player();
+if(shuffleLocation.location() == LOCATION_HAND)
+{
+	const Place shufflePlace = {player, LOCATION_HAND, 0, -1};
+	const glm::vec3 shuffleLoc = GetHandLocXYZ(shufflePlace, 1);
+	const glm::vec3 shuffleRot = GetRotXYZ(shufflePlace, POS_FACEDOWN);
+	Animation::MoveCards::Container cards1, cards2;
+	Animation::SetCardImages::Container cardsImg;
+	int i = 0;
+	for(auto& card : hand[player])
+	{
+		const Place place = {player, LOCATION_HAND, i, -1};
+		const glm::vec3 loc = GetLocXYZ(place);
+		const glm::vec3 rot = GetRotXYZ(place, card.pos());
+		Animation::MoveCardData mcd1 =
+		{
+			card,
+			loc,
+			rot,
+			shuffleLoc,
+			shuffleRot
+		};
+		Animation::MoveCardData mcd2 =
+		{
+			card,
+			shuffleLoc,
+			shuffleRot,
+			loc,
+			rot
+		};
+		cards1.push_back(mcd1);
+		cards2.push_back(mcd2);
+		cardsImg.push_back(card);
+		i++;
+	}
+	PushAnimation<Animation::MoveCards>(cam.vp, std::move(cards1));
+	PushAnimation<Animation::SetCardImages>(ctm, std::move(cardsImg));
+	PushAnimation<Animation::MoveCards>(cam.vp, std::move(cards2));
+}
+else
+{
+	// TODO
+}
+break;
+}
