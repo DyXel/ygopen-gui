@@ -17,6 +17,7 @@
 #include "animations/call.hpp"
 #include "animations/move_card.hpp"
 #include "animations/set_card_image.hpp"
+#include "elements/action_btn.hpp"
 #include "../board.hpp"
 #include "../sdl_utility.hpp"
 #include "../drawing/renderer.hpp"
@@ -167,6 +168,25 @@ public:
 		const glm::vec4 BLUE = {0.0f, 1.0f, 0.0f, 0.5f};
 		mousePrim->SetColors({BLUE, BLUE, BLUE, BLUE});
 #endif // defined(DEBUG_MOUSE_POS)
+
+#define ACTBTN(csel, string) \
+	do \
+	{ \
+		actBtn[csel] = GUI::CActBtn::New(env); \
+		actBtn[csel]->SetImage(TextureFromPath(env.renderer, string)); \
+		actBtn[csel]->SetCallback(std::bind(&CGraphicBoard::ActBtnSubmit, this, csel)); \
+		actBtn[csel]->visible = false; \
+	}while(0)
+		ACTBTN(Core::CSELECT_W_EFFECT, "TEMP/act_act.png");
+		ACTBTN(Core::CSELECT_SUMMONABLE, "TEMP/act_ns.png");
+		ACTBTN(Core::CSELECT_SPSUMMONABLE, "TEMP/act_ss.png");
+		ACTBTN(Core::CSELECT_REPOSITIONABLE, "TEMP/act_ad.png");
+		ACTBTN(Core::CSELECT_MSETABLE, "TEMP/act_mset.png");
+		ACTBTN(Core::CSELECT_SSETABLE, "TEMP/act_sset.png");
+		ACTBTN(Core::CSELECT_CAN_ATTACK, "TEMP/act_atk.png");
+#undef ACTBTN
+		for(int i = Core::CSELECT_W_EFFECT; i <= Core::CSELECT_SSETABLE; i++)
+			env.Add(actBtn[i]);
 	}
 	
 	virtual ~CGraphicBoard() = default;
@@ -205,6 +225,15 @@ public:
 	{
 		cam.pCan = parent;
 		cam.can = rect;
+		const glm::mat4 ortho = glm::ortho<float>(0.0f, parent.w, parent.h, 0.0f);
+		
+		SDL_Rect bCanvas = {10, 10, 64, 64};
+		for(int i = Core::CSELECT_W_EFFECT; i <= Core::CSELECT_SSETABLE; i++)
+		{
+			actBtn[i]->Resize(ortho, bCanvas);
+			bCanvas.y += 64 + 10;
+		}
+		
 		UpdateMatrices();
 	}
 	
@@ -289,6 +318,7 @@ private:
 	bool multiSelect;
 	std::vector<std::reference_wrapper<GraphicCard>> selectedCards;
 	std::map<Place, GraphicCard&> cardsWithAction;
+	GUI::ActBtn actBtn[Core::CardSelectionType_ARRAYSIZE];
 	// Zone selection
 	unsigned zoneSelectCount; // total number of zones needed to select
 	using ZoneIterSet = std::set<ZoneMapIter, std::equal_to<ZoneMapIter>>;
@@ -297,6 +327,16 @@ private:
 	
 	AnswerCallback acb; // TODO: find a better name
 	
+	void ActBtnSubmit(Core::CardSelectionType csel)
+	{
+		Core::Answer answer;
+		auto cardSeq = answer.mutable_card_seqs()->add_card_seq();
+		cardSeq->set_type(csel);
+		GraphicCard& card = selectedCards.rbegin()->get();
+		const int seq = card.action->ts[csel];
+		cardSeq->set_sequence(seq);
+		acb(answer);
+	}
 	
 	/**********************************************************************/
 	template<typename DoFunc>
@@ -406,39 +446,172 @@ private:
 		}
 	}
 	
-	bool OnEvent(const SDL_Event& e) override // IElement
+	bool OnMouseMotion(const SDL_MouseMotionEvent& motion)
 	{
-		if(e.type == SDL_MOUSEMOTION)
-		{
-			glm::vec3 mousePos{};
-			// Convert mouse coordinates to NDC
-			mousePos.x = e.motion.x / (cam.pCan.w * 0.5f) - 1.0f;
-			mousePos.y = -(e.motion.y / (cam.pCan.h * 0.5f) - 1.0f);
+		glm::vec3 mPos = {motion.x / (cam.pCan.w * 0.5f) - 1.0f,
+		                 -(motion.y / (cam.pCan.h * 0.5f) - 1.0f), 0.0f};
 #if defined(DEBUG_MOUSE_POS)
-			mousePrim->SetMatrix(glm::translate(mousePos));
+		mousePrim->SetMatrix(glm::translate(mPos));
 #endif // defined(DEBUG_MOUSE_POS)
-			// TODO: zone deselection
-			selectedZone = zones.end();
-			for(auto it = zones.begin(); it != zones.end(); ++it)
+		// Try checking for cards
+		if(selectedCard)
+		{
+			if(PointInPoly(mPos, selectedCard->hitbox->vertices))
 			{
-				if(PointInPoly(mousePos, it->second.hitbox))
+				return true;
+			}
+			else
+			{
+				// TODO: card deselection animation
+				selectedCard = nullptr;
+			}
+		}
+		for(auto& pile : hand)
+		{
+			for(auto& card : pile)
+			{
+				if(card.hitbox && PointInPoly(mPos, card.hitbox->vertices))
 				{
-					selectedZone = it;
+					selectedCard = &card;
+					// TODO: card selection and/or hover animation
 					return true;
 				}
 			}
 		}
-		else if(e.type == SDL_KEYDOWN && !e.key.repeat &&
-		        e.key.keysym.scancode == SDL_SCANCODE_SPACE)
+		// Try checking for zones
+		if(selectedZone != zones.end())
 		{
-			Core::Answer answer;
-			answer.set_number(PHASE_END);
-			acb(answer);
+			if(PointInPoly(mPos, selectedZone->second.hitbox))
+			{
+				return true;
+			}
+			else
+			{
+				// TODO: zone deselection animation
+				selectedZone = zones.end();
+			}
 		}
-		else if(e.type == SDL_KEYDOWN && !e.key.repeat &&
-		        e.key.keysym.scancode == SDL_SCANCODE_END)
+		for(auto it = zones.begin(); it != zones.end(); ++it)
 		{
-			ani.FinishAll();
+			if(PointInPoly(mPos, it->second.hitbox))
+			{
+				selectedZone = it;
+				// TODO: zone selection animation
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	bool OnMouseButtonDown([[maybe_unused]] const SDL_MouseButtonEvent& button)
+	{
+		auto SelectUnselectCard = [&](GraphicCard& card)
+		{
+			if(!multiSelect)
+			{
+				selectedCards.clear();
+				selectedCards.emplace_back(card);
+				return;
+			}
+			auto SearchFunc = [&card](GraphicCard& vcard)
+			{
+				return &card == &vcard;
+			};
+			auto search = std::find_if(selectedCards.begin(),
+			                           selectedCards.end(), SearchFunc);
+			if(search == selectedCards.end())
+				selectedCards.push_back(card);
+			else
+				selectedCards.erase(search);
+		};
+		if(selectedCard && selectedCard->action)
+		{
+			for(const auto& kv : selectedCard->action->ts)
+				actBtn[kv.first]->visible = true;
+			SelectUnselectCard(*selectedCard);
+			return true;
+		}
+		if(selectedZone != zones.end())
+		{
+			// Handle zone selection
+			if(selectableZones.size())
+			{
+				if(selectedZones.find(selectedZone) == selectedZones.end())
+				{
+					selectedZones.insert(selectedZone);
+					if(zoneSelectCount == selectedZones.size())
+					{
+						Core::Answer answer;
+						auto places = answer.mutable_places();
+						for(auto& zoneIter : selectedZones)
+						{
+							auto place = places->add_places();
+							const auto& zone = zoneIter->first;
+							place->set_controller(CON(zone));
+							place->set_location(LOC(zone));
+							place->set_sequence(SEQ(zone));
+						}
+						acb(answer);
+					}
+				}
+				else
+				{
+					selectedZones.erase(selectedZone);
+				}
+				return true;
+			}
+			// Handle zone card selection
+			const auto t = std::tuple_cat(selectedZone->first,
+			                              std::tuple<int32_t>(-1));
+			auto search = zoneCards.find(t);
+			if(search != zoneCards.end() && search->second.action)
+			{
+				for(const auto& kv : search->second.action->ts)
+					actBtn[kv.first]->visible = true;
+				SelectUnselectCard(search->second);
+				return true;
+			}
+		}
+	}
+	
+	bool OnEvent(const SDL_Event& e) override
+	{
+		if(e.type == SDL_MOUSEMOTION && OnMouseMotion(e.motion))
+		{
+			return true;
+		}
+		else if(e.type == SDL_MOUSEBUTTONDOWN && OnMouseButtonDown(e.button))
+		{
+			return true;
+		}
+		else if(e.type == SDL_KEYDOWN && !e.key.repeat)
+		{
+			switch(e.key.keysym.scancode)
+			{
+			case SDL_SCANCODE_A:
+			{
+				ActBtnSubmit(Core::CSELECT_W_EFFECT);
+				return true;
+			}
+			case SDL_SCANCODE_SPACE:
+			{
+				Core::Answer answer;
+				answer.set_number(PHASE_END);
+				acb(answer);
+				return true;
+			}
+			case SDL_SCANCODE_END:
+			{
+				ani.FinishAll();
+				return true;
+			}
+			case SDL_SCANCODE_X:
+			{
+				ani.SetSpeed(0.1f);
+				return true;
+			}
+			default: break;
+			}
 		}
 		return false;
 	}
