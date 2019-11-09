@@ -63,6 +63,8 @@ target_sources(ygopen-gui PRIVATE
 	${CSR}/gframe/animations/move_card.hpp
 	${CSR}/gframe/animations/set_card_image.cpp
 	${CSR}/gframe/animations/set_card_image.hpp
+	${CSR}/gframe/elements/action_btn.cpp
+	${CSR}/gframe/elements/action_btn.hpp
 	${CSR}/gui/button.cpp
 	${CSR}/gui/button.hpp
 	${CSR}/gui/common.hpp

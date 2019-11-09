@@ -1,8 +1,7 @@
-#ifndef GUI_BUTTON_HPP
-#define GUI_BUTTON_HPP
+#ifndef ACTION_BTN_HPP
+#define ACTION_BTN_HPP
 #include <functional>
-#include <string_view>
-#include "element.hpp"
+#include "../../gui/element.hpp"
 
 namespace YGOpen
 {
@@ -10,39 +9,31 @@ namespace YGOpen
 namespace GUI
 {
 
-ELEMENT_DECLARATION(CButton)
+ELEMENT_DECLARATION(CActBtn)
 {
 public:
-	ELEMENT_IMPLEMENT_New_METHOD(CButton)
+	ELEMENT_IMPLEMENT_New_METHOD(CActBtn)
 	void Resize(const glm::mat4& mat, const SDL_Rect& rect) override;
 	void Draw() override;
 	using Callback = std::function<void(void)>;
 	void SetCallback(Callback callback);
-	void SetText(std::string_view txt);
+	void SetImage(Drawing::Texture tex);
 protected:
-	CButton(Environment& env);
-	void Tick() override;
-	void OnFocus(bool gained) override;
+	CActBtn(Environment& env);
 	bool OnEvent(const SDL_Event& e) override;
 private:
 	SDL_Rect r{};
-	float brightness{1.0f};
 	bool pressed{false};
 	Callback cb;
-	Drawing::Texture strTex;
 	using DyPrimitive = std::pair<Drawing::Primitive, Drawing::Vertices>;
-	DyPrimitive shadow;
 	DyPrimitive content;
-	DyPrimitive lines;
-	DyPrimitive text;
-
-	void SetBrightness(float b);
+	DyPrimitive img;
 };
 
-using Button = std::shared_ptr<CButton>;
+using ActBtn = std::shared_ptr<CActBtn>;
 
 } // namespace GUI
 
 } // namespace YGOpen
 
-#endif // GUI_BUTTON_HPP
+#endif // ACTION_BTN_HPP
