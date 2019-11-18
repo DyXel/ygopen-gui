@@ -589,27 +589,33 @@ private:
 		{
 			switch(e.key.keysym.scancode)
 			{
-			case SDL_SCANCODE_A:
-			{
-				ActBtnSubmit(Core::CSELECT_W_EFFECT);
-				return true;
-			}
 			case SDL_SCANCODE_SPACE:
 			{
-				Core::Answer answer;
-				answer.set_number(PHASE_END);
-				acb(answer);
-				return true;
+			Core::Answer answer;
+			answer.set_cancel(true);
+			acb(answer);
+			return true;
 			}
+			// Animation controls
 			case SDL_SCANCODE_END:
 			{
-				ani.FinishAll();
-				return true;
+			ani.FinishAll();
+			return true;
+			}
+			case SDL_SCANCODE_Z:
+			{
+			ani.SetSpeed(0.1f);
+			return true;
 			}
 			case SDL_SCANCODE_X:
 			{
-				ani.SetSpeed(0.1f);
-				return true;
+			ani.SetSpeed(1.0f);
+			return true;
+			}
+			case SDL_SCANCODE_C:
+			{
+			ani.SetSpeed(2.0f);
+			return true;
 			}
 			default: break;
 			}
