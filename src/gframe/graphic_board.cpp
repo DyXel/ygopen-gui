@@ -572,6 +572,7 @@ private:
 				return true;
 			}
 		}
+		return false;
 	}
 	
 	bool OnEvent(const SDL_Event& e) override
