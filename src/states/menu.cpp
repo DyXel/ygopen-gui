@@ -67,9 +67,9 @@ void Menu::OnResize()
 {
 	const int& w = data.canvas.w;
 	const int& h = data.canvas.h;
+	const glm::mat4 ortho = Drawing::Get2DProjMatrix(w, h);
 	const int bkgW = data.menuBkg->GetWidth();
 	SDL_Rect bCanvas;
-	glm::mat4 proj = Drawing::Get2DProjMatrix(w, h);
 	renderer->SetViewport(0, 0, w, h);
 	if(w >= h)
 	{
@@ -84,15 +84,15 @@ void Menu::OnResize()
 	
 	Drawing::ResizeQuad(bkgVertices, bkgW, h);
 	bkg->SetVertices(bkgVertices);
-	bkg->SetMatrix(proj * Drawing::Trans2D((-bkgW / 2.0f) + (w / 2.0f), 0.0f));
+	bkg->SetMatrix(ortho * Drawing::Trans2D((-bkgW / 2.0f) + (w / 2.0f), 0.0f));
 	
 	const int bSeparation = h / 40;
 	
 	bCanvas.x = w / 2 - bCanvas.w / 2;
 	bCanvas.y = bSeparation;
-	duelBtn->Resize(proj, bCanvas);
+	duelBtn->Resize(ortho, bCanvas);
 	bCanvas.y += bSeparation + bCanvas.h;
-	exitBtn->Resize(proj, bCanvas);
+	exitBtn->Resize(ortho, bCanvas);
 }
 
 } // namespace State
