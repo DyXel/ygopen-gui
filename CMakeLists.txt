@@ -76,9 +76,9 @@ set(CLANG_OR_GNU $<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>)
 target_compile_options(ygopen-gui PRIVATE
 	# Clang and GNU compilers
 	$<${CLANG_OR_GNU}:-Wall -Wextra -pedantic>
-	$<$<AND:$<CONFIG:Debug>,${CLANG_OR_GNU}>:-ggdb3 -Og -D_DEBUG>
-	$<$<AND:$<CONFIG:Release>,${CLANG_OR_GNU}>:-O2>
-	$<$<AND:$<CONFIG:RelWithDebInfo>,${CLANG_OR_GNU}>:-ggdb3 -O2 -D_DEBUG>
+	$<$<AND:$<CONFIG:Debug>,${CLANG_OR_GNU}>:-ggdb3 -O0 -D_DEBUG>
+	$<$<AND:$<CONFIG:Release>,${CLANG_OR_GNU}>:-Ofast>
+	$<$<AND:$<CONFIG:RelWithDebInfo>,${CLANG_OR_GNU}>:-ggdb3 -Ofast -D_DEBUG>
 	# Microsoft compiler
 	$<$<CXX_COMPILER_ID:MSVC>:/W4>
 )
