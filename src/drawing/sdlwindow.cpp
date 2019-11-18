@@ -44,6 +44,9 @@ SDLWindow::SDLWindow(const Backend backend)
 	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+	// Don't use deprecated functionality
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS,
+	                    SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
 	
 	if(backend == OPENGL_CORE)
 	{
