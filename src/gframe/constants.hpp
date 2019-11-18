@@ -15,6 +15,7 @@ using LitePlace = std::tuple<uint32_t /*controller*/,
 
 const float CARD_THICKNESS = 0.0040f;
 const glm::vec3 OVERLAY_OFFSET = {0.01f, -0.01f, -0.0001f};
+const glm::vec3 UP = {0.0f, 0.0f, 1.0f};
 
 static const Drawing::Vertices ZONE_HITBOX_VERTICES =
 {

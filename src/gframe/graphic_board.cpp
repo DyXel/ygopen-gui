@@ -695,7 +695,6 @@ private:
 		glm::vec3 rot = {0.0f, 0.0f, 0.0f};
 		if(LOC(p) & LOCATION_HAND)
 		{
-			static const glm::vec3 UP = {0.0f, 1.0f, 0.0f};
 			const LitePlace place = {CON(p), LOCATION_HAND, 0};
 			const glm::vec3 loc = locations.at(place);
 			if(pos & POS_FACEDOWN)
@@ -705,10 +704,9 @@ private:
 			}
 			else
 			{
-				glm::mat4 lookAt = glm::lookAt(cam.pos, loc, UP);
+				glm::mat4 lookAt = glm::lookAt(loc, cam.pos, UP);
 				glm::extractEulerAngleXYZ(lookAt, rot.x, rot.y, rot.z);
-				rot.x = glm::abs(rot.x);
-				rot.z = -rot.z;
+				rot.y += glm::radians(-180.0f);
 			}
 		}
 		else if(IsPile(p))
@@ -735,8 +733,7 @@ private:
 		// Recalculate View-Projection matrix
 		const auto aspectRatio = static_cast<float>(cam.can.w) / cam.can.h;
 		const auto proj = glm::perspective(1.0f, aspectRatio, 0.1f, 10.0f);
-		const auto view = glm::lookAt(cam.pos, {0.0f, 0.0f, 0.0f},
-		                              {0.0f, 1.0f, 0.0f});
+		const auto view = glm::lookAt(cam.pos, {0.0f, 0.0f, 0.0f}, UP);
 		cam.vp = proj * view;
 		// Apply matrix to all elements
 		for(auto& kv : zones)
