@@ -215,9 +215,9 @@ public:
 		HandHitbox(1);
 	}
 	
-	void SetAnswerCallback(AnswerCallback answerCb) override
+	void SetAnswerSubmitter(AnswerCallback cb) override
 	{
-		acb = answerCb;
+		answerSubmitter = cb;
 	}
 	
 	void Resize(const SDL_Rect& parent, const SDL_Rect& rect) override
@@ -322,7 +322,7 @@ private:
 	std::set<LitePlace> selectedZones;
 	std::set<LitePlace> selectableZones;
 	
-	AnswerCallback acb; // TODO: find a better name
+	AnswerCallback answerSubmitter;
 	
 	void ActBtnSubmit(Core::CardSelectionType csel)
 	{
@@ -332,7 +332,7 @@ private:
 		GraphicCard& card = selectedCards.rbegin()->get();
 		const int seq = card.action->ts[csel];
 		cardSeq->set_sequence(seq);
-		acb(answer);
+		answerSubmitter(answer);
 	}
 	
 	/**********************************************************************/
@@ -548,7 +548,7 @@ private:
 							place->set_location(LOC(zone));
 							place->set_sequence(SEQ(zone));
 						}
-						acb(answer);
+						answerSubmitter(answer);
 					}
 				}
 				else

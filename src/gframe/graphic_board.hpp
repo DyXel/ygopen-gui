@@ -34,7 +34,7 @@ public:
 	
 	virtual void SetCameraPosition(const glm::vec3& pos) = 0;
 	virtual void UpdateHitboxes() = 0;
-	virtual void SetAnswerCallback(AnswerCallback answerCb) = 0;
+	virtual void SetAnswerSubmitter(AnswerCallback cb) = 0;
 	virtual void Resize(const SDL_Rect& parent, const SDL_Rect& rect) = 0;
 	
 	virtual void AddMsg(const Core::AnyMsg& msg) = 0;
