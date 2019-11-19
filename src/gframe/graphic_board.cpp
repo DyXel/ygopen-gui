@@ -184,7 +184,7 @@ public:
 		ACTBTN(Core::CSELECT_SSETABLE, "TEMP/act_sset.png");
 		ACTBTN(Core::CSELECT_CAN_ATTACK, "TEMP/act_atk.png");
 #undef ACTBTN
-		for(int i = Core::CSELECT_W_EFFECT; i <= Core::CSELECT_SSETABLE; i++)
+		for(int i = Core::CSELECT_W_EFFECT; i <= Core::CSELECT_CAN_ATTACK; i++)
 			env.Add(actBtn[i]);
 	}
 	
@@ -227,7 +227,7 @@ public:
 		const glm::mat4 ortho = glm::ortho<float>(0.0f, parent.w, parent.h, 0.0f);
 		
 		SDL_Rect bCanvas = {10, 10, 64, 64};
-		for(int i = Core::CSELECT_W_EFFECT; i <= Core::CSELECT_SSETABLE; i++)
+		for(int i = Core::CSELECT_W_EFFECT; i <= Core::CSELECT_CAN_ATTACK; i++)
 		{
 			actBtn[i]->Resize(ortho, bCanvas);
 			bCanvas.y += 64 + 10;
@@ -389,7 +389,7 @@ private:
 	
 	inline void CancelRequestActions()
 	{
-		for(int i = Core::CSELECT_W_EFFECT; i <= Core::CSELECT_SSETABLE; i++)
+		for(int i = Core::CSELECT_W_EFFECT; i <= Core::CSELECT_CAN_ATTACK; i++)
 			actBtn[i]->visible = false;
 		for(const auto& kv : cardsWithAction)
 			kv.second.action.reset(nullptr);
@@ -571,6 +571,43 @@ private:
 		return false;
 	}
 	
+	bool OnKeyDownEvent(const SDL_KeyboardEvent& key)
+	{
+		switch(key.keysym.scancode)
+		{
+		case SDL_SCANCODE_SPACE:
+		{
+		Core::Answer answer;
+		answer.set_cancel(true);
+		answerSubmitter(answer);
+		return true;
+		}
+		// Animation controls
+		case SDL_SCANCODE_END:
+		{
+		ani.FinishAll();
+		return true;
+		}
+		case SDL_SCANCODE_Z:
+		{
+		ani.SetSpeed(0.1f);
+		return true;
+		}
+		case SDL_SCANCODE_X:
+		{
+		ani.SetSpeed(1.0f);
+		return true;
+		}
+		case SDL_SCANCODE_C:
+		{
+		ani.SetSpeed(2.0f);
+		return true;
+		}
+		default: break;
+		}
+		return false;
+	}
+	
 	bool OnEvent(const SDL_Event& e) override
 	{
 		if(e.type == SDL_MOUSEMOTION && OnMouseMotion(e.motion))
@@ -581,40 +618,9 @@ private:
 		{
 			return true;
 		}
-		else if(e.type == SDL_KEYDOWN && !e.key.repeat)
+		else if(e.type == SDL_KEYDOWN && !e.key.repeat && OnKeyDownEvent(e.key))
 		{
-			switch(e.key.keysym.scancode)
-			{
-			case SDL_SCANCODE_SPACE:
-			{
-			Core::Answer answer;
-			answer.set_cancel(true);
-			acb(answer);
-			return true;
-			}
-			// Animation controls
-			case SDL_SCANCODE_END:
-			{
-			ani.FinishAll();
-			return true;
-			}
-			case SDL_SCANCODE_Z:
-			{
-			ani.SetSpeed(0.1f);
-			return true;
-			}
-			case SDL_SCANCODE_X:
-			{
-			ani.SetSpeed(1.0f);
-			return true;
-			}
-			case SDL_SCANCODE_C:
-			{
-			ani.SetSpeed(2.0f);
-			return true;
-			}
-			default: break;
-			}
+			
 		}
 		return false;
 	}
