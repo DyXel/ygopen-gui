@@ -13,14 +13,6 @@ if(advancing)
 		card.code.AddOrNext(realtime, currentInfo.code());
 		card.pos.AddOrNext(realtime, card.pos()); // copy
 	}
-	else if(reason == Core::Msg::UpdateCard::REASON_MOVE)
-	{
-		const auto previous = PlaceFromPbCardInfo(previousInfo);
-		const auto current = PlaceFromPbCardInfo(currentInfo);
-		auto& card = MoveSingle(previous, current);
-		card.code.AddOrNext(realtime, currentInfo.code());
-		card.pos.AddOrNext(realtime, currentInfo.position());
-	}
 	else // REASON_POS_CHANGE or REASON_SET
 	{
 		auto& card = GetCard(PlaceFromPbCardInfo(previousInfo));
@@ -37,21 +29,34 @@ else
 		card.code.Prev();
 		card.pos.Prev();
 	}
-	else if(reason == Core::Msg::UpdateCard::REASON_MOVE)
-	{
-		const auto previous = PlaceFromPbCardInfo(previousInfo);
-		const auto current = PlaceFromPbCardInfo(currentInfo);
-		auto& card = GetCard(current);
-		card.code.Prev();
-		card.pos.Prev();
-		MoveSingle(current, previous);
-	}
 	else // REASON_POS_CHANGE or REASON_SET
 	{
 		auto& card = GetCard(PlaceFromPbCardInfo(previousInfo));
 		card.code.Prev();
 		card.pos.Prev();
 	}
+}
+break;
+}
+
+case Core::Information::kMoveCard:
+{
+const auto& moveCard = info.move_card();
+const auto& currentInfo = moveCard.current();
+const auto previous = PlaceFromPbCardInfo(moveCard.previous());
+const auto current = PlaceFromPbCardInfo(currentInfo);
+if(advancing)
+{
+	auto& card = MoveSingle(previous, current);
+	card.code.AddOrNext(realtime, currentInfo.code());
+	card.pos.AddOrNext(realtime, currentInfo.position());
+}
+else
+{
+	auto& card = GetCard(current);
+	card.code.Prev();
+	card.pos.Prev();
+	MoveSingle(current, previous);
 }
 break;
 }

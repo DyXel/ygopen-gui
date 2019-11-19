@@ -2,7 +2,6 @@ case Core::Information::kUpdateCard:
 {
 const auto& updateCard = info.update_card();
 const auto& previousInfo = updateCard.previous();
-const auto& currentInfo = updateCard.current();
 const auto reason = updateCard.reason();
 switch(reason)
 {
@@ -31,107 +30,109 @@ case Core::Msg::UpdateCard::REASON_SET:
 	PushAnimation<Animation::MoveCard>(cam.vp, mcd);
 	break;
 }
-case Core::Msg::UpdateCard::REASON_MOVE:
-{
-	const auto previous = PlaceFromPbCardInfo(previousInfo);
-	const auto current = PlaceFromPbCardInfo(currentInfo);
-	Animation::MoveCards::Container cards;
-	int handNetChange[2] = {0};
-	// Calculate net change of hands
-	if(LOC(previous) & LOCATION_HAND)
-	{
-		if(advancing)
-			handNetChange[CON(previous)]--;
-		else
-			handNetChange[CON(previous)]++;
-	}
-	if(LOC(current) & LOCATION_HAND)
-	{
-		if(advancing)
-			handNetChange[CON(current)]++;
-		else
-			handNetChange[CON(current)]--;
-	}
-	auto RefreshHand = [&](const uint8_t p)
-	{
-		uint32_t i = 0u;
-		const auto& is = (advancing) ? current : previous;
-		const auto& was = (advancing) ? previous : current;
-		Place startP = {p, LOCATION_HAND, 0, -1};
-		Place endP = {p, LOCATION_HAND, 0, -1};
-		for(auto& card : hand[p])
-		{
-			SEQ(startP) = SEQ(endP) = i;
-			// Make gap if card was moved from the hand
-			SEQ(startP) += LOC(was) & LOCATION_HAND && i >= SEQ(was);
-			// Remove gap if card was moved to the hand
-			SEQ(startP) -= LOC(is) & LOCATION_HAND && i >= SEQ(is);
-			Animation::MoveCardData mcd =
-			{
-				card,
-				GetHandLocXYZ(startP, hand[p].size() - handNetChange[p]),
-				GetRotXYZ(startP, card.pos()),
-				GetLocXYZ(endP),
-				GetRotXYZ(endP, card.pos())
-			};
-			cards.push_back(mcd);
-			i++;
-		}
-	};
-	// Only run the animations if there was an actual net change
-	// A card should not be able to move to a different part of the hand
-	// except by shuffling (which actually does not move any card client side)
-	if(handNetChange[0] != 0)
-		RefreshHand(0);
-	if(handNetChange[1] != 0)
-		RefreshHand(1);
-	// Gets the right location taking into consideration hand movement
-	auto GetFixedLoc = [&](const Place& place) -> glm::vec3
-	{
-		const auto phdc = handNetChange[CON(place)];
-		if(LOC(place) & LOCATION_HAND && phdc != 0)
-			return GetHandLocXYZ(place, hand[CON(place)].size() - phdc);
-		return GetLocXYZ(place);
-	};
-	// Animate actual moved card
-	auto& card = GetCard((advancing) ? current : previous);
-	if(advancing)
-	{
-		Animation::MoveCardData mcd =
-		{
-			card,
-			GetFixedLoc(previous),
-			GetRotXYZ(previous, card.pos(-1)),
-			GetLocXYZ(current),
-			GetRotXYZ(current, card.pos())
-		};
-		cards.push_back(mcd);
-	}
-	else
-	{
-		Animation::MoveCardData mcd =
-		{
-			card,
-			GetFixedLoc(current),
-			GetRotXYZ(current, card.pos(1)),
-			GetLocXYZ(previous),
-			GetRotXYZ(previous, card.pos())
-		};
-		cards.push_back(mcd);
-	}
-// 	if(updateCard.core_reason() & 0x1 && advancing) // REASON_DESTROY
-// 		ani.Push(/*destroy sound*/);
-	PushAnimation<Animation::SetCardImage>(ctm, card);
-	PushAnimation<Animation::MoveCards>(cam.vp, std::move(cards));
-	// Update hand hitboxes if there was any net change
-	if(handNetChange[0] != 0)
-		PushAnimation<Animation::Call>(std::bind(&CGraphicBoard::HandHitbox, this, 0));
-	if(handNetChange[1] != 0)
-		PushAnimation<Animation::Call>(std::bind(&CGraphicBoard::HandHitbox, this, 1));
-	break;
-}
 default: break;
 }
+break;
+}
+
+case Core::Information::kMoveCard:
+{
+const auto& moveCard = info.move_card();
+const auto previous = PlaceFromPbCardInfo(moveCard.previous());
+const auto current = PlaceFromPbCardInfo(moveCard.current());
+Animation::MoveCards::Container cards;
+int handNetChange[2] = {0};
+// Calculate net change of hands
+if(LOC(previous) & LOCATION_HAND)
+{
+	if(advancing)
+		handNetChange[CON(previous)]--;
+	else
+		handNetChange[CON(previous)]++;
+}
+if(LOC(current) & LOCATION_HAND)
+{
+	if(advancing)
+		handNetChange[CON(current)]++;
+	else
+		handNetChange[CON(current)]--;
+}
+auto RefreshHand = [&](const uint8_t p)
+{
+	uint32_t i = 0u;
+	const auto& is = (advancing) ? current : previous;
+	const auto& was = (advancing) ? previous : current;
+	Place startP = {p, LOCATION_HAND, 0, -1};
+	Place endP = {p, LOCATION_HAND, 0, -1};
+	for(auto& card : hand[p])
+	{
+		SEQ(startP) = SEQ(endP) = i;
+		// Make gap if card was moved from the hand
+		SEQ(startP) += LOC(was) & LOCATION_HAND && i >= SEQ(was);
+		// Remove gap if card was moved to the hand
+		SEQ(startP) -= LOC(is) & LOCATION_HAND && i >= SEQ(is);
+		Animation::MoveCardData mcd =
+		{
+			card,
+			GetHandLocXYZ(startP, hand[p].size() - handNetChange[p]),
+			GetRotXYZ(startP, card.pos()),
+			GetLocXYZ(endP),
+			GetRotXYZ(endP, card.pos())
+		};
+		cards.push_back(mcd);
+		i++;
+	}
+};
+// Only run the animations if there was an actual net change
+// A card should not be able to move to a different part of the hand
+// except by shuffling (which actually does not move any card client side)
+if(handNetChange[0] != 0)
+	RefreshHand(0);
+if(handNetChange[1] != 0)
+	RefreshHand(1);
+// Gets the right location taking into consideration hand movement
+auto GetFixedLoc = [&](const Place& place) -> glm::vec3
+{
+	const auto phdc = handNetChange[CON(place)];
+	if(LOC(place) & LOCATION_HAND && phdc != 0)
+		return GetHandLocXYZ(place, hand[CON(place)].size() - phdc);
+	return GetLocXYZ(place);
+};
+// Animate actual moved card
+auto& card = GetCard((advancing) ? current : previous);
+if(advancing)
+{
+	Animation::MoveCardData mcd =
+	{
+		card,
+		GetFixedLoc(previous),
+		GetRotXYZ(previous, card.pos(-1)),
+		GetLocXYZ(current),
+		GetRotXYZ(current, card.pos())
+	};
+	cards.push_back(mcd);
+}
+else
+{
+	Animation::MoveCardData mcd =
+	{
+		card,
+		GetFixedLoc(current),
+		GetRotXYZ(current, card.pos(1)),
+		GetLocXYZ(previous),
+		GetRotXYZ(previous, card.pos())
+	};
+	cards.push_back(mcd);
+}
+// 	if(updateCard.core_reason() & 0x1 && advancing) // REASON_DESTROY
+// 		ani.Push(/*destroy sound*/);
+PushAnimation<Animation::SetCardImage>(ctm, card);
+PushAnimation<Animation::MoveCards>(cam.vp, std::move(cards));
+// Update hand hitboxes if there was any net change
+if(handNetChange[0] != 0)
+	PushAnimation<Animation::Call>(std::bind(&CGraphicBoard::HandHitbox, this, 0));
+if(handNetChange[1] != 0)
+	PushAnimation<Animation::Call>(std::bind(&CGraphicBoard::HandHitbox, this, 1));
 break;
 }
 
