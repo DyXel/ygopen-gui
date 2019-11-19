@@ -160,7 +160,6 @@ public:
 			zone.hitboxPrim->SetColors({RED, RED, RED, RED, RED});
 #endif // defined(DEBUG_HITBOXES)
 		}
-		selectedZone = zones.end();
 #if defined(DEBUG_MOUSE_POS)
 		mousePrim = env.renderer->NewPrimitive();
 		mousePrim->SetDrawMode(Drawing::PDM_LINE_LOOP);
@@ -308,8 +307,7 @@ private:
 	std::map<LitePlace, glm::vec3> locations;
 	std::map<LitePlace, Zone> zones;
 	
-	using ZoneMapIter = std::map<LitePlace, Zone>::iterator;
-	ZoneMapIter selectedZone;
+	LitePlace const* selectedZone{nullptr};
 	GraphicCard* selectedCard{nullptr};
 	
 	//*********************************
@@ -321,9 +319,8 @@ private:
 	GUI::ActBtn actBtn[Core::CardSelectionType_ARRAYSIZE];
 	// Zone selection
 	unsigned zoneSelectCount; // total number of zones needed to select
-	using ZoneIterSet = std::set<ZoneMapIter, std::equal_to<ZoneMapIter>>;
-	ZoneIterSet selectedZones;
-	ZoneIterSet selectableZones;
+	std::set<LitePlace> selectedZones;
+	std::set<LitePlace> selectableZones;
 	
 	AnswerCallback acb; // TODO: find a better name
 	
@@ -479,23 +476,23 @@ private:
 			}
 		}
 		// Try checking for zones
-		if(selectedZone != zones.end())
+		if(selectedZone)
 		{
-			if(PointInPoly(mPos, selectedZone->second.hitbox))
+			if(PointInPoly(mPos, zones[*selectedZone].hitbox))
 			{
 				return true;
 			}
 			else
 			{
 				// TODO: zone deselection animation
-				selectedZone = zones.end();
+				selectedZone = nullptr;
 			}
 		}
-		for(auto it = zones.begin(); it != zones.end(); ++it)
+		for(const auto& kv : zones)
 		{
-			if(PointInPoly(mPos, it->second.hitbox))
+			if(PointInPoly(mPos, kv.second.hitbox))
 			{
-				selectedZone = it;
+				selectedZone = &kv.first;
 				// TODO: zone selection animation
 				return true;
 			}
@@ -519,7 +516,7 @@ private:
 			};
 			auto search = std::find_if(selectedCards.begin(),
 			                           selectedCards.end(), SearchFunc);
-			if(search == selectedCards.end())
+			if(search == selectedCards.cend())
 				selectedCards.push_back(card);
 			else
 				selectedCards.erase(search);
@@ -531,22 +528,22 @@ private:
 			SelectUnselectCard(*selectedCard);
 			return true;
 		}
-		if(selectedZone != zones.end())
+		if(selectedZone)
 		{
+			const auto& sZone = *selectedZone; // saves us few dereferences
 			// Handle zone selection
-			if(selectableZones.size())
+			if(selectableZones.find(sZone) != selectableZones.cend())
 			{
-				if(selectedZones.find(selectedZone) == selectedZones.end())
+				if(selectedZones.find(sZone) == selectedZones.cend())
 				{
-					selectedZones.insert(selectedZone);
-					if(zoneSelectCount == selectedZones.size())
+					selectedZones.insert(sZone);
+					if(selectedZones.size() == zoneSelectCount)
 					{
 						Core::Answer answer;
 						auto places = answer.mutable_places();
-						for(auto& zoneIter : selectedZones)
+						for(const auto& zone : selectedZones)
 						{
 							auto place = places->add_places();
-							const auto& zone = zoneIter->first;
 							place->set_controller(CON(zone));
 							place->set_location(LOC(zone));
 							place->set_sequence(SEQ(zone));
@@ -556,15 +553,14 @@ private:
 				}
 				else
 				{
-					selectedZones.erase(selectedZone);
+					selectedZones.erase(sZone);
 				}
 				return true;
 			}
 			// Handle zone card selection
-			const auto t = std::tuple_cat(selectedZone->first,
-			                              std::tuple<int32_t>(-1));
+			const auto t = std::tuple_cat(sZone, std::tuple<int32_t>(-1));
 			auto search = zoneCards.find(t);
-			if(search != zoneCards.end() && search->second.action)
+			if(search != zoneCards.cend() && search->second.action)
 			{
 				for(const auto& kv : search->second.action->ts)
 					actBtn[kv.first]->visible = true;

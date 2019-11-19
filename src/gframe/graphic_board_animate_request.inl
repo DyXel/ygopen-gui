@@ -30,11 +30,9 @@ case Core::Request::kSelectPlaces:
 {
 const auto& selectPlaces = request.select_places();
 zoneSelectCount = selectPlaces.min();
-const auto& places = selectPlaces.places();
-for(auto& pbp : places)
-{
-	const LitePlace lp = {pbp.controller(), pbp.location(), pbp.sequence()};
-	selectableZones.insert(zones.find(lp));
+for(auto& pbp : selectPlaces.places())
+	selectableZones.insert({pbp.controller(), pbp.location(), pbp.sequence()});
+break;
 }
 break;
 }
