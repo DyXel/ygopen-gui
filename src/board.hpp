@@ -222,7 +222,7 @@ protected:
 	{
 		if(msg.AnyMsg_case() != Core::AnyMsg::kInformation)
 			return;
-		auto& info = msg.information();
+		const auto& info = msg.information();
 		switch(info.Information_case())
 		{
 			// Critical messages, must be handled or the board is invalid.
@@ -233,7 +233,7 @@ protected:
 			case Core::Information::kHint:
 			case Core::Information::kWin:
 			case Core::Information::kConfirmCards:
-			case Core::Information::kSummonCard:
+			case Core::Information::kSummoned:
 			case Core::Information::kSelectedCards:
 			case Core::Information::kOnAttack:
 			case Core::Information::kCardHint:
@@ -279,7 +279,6 @@ C& DuelBoard<C>::GetCard(const Place& place)
 template<typename C>
 C& DuelBoard<C>::MoveSingle(const Place& from, const Place& to)
 {
-	// NOTE: move always move-insert for Piles
 	if(from == to)
 		throw std::exception();
 	if(IsPile(from) && IsPile(to))
