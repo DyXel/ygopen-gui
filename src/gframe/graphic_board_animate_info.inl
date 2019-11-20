@@ -1,37 +1,25 @@
 case Core::Information::kUpdateCard:
 {
 const auto& updateCard = info.update_card();
-const auto& previousInfo = updateCard.previous();
-const auto reason = updateCard.reason();
-switch(reason)
-{
-case Core::Msg::UpdateCard::REASON_DECK_TOP:
-{
-	auto& pile = GetPile(PlaceFromPbCardInfo(previousInfo));
-	auto& card = *(pile.rbegin() - previousInfo.sequence());
+const auto deckTop = updateCard.deck_top();
+auto previous = PlaceFromPbCardInfo(updateCard.previous());
+if(deckTop)
+	SEQ(previous) = GetPile(previous).size() - 1 - SEQ(previous);
+auto& card = GetCard(previous);
+const auto locVec = GetLocXYZ(previous);
+if(advancing)
 	PushAnimation<Animation::SetCardImage>(ctm, card);
-	// TODO: Animate
-	break;
-}
-case Core::Msg::UpdateCard::REASON_POS_CHANGE:
-case Core::Msg::UpdateCard::REASON_SET:
+Animation::MoveCardData mcd =
 {
-	const auto previous = PlaceFromPbCardInfo(previousInfo);
-	const auto locVec = GetLocXYZ(previous);
-	auto& card = GetCard(previous);
-	Animation::MoveCardData mcd =
-	{
-		card,
-		locVec,
-		GetRotXYZ(previous, card.pos((advancing) ? -1 : 1)),
-		locVec,
-		GetRotXYZ(previous, card.pos())
-	};
-	PushAnimation<Animation::MoveCard>(cam.vp, mcd);
-	break;
-}
-default: break;
-}
+	card,
+	locVec,
+	GetRotXYZ(previous, card.pos((advancing) ? -1 : 1)),
+	locVec,
+	GetRotXYZ(previous, card.pos())
+};
+PushAnimation<Animation::MoveCard>(cam.vp, mcd);
+if(!advancing)
+	PushAnimation<Animation::SetCardImage>(ctm, card);
 break;
 }
 

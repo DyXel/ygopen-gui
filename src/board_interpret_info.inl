@@ -1,40 +1,20 @@
 case Core::Information::kUpdateCard:
 {
 const auto& updateCard = info.update_card();
-const auto& previousInfo = updateCard.previous();
 const auto& currentInfo = updateCard.current();
-const auto reason = updateCard.reason();
+auto previous = PlaceFromPbCardInfo(updateCard.previous());
+if(updateCard.deck_top())
+	SEQ(previous) = GetPile(previous).size() - 1 - SEQ(previous);
+auto& card = GetCard(previous);
 if(advancing)
 {
-	if(reason == Core::Msg::UpdateCard::REASON_DECK_TOP)
-	{
-		auto& pile = GetPile(PlaceFromPbCardInfo(previousInfo));
-		auto& card = *(pile.rbegin() - previousInfo.sequence());
-		card.code.AddOrNext(realtime, currentInfo.code());
-		card.pos.AddOrNext(realtime, card.pos()); // copy
-	}
-	else // REASON_POS_CHANGE or REASON_SET
-	{
-		auto& card = GetCard(PlaceFromPbCardInfo(previousInfo));
-		card.code.AddOrNext(realtime, currentInfo.code());
-		card.pos.AddOrNext(realtime, currentInfo.position());
-	}
+	card.code.AddOrNext(realtime, currentInfo.code());
+	card.pos.AddOrNext(realtime, currentInfo.position());
 }
 else
 {
-	if(reason == Core::Msg::UpdateCard::REASON_DECK_TOP)
-	{
-		auto& pile = GetPile(PlaceFromPbCardInfo(previousInfo));
-		auto& card = *(pile.rbegin() - previousInfo.sequence());
-		card.code.Prev();
-		card.pos.Prev();
-	}
-	else // REASON_POS_CHANGE or REASON_SET
-	{
-		auto& card = GetCard(PlaceFromPbCardInfo(previousInfo));
-		card.code.Prev();
-		card.pos.Prev();
-	}
+	card.code.Prev();
+	card.pos.Prev();
 }
 break;
 }
