@@ -29,7 +29,7 @@ break;
 case Core::Request::kSelectPlaces:
 {
 const auto& selectPlaces = request.select_places();
-zoneSelectCount = selectPlaces.min();
+zoneSelectCount = selectPlaces.count();
 for(auto& pbp : selectPlaces.places())
 	selectableZones.insert({pbp.controller(), pbp.location(), pbp.sequence()});
 break;
