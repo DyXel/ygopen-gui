@@ -172,14 +172,12 @@ protected:
 	std::map<Place, Sequential<bool, false>> disabledZones = []()
 	{
 		std::map<Place, Sequential<bool, false>> tempMap;
-		std::array<int, 3> locations = {LOCATION_MZONE, LOCATION_SZONE,
-		                                LOCATION_PZONE};
 		for(int con = 0; con < 1; con++)
 		{
-			for(auto loc : locations)
+			for(auto loc : {LOCATION_MZONE, LOCATION_SZONE, LOCATION_PZONE})
 			{
 				int seq = 0;
-				do
+				for(;;)
 				{
 					std::pair<Place, Sequential<bool, false>> p;
 					p.first = {con, loc, seq, -1};
@@ -191,7 +189,7 @@ protected:
 						break;
 					if(loc == LOCATION_PZONE && seq > 1)
 						break;
-				}while(true);
+				}
 			}
 		}
 		return tempMap;
