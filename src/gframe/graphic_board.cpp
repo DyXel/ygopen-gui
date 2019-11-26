@@ -176,15 +176,15 @@ public:
 		actBtn[csel]->SetCallback(std::bind(&CGraphicBoard::ActBtnSubmit, this, csel)); \
 		actBtn[csel]->visible = false; \
 	}while(0)
-		ACTBTN(Core::CSELECT_W_EFFECT, "TEMP/act_act.png");
-		ACTBTN(Core::CSELECT_SUMMONABLE, "TEMP/act_ns.png");
-		ACTBTN(Core::CSELECT_SPSUMMONABLE, "TEMP/act_ss.png");
-		ACTBTN(Core::CSELECT_REPOSITIONABLE, "TEMP/act_ad.png");
-		ACTBTN(Core::CSELECT_MSETABLE, "TEMP/act_mset.png");
-		ACTBTN(Core::CSELECT_SSETABLE, "TEMP/act_sset.png");
-		ACTBTN(Core::CSELECT_CAN_ATTACK, "TEMP/act_atk.png");
+		ACTBTN(Core::SELECTION_TYPE_W_EFFECT, "TEMP/act_act.png");
+		ACTBTN(Core::SELECTION_TYPE_SUMMONABLE, "TEMP/act_ns.png");
+		ACTBTN(Core::SELECTION_TYPE_SPSUMMONABLE, "TEMP/act_ss.png");
+		ACTBTN(Core::SELECTION_TYPE_REPOSITIONABLE, "TEMP/act_ad.png");
+		ACTBTN(Core::SELECTION_TYPE_MSETABLE, "TEMP/act_mset.png");
+		ACTBTN(Core::SELECTION_TYPE_SSETABLE, "TEMP/act_sset.png");
+		ACTBTN(Core::SELECTION_TYPE_CAN_ATTACK, "TEMP/act_atk.png");
 #undef ACTBTN
-		for(int i = Core::CSELECT_W_EFFECT; i <= Core::CSELECT_CAN_ATTACK; i++)
+		for(int i = Core::SELECTION_TYPE_W_EFFECT; i <= Core::SELECTION_TYPE_CAN_ATTACK; i++)
 			env.Add(actBtn[i]);
 	}
 	
@@ -227,7 +227,7 @@ public:
 		const glm::mat4 ortho = glm::ortho<float>(0.0f, parent.w, parent.h, 0.0f);
 		
 		SDL_Rect bCanvas = {10, 10, 64, 64};
-		for(int i = Core::CSELECT_W_EFFECT; i <= Core::CSELECT_CAN_ATTACK; i++)
+		for(int i = Core::SELECTION_TYPE_W_EFFECT; i <= Core::SELECTION_TYPE_CAN_ATTACK; i++)
 		{
 			actBtn[i]->Resize(ortho, bCanvas);
 			bCanvas.y += 64 + 10;
@@ -316,7 +316,7 @@ private:
 	bool multiSelect;
 	std::vector<std::reference_wrapper<GraphicCard>> selectedCards;
 	std::map<Place, GraphicCard&> cardsWithAction;
-	GUI::ActBtn actBtn[Core::CardSelectionType_ARRAYSIZE];
+	GUI::ActBtn actBtn[Core::SelectionType_ARRAYSIZE];
 	// Zone selection
 	unsigned zoneSelectCount; // total number of zones needed to select
 	std::set<LitePlace> selectedZones;
@@ -324,7 +324,7 @@ private:
 	
 	AnswerCallback answerSubmitter;
 	
-	void ActBtnSubmit(Core::CardSelectionType csel)
+	void ActBtnSubmit(Core::SelectionType csel)
 	{
 		Core::Answer answer;
 		auto sseq = answer.add_seqs();
@@ -389,7 +389,7 @@ private:
 	
 	inline void CancelRequestActions()
 	{
-		for(int i = Core::CSELECT_W_EFFECT; i <= Core::CSELECT_CAN_ATTACK; i++)
+		for(int i = Core::SELECTION_TYPE_W_EFFECT; i <= Core::SELECTION_TYPE_CAN_ATTACK; i++)
 			actBtn[i]->visible = false;
 		for(const auto& kv : cardsWithAction)
 			kv.second.action.reset(nullptr);
@@ -577,7 +577,7 @@ private:
 		case SDL_SCANCODE_SPACE:
 		{
 		Core::Answer answer;
-		answer.set_cancel(true);
+		answer.set_finish(true);
 		answerSubmitter(answer);
 		return true;
 		}
