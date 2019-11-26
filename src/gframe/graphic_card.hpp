@@ -27,7 +27,7 @@ struct GraphicCard : public Card
 	// Information used for selections and actions
 	struct ActionData
 	{
-		std::map<Core::CardSelectionType, int> ts;
+		std::map<Core::SelectionType, int> ts;
 // 		int weight{0};
 	};
 	std::unique_ptr<HitboxData> hitbox;
