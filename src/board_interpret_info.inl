@@ -163,12 +163,20 @@ if(advancing)
 	          std::back_inserter(hand[player]));
 	deck[player].resize(deck[player].size() - cards.size());
 	for(int i = 0; i < cards.size(); i++)
-		hand[player][handSz + i].code.AddOrNext(realtime, cards[i].code());
+	{
+		auto& card = hand[player][handSz + i];
+		card.code.AddOrNext(realtime, cards[i].code());
+		card.pos.AddOrNext(realtime, cards[i].position());
+	}
 }
 else
 {
 	for(int i = 0; i < cards.size(); i++)
-		hand[player][handSz - i - 1].code.Prev();
+	{
+		auto& card = hand[player][handSz - i - 1];
+		card.code.Prev();
+		card.pos.Prev();
+	}
 	std::move(hand[player].rbegin(), hand[player].rbegin() + cards.size(),
 	          std::back_inserter(deck[player]));
 	hand[player].resize(hand[player].size() - cards.size());

@@ -327,11 +327,11 @@ private:
 	void ActBtnSubmit(Core::CardSelectionType csel)
 	{
 		Core::Answer answer;
-		auto cardSeq = answer.mutable_card_seqs()->add_card_seq();
-		cardSeq->set_type(csel);
+		auto sseq = answer.add_seqs();
+		sseq->set_type(csel);
 		GraphicCard& card = selectedCards.rbegin()->get();
 		const int seq = card.action->ts[csel];
-		cardSeq->set_sequence(seq);
+		sseq->set_seq(seq);
 		answerSubmitter(answer);
 	}
 	
@@ -540,10 +540,9 @@ private:
 					if(selectedZones.size() == zoneSelectCount)
 					{
 						Core::Answer answer;
-						auto places = answer.mutable_places();
 						for(const auto& zone : selectedZones)
 						{
-							auto place = places->add_places();
+							auto place = answer.add_places();
 							place->set_controller(CON(zone));
 							place->set_location(LOC(zone));
 							place->set_sequence(SEQ(zone));
