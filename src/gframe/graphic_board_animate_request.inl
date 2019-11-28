@@ -1,7 +1,7 @@
 case Core::Request::kSelectCmd:
 {
 const auto& selectCmd = request.select_cmd();
-auto X = [&](Core::CardSelectionType type, const auto& container)
+auto X = [&](Core::SelectionType type, const auto& container)
 {
 	int i = 0;
 	for(const auto& cardInfo : container)
@@ -15,13 +15,13 @@ auto X = [&](Core::CardSelectionType type, const auto& container)
 		i++;
 	}
 };
-X(Core::CSELECT_W_EFFECT, selectCmd.cards_w_effect());
-X(Core::CSELECT_SUMMONABLE, selectCmd.cards_summonable());
-X(Core::CSELECT_SPSUMMONABLE, selectCmd.cards_spsummonable());
-X(Core::CSELECT_REPOSITIONABLE, selectCmd.cards_repositionable());
-X(Core::CSELECT_MSETABLE, selectCmd.cards_msetable());
-X(Core::CSELECT_SSETABLE, selectCmd.cards_ssetable());
-X(Core::CSELECT_CAN_ATTACK, selectCmd.cards_can_attack());
+X(Core::SELECTION_TYPE_ACTIVABLE, selectCmd.activable_cards());
+X(Core::SELECTION_TYPE_SUMMONABLE, selectCmd.summonable_cards());
+X(Core::SELECTION_TYPE_SPSUMMONABLE, selectCmd.spsummonable_cards());
+X(Core::SELECTION_TYPE_REPOSITIONABLE, selectCmd.repositionable_cards());
+X(Core::SELECTION_TYPE_MSETABLE, selectCmd.msetable_cards());
+X(Core::SELECTION_TYPE_SSETABLE, selectCmd.ssetable_cards());
+X(Core::SELECTION_TYPE_CAN_ATTACK, selectCmd.can_attack_cards());
 multiSelect = false;
 break;
 }
