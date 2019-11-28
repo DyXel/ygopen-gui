@@ -176,7 +176,7 @@ public:
 		actBtn[csel]->SetCallback(std::bind(&CGraphicBoard::ActBtnSubmit, this, csel)); \
 		actBtn[csel]->visible = false; \
 	}while(0)
-		ACTBTN(Core::SELECTION_TYPE_W_EFFECT, "TEMP/act_act.png");
+		ACTBTN(Core::SELECTION_TYPE_ACTIVABLE, "TEMP/act_act.png");
 		ACTBTN(Core::SELECTION_TYPE_SUMMONABLE, "TEMP/act_ns.png");
 		ACTBTN(Core::SELECTION_TYPE_SPSUMMONABLE, "TEMP/act_ss.png");
 		ACTBTN(Core::SELECTION_TYPE_REPOSITIONABLE, "TEMP/act_ad.png");
@@ -184,7 +184,7 @@ public:
 		ACTBTN(Core::SELECTION_TYPE_SSETABLE, "TEMP/act_sset.png");
 		ACTBTN(Core::SELECTION_TYPE_CAN_ATTACK, "TEMP/act_atk.png");
 #undef ACTBTN
-		for(int i = Core::SELECTION_TYPE_W_EFFECT; i <= Core::SELECTION_TYPE_CAN_ATTACK; i++)
+		for(int i = Core::SELECTION_TYPE_ACTIVABLE; i <= Core::SELECTION_TYPE_CAN_ATTACK; i++)
 			env.Add(actBtn[i]);
 	}
 	
@@ -227,7 +227,7 @@ public:
 		const glm::mat4 ortho = glm::ortho<float>(0.0f, parent.w, parent.h, 0.0f);
 		
 		SDL_Rect bCanvas = {10, 10, 64, 64};
-		for(int i = Core::SELECTION_TYPE_W_EFFECT; i <= Core::SELECTION_TYPE_CAN_ATTACK; i++)
+		for(int i = Core::SELECTION_TYPE_ACTIVABLE; i <= Core::SELECTION_TYPE_CAN_ATTACK; i++)
 		{
 			actBtn[i]->Resize(ortho, bCanvas);
 			bCanvas.y += 64 + 10;
@@ -389,7 +389,7 @@ private:
 	
 	inline void CancelRequestActions()
 	{
-		for(int i = Core::SELECTION_TYPE_W_EFFECT; i <= Core::SELECTION_TYPE_CAN_ATTACK; i++)
+		for(int i = Core::SELECTION_TYPE_ACTIVABLE; i <= Core::SELECTION_TYPE_CAN_ATTACK; i++)
 			actBtn[i]->visible = false;
 		for(const auto& kv : cardsWithAction)
 			kv.second.action.reset(nullptr);
