@@ -247,31 +247,31 @@ break;
 case Core::Information::kShuffleSetCards:
 {
 const auto& shuffleSetCards = info.shuffle_set_cards();
-const auto& cardsPrevious = shuffleSetCards.cards_previous();
-const auto& cardsCurrent = shuffleSetCards.cards_current();
+const auto& previousCards = shuffleSetCards.previous_cards();
+const auto& currentCards = shuffleSetCards.current_cards();
 if(advancing)
 {
-	for(int i = 0; i < cardsPrevious.size(); i++)
+	for(int i = 0; i < previousCards.size(); i++)
 	{
-		auto& c = zoneCards[PlaceFromPbCardInfo(cardsPrevious[i])];
-		if(!cardsCurrent.empty())
+		auto& card = zoneCards[PlaceFromPbCardInfo(previousCards[i])];
+		if(!currentCards.empty())
 		{
-			auto& currentInfo = cardsCurrent[i];
-			c.code.AddOrNext(realtime, currentInfo.code());
-			c.pos.AddOrNext(realtime, currentInfo.position());
+			const auto& currentInfo = currentCards[i];
+			card.code.AddOrNext(realtime, currentInfo.code());
+			card.pos.AddOrNext(realtime, currentInfo.position());
 			continue;
 		}
-		c.code.AddOrNext(realtime, 0);
-		c.pos.AddOrNext(realtime, cardsPrevious[i].position());
+		card.code.AddOrNext(realtime, 0);
+		card.pos.AddOrNext(realtime, previousCards[i].position());
 	}
 }
 else
 {
-	for(int i = 0; i < cardsPrevious.size(); i++)
+	for(int i = 0; i < previousCards.size(); i++)
 	{
-		auto& c = zoneCards[PlaceFromPbCardInfo(cardsPrevious[i])];
-		c.code.Prev();
-		c.pos.Prev();
+		auto& card = zoneCards[PlaceFromPbCardInfo(previousCards[i])];
+		card.code.Prev();
+		card.pos.Prev();
 	}
 }
 break;
@@ -284,16 +284,16 @@ const Counter counter = CounterFromPbCounter(counterChange.counter());
 const Place place = PlaceFromPbPlace(counterChange.place());
 if(advancing)
 {
-	if(counterChange.type() == Core::Msg::CounterChange::CHANGE_ADD)
+	if(counterChange.type() == Core::Msg::CounterChange::COUNTER_CHANGE_TYPE_ADD)
 		AddCounter(place, counter);
-	else // counterChange.type() == Core::Msg::CounterChange::CHANGE_REMOVE
+	else // counterChange.type() == Core::Msg::CounterChange::COUNTER_CHANGE_TYPE_REMOVE
 		RemoveCounter(place, counter);
 }
 else
 {
-	if(counterChange.type() == Core::Msg::CounterChange::CHANGE_ADD)
+	if(counterChange.type() == Core::Msg::CounterChange::COUNTER_CHANGE_TYPE_ADD)
 		RemoveCounter(place, counter);
-	else // counterChange.type() == Core::Msg::CounterChange::CHANGE_REMOVE
+	else // counterChange.type() == Core::Msg::CounterChange::COUNTER_CHANGE_TYPE_REMOVE
 		AddCounter(place, counter);
 }
 break;
@@ -336,8 +336,8 @@ const auto amount = lpChange.amount();
 if(advancing)
 {
 	auto type = lpChange.type();
-	if(type == Core::Msg::LpChange::CHANGE_DAMAGE ||
-	   type == Core::Msg::LpChange::CHANGE_PAY)
+	if(type == Core::Msg::LpChange::LP_CHANGE_TYPE_DAMAGE ||
+	   type == Core::Msg::LpChange::LP_CHANGE_TYPE_PAY)
 	{
 		auto deltaAmount = static_cast<int32_t>(playerLP[player]()) - amount;
 		if(deltaAmount < 0)
@@ -345,11 +345,11 @@ if(advancing)
 		else
 			playerLP[player].AddOrNext(realtime, deltaAmount);
 	}
-	else if(type == Core::Msg::LpChange::CHANGE_RECOVER)
+	else if(type == Core::Msg::LpChange::LP_CHANGE_TYPE_RECOVER)
 	{
 		playerLP[player].AddOrNext(realtime, playerLP[player]() + amount);
 	}
-	else // (type == Core::Msg::LpChange::CHANGE_BECOME)
+	else // (type == Core::Msg::LpChange::LP_CHANGE_TYPE_BECOME)
 	{
 		playerLP[player].AddOrNext(realtime, amount);
 	}
