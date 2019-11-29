@@ -57,13 +57,12 @@ inline bool IsPile(const Place& place)
 
 inline Place PlaceFromPbPlace(const Core::Data::Place& p)
 {
-	return {p.controller(), p.location(), p.sequence(), -1};
+	return {p.con(), p.loc(), p.seq(), p.oseq()};
 }
 
-inline Place PlaceFromPbCardInfo(const Core::Data::CardInfo& cd)
+inline Place PlaceFromPbCard(const Core::Data::CardInfo& cd)
 {
-	return {cd.controller(), cd.location(),
-	        cd.sequence(), cd.overlay_sequence()};
+	return PlaceFromPbPlace(cd.place());
 }
 
 inline Counter CounterFromPbCounter(const Core::Data::Counter& c)

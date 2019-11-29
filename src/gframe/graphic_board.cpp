@@ -543,9 +543,10 @@ private:
 						for(const auto& zone : selectedZones)
 						{
 							auto place = answer.add_places();
-							place->set_controller(CON(zone));
-							place->set_location(LOC(zone));
-							place->set_sequence(SEQ(zone));
+							place->set_con(CON(zone));
+							place->set_loc(LOC(zone));
+							place->set_seq(SEQ(zone));
+							place->set_oseq(-1);
 						}
 						answerSubmitter(answer);
 					}

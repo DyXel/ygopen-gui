@@ -2,14 +2,14 @@ case Core::Information::kUpdateCard:
 {
 const auto& updateCard = info.update_card();
 const auto& currentInfo = updateCard.current();
-auto previous = PlaceFromPbCardInfo(updateCard.previous());
+auto previous = PlaceFromPbCard(updateCard.previous());
 if(updateCard.deck_top())
 	SEQ(previous) = GetPile(previous).size() - 1 - SEQ(previous);
 auto& card = GetCard(previous);
 if(advancing)
 {
 	card.code.AddOrNext(realtime, currentInfo.code());
-	card.pos.AddOrNext(realtime, currentInfo.position());
+	card.pos.AddOrNext(realtime, currentInfo.pos());
 }
 else
 {
@@ -23,13 +23,13 @@ case Core::Information::kMoveCard:
 {
 const auto& moveCard = info.move_card();
 const auto& currentInfo = moveCard.current();
-const auto previous = PlaceFromPbCardInfo(moveCard.previous());
-const auto current = PlaceFromPbCardInfo(currentInfo);
+const auto previous = PlaceFromPbCard(moveCard.previous());
+const auto current = PlaceFromPbCard(currentInfo);
 if(advancing)
 {
 	auto& card = MoveSingle(previous, current);
 	card.code.AddOrNext(realtime, currentInfo.code());
-	card.pos.AddOrNext(realtime, currentInfo.position());
+	card.pos.AddOrNext(realtime, currentInfo.pos());
 }
 else
 {
@@ -47,20 +47,20 @@ const auto& addCard = info.add_card();
 const auto& cardInfo = addCard.card();
 if(advancing)
 {
-	auto place = PlaceFromPbCardInfo(addCard.card());
+	auto place = PlaceFromPbCard(addCard.card());
 	if(realtime && IsPile(place))
 	{
 		auto& pile = GetPile(place);
 		C& card = *pile.emplace(pile.begin() + SEQ(place));
 		card.code.AddOrNext(realtime, cardInfo.code());
-		card.pos.AddOrNext(realtime, cardInfo.position());
+		card.pos.AddOrNext(realtime, cardInfo.pos());
 	}
 	else if (realtime && !IsPile(place))
 	{
 		auto p = zoneCards.emplace(place, C{});
 		C& card = (*p.first).second;
 		card.code.AddOrNext(realtime, cardInfo.code());
-		card.pos.AddOrNext(realtime, cardInfo.position());
+		card.pos.AddOrNext(realtime, cardInfo.pos());
 	}
 	// Move out of the temporal
 	else if(!realtime && IsPile(place))
@@ -71,7 +71,7 @@ if(advancing)
 		                        std::move(tempCards[t]));
 		tempCards.erase(t);
 		card.code.AddOrNext(realtime, cardInfo.code());
-		card.pos.AddOrNext(realtime, cardInfo.position());
+		card.pos.AddOrNext(realtime, cardInfo.pos());
 	}
 	else // (!realtime && !IsPile(place))
 	{
@@ -80,12 +80,12 @@ if(advancing)
 		tempCards.erase(t);
 		C& card = (*p.first).second;
 		card.code.AddOrNext(realtime, cardInfo.code());
-		card.pos.AddOrNext(realtime, cardInfo.position());
+		card.pos.AddOrNext(realtime, cardInfo.pos());
 	}
 }
 else
 {
-	auto place = PlaceFromPbCardInfo(addCard.card());
+	auto place = PlaceFromPbCard(addCard.card());
 	// Move into the temporal
 	if(IsPile(place))
 	{
@@ -113,7 +113,7 @@ break;
 case Core::Information::kRemoveCard:
 {
 const auto& removeCard = info.remove_card();
-const auto place = PlaceFromPbCardInfo(removeCard.card());
+const auto place = PlaceFromPbCard(removeCard.card());
 if(advancing)
 {
 	// Move into the temporal
@@ -166,7 +166,7 @@ if(advancing)
 	{
 		auto& card = hand[player][handSz + i];
 		card.code.AddOrNext(realtime, cards[i].code());
-		card.pos.AddOrNext(realtime, cards[i].position());
+		card.pos.AddOrNext(realtime, cards[i].pos());
 	}
 }
 else
@@ -189,8 +189,8 @@ case Core::Information::kSwapCards:
 const auto& swapCards = info.swap_cards();
 const auto& card1Info = swapCards.card1();
 const auto& card2Info = swapCards.card2();
-const auto card1Place = PlaceFromPbCardInfo(card1Info);
-const auto card2Place = PlaceFromPbCardInfo(card2Info);
+const auto card1Place = PlaceFromPbCard(card1Info);
+const auto card2Place = PlaceFromPbCard(card2Info);
 C tmp;
 if(IsPile(card1Place))
 {
@@ -253,23 +253,23 @@ if(advancing)
 {
 	for(int i = 0; i < previousCards.size(); i++)
 	{
-		auto& card = zoneCards[PlaceFromPbCardInfo(previousCards[i])];
+		auto& card = zoneCards[PlaceFromPbCard(previousCards[i])];
 		if(!currentCards.empty())
 		{
 			const auto& currentInfo = currentCards[i];
 			card.code.AddOrNext(realtime, currentInfo.code());
-			card.pos.AddOrNext(realtime, currentInfo.position());
+			card.pos.AddOrNext(realtime, currentInfo.pos());
 			continue;
 		}
 		card.code.AddOrNext(realtime, 0);
-		card.pos.AddOrNext(realtime, previousCards[i].position());
+		card.pos.AddOrNext(realtime, previousCards[i].pos());
 	}
 }
 else
 {
 	for(int i = 0; i < previousCards.size(); i++)
 	{
-		auto& card = zoneCards[PlaceFromPbCardInfo(previousCards[i])];
+		auto& card = zoneCards[PlaceFromPbCard(previousCards[i])];
 		card.code.Prev();
 		card.pos.Prev();
 	}

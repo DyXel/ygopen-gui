@@ -6,7 +6,7 @@ auto X = [&](Core::SelectionType type, const auto& container)
 	int i = 0;
 	for(const auto& cardInfo : container)
 	{
-		const auto place = PlaceFromPbCardInfo(cardInfo);
+		const auto place = PlaceFromPbCard(cardInfo);
 		auto& card = GetCard(place);
 		if(!card.action)
 			card.action.reset(new GraphicCard::ActionData());
@@ -31,7 +31,7 @@ case Core::Request::kSelectPlaces:
 const auto& selectPlaces = request.select_places();
 zoneSelectCount = selectPlaces.count();
 for(auto& pbp : selectPlaces.places())
-	selectableZones.insert({pbp.controller(), pbp.location(), pbp.sequence()});
+	selectableZones.insert({pbp.con(), pbp.loc(), pbp.seq()});
 break;
 }
 break;

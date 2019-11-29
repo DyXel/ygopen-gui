@@ -2,7 +2,7 @@ case Core::Information::kUpdateCard:
 {
 const auto& updateCard = info.update_card();
 const auto deckTop = updateCard.deck_top();
-auto previous = PlaceFromPbCardInfo(updateCard.previous());
+auto previous = PlaceFromPbCard(updateCard.previous());
 if(deckTop)
 	SEQ(previous) = GetPile(previous).size() - 1 - SEQ(previous);
 auto& card = GetCard(previous);
@@ -26,8 +26,8 @@ break;
 case Core::Information::kMoveCard:
 {
 const auto& moveCard = info.move_card();
-const auto previous = PlaceFromPbCardInfo(moveCard.previous());
-const auto current = PlaceFromPbCardInfo(moveCard.current());
+const auto previous = PlaceFromPbCard(moveCard.previous());
+const auto current = PlaceFromPbCard(moveCard.current());
 Animation::MoveCards::Container cards;
 int handNetChange[2] = {0};
 // Calculate net change of hands
@@ -128,7 +128,7 @@ case Core::Information::kAddCard:
 {
 const auto& addCard = info.add_card();
 const auto& cardInfo = addCard.card();
-const auto place = PlaceFromPbCardInfo(cardInfo);
+const auto place = PlaceFromPbCard(cardInfo);
 if(realtime) // Set Card Data
 {
 	auto& card = GetCard(place);
@@ -171,7 +171,7 @@ break;
 case Core::Information::kRemoveCard:
 {
 const auto& removeCard = info.remove_card();
-const auto place = PlaceFromPbCardInfo(removeCard.card());
+const auto place = PlaceFromPbCard(removeCard.card());
 static const glm::vec3 FAR_AWAY_LOCATION = {0.0f, 0.0f, 100.0f};
 static const glm::vec3 FAR_AWAY_ROTATION = {0.0f, 0.0f, 0.0f};
 // TODO: handle hand animation
@@ -298,8 +298,8 @@ break;
 case Core::Information::kSwapCards:
 {
 const auto& swapCards = info.swap_cards();
-const auto card1Place = PlaceFromPbCardInfo(swapCards.card1());
-const auto card2Place = PlaceFromPbCardInfo(swapCards.card2());
+const auto card1Place = PlaceFromPbCard(swapCards.card1());
+const auto card2Place = PlaceFromPbCard(swapCards.card2());
 auto& card1 = GetCard(card1Place);
 auto& card2 = GetCard(card2Place);
 Animation::MoveCards::Container cards;
