@@ -6,7 +6,7 @@
 #include "../card.hpp"
 #include "../drawing/types.hpp"
 
-#include "core_msg_answer.pb.h"
+#include "canswer.pb.h"
 
 namespace YGOpen
 {
@@ -27,7 +27,7 @@ struct GraphicCard : public Card
 	// Information used for selections and actions
 	struct ActionData
 	{
-		std::map<Core::SelectionType, int> ts;
+		std::map<Proto::CData::SelectionType, int> ts;
 // 		int weight{0};
 	};
 	std::unique_ptr<HitboxData> hitbox;

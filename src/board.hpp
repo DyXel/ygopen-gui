@@ -14,8 +14,8 @@
 
 #include "enums/location.hpp"
 #include "enums/position.hpp"
-#include "core_data.pb.h"
-#include "core_msg.pb.h"
+#include "cdata.pb.h"
+#include "cmsg.pb.h"
 
 namespace YGOpen
 {
@@ -55,17 +55,17 @@ inline bool IsPile(const Place& place)
 	return IsPile(LOC(place));
 }
 
-inline Place PlaceFromPbPlace(const Core::Data::Place& p)
+inline Place PlaceFromPbPlace(const Proto::CData::Place& p)
 {
 	return {p.con(), p.loc(), p.seq(), p.oseq()};
 }
 
-inline Place PlaceFromPbCard(const Core::Data::CardInfo& cd)
+inline Place PlaceFromPbCard(const Proto::CData::Card& cd)
 {
 	return PlaceFromPbPlace(cd.place());
 }
 
-inline Counter CounterFromPbCounter(const Core::Data::Counter& c)
+inline Counter CounterFromPbCounter(const Proto::CData::Counter& c)
 {
 	return {c.type(), c.count()};
 }
@@ -76,7 +76,7 @@ class DuelBoard
 	static_assert(std::is_base_of<Card, C>::value, "C must be based off Card");
 public:
 	// Add a message at the end of the message list.
-	void AppendMsg(const Core::AnyMsg& msg)
+	void AppendMsg(const Proto::CMsg& msg)
 	{
 		msgs.push_back(msg);
 	}
@@ -125,7 +125,7 @@ protected:
 	bool advancing{}; // Are we going forward or going backward?
 	uint32_t state{};
 	uint32_t processedState{};
-	std::vector<Core::AnyMsg> msgs;
+	std::vector<Proto::CMsg> msgs;
 	
 	uint32_t turn{}; // Current turn.
 	std::array<Sequential<uint32_t>, 2> playerLP; // Both player LP.
@@ -215,26 +215,23 @@ protected:
 	// used when moving cards out of field.
 	C& ClearAllCounters(C& card);
 
-	void InterpretMsg(const Core::AnyMsg& msg)
+	void InterpretMsg(const Proto::CMsg& msg)
 	{
-		if(msg.AnyMsg_case() != Core::AnyMsg::kInformation)
+		if(msg.t_case() != Proto::CMsg::kInfo)
 			return;
-		const auto& info = msg.information();
-		switch(info.Information_case())
+		const auto& info = msg.info();
+		switch(info.t_case())
 		{
 			// Critical messages, must be handled or the board is invalid.
 #include "board_interpret_info.inl"
 			// Non-critical messages, not handled by this class.
-			case Core::Information::kMatchKiller:
-			case Core::Information::kResult:
-			case Core::Information::kHint:
-			case Core::Information::kWin:
-			case Core::Information::kConfirmCards:
-			case Core::Information::kSummoned:
-			case Core::Information::kSelectedCards:
-			case Core::Information::kOnAttack:
-			case Core::Information::kCardHint:
-			case Core::Information::kPlayerHint:
+			case Proto::CMsg::Info::kMatchKiller:
+			case Proto::CMsg::Info::kResult:
+			case Proto::CMsg::Info::kWin:
+			case Proto::CMsg::Info::kConfirmCards:
+			case Proto::CMsg::Info::kSummoned:
+			case Proto::CMsg::Info::kSelectedCards:
+			case Proto::CMsg::Info::kOnAttack:
 			{
 				return;
 			}

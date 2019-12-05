@@ -1,4 +1,4 @@
-case Core::Information::kUpdateCard:
+case Proto::CMsg::Info::kUpdateCard:
 {
 const auto& updateCard = info.update_card();
 const auto& currentInfo = updateCard.current();
@@ -19,7 +19,7 @@ else
 break;
 }
 
-case Core::Information::kMoveCard:
+case Proto::CMsg::Info::kMoveCard:
 {
 const auto& moveCard = info.move_card();
 const auto& currentInfo = moveCard.current();
@@ -41,7 +41,7 @@ else
 break;
 }
 
-case Core::Information::kAddCard:
+case Proto::CMsg::Info::kAddCard:
 {
 const auto& addCard = info.add_card();
 const auto& cardInfo = addCard.card();
@@ -110,7 +110,7 @@ else
 break;
 }
 
-case Core::Information::kRemoveCard:
+case Proto::CMsg::Info::kRemoveCard:
 {
 const auto& removeCard = info.remove_card();
 const auto place = PlaceFromPbCard(removeCard.card());
@@ -151,7 +151,7 @@ else
 break;
 }
 
-case Core::Information::kDraw:
+case Proto::CMsg::Info::kDraw:
 {
 const auto& draw = info.draw();
 const auto& cards = draw.cards();
@@ -184,7 +184,7 @@ else
 break;
 }
 
-case Core::Information::kSwapCards:
+case Proto::CMsg::Info::kSwapCards:
 {
 const auto& swapCards = info.swap_cards();
 const auto& card1Info = swapCards.card1();
@@ -216,7 +216,7 @@ else
 break;
 }
 
-case Core::Information::kShuffleLocation:
+case Proto::CMsg::Info::kShuffleLocation:
 {
 const auto& shuffleLocation = info.shuffle_location();
 if(advancing)
@@ -244,7 +244,7 @@ else
 break;
 }
 
-case Core::Information::kShuffleSetCards:
+case Proto::CMsg::Info::kShuffleSetCards:
 {
 const auto& shuffleSetCards = info.shuffle_set_cards();
 const auto& previousCards = shuffleSetCards.previous_cards();
@@ -277,29 +277,29 @@ else
 break;
 }
 
-case Core::Information::kCounterChange:
+case Proto::CMsg::Info::kCounterChange:
 {
 const auto& counterChange = info.counter_change();
 const Counter counter = CounterFromPbCounter(counterChange.counter());
 const Place place = PlaceFromPbPlace(counterChange.place());
 if(advancing)
 {
-	if(counterChange.type() == Core::Msg::CounterChange::COUNTER_CHANGE_TYPE_ADD)
+	if(counterChange.type() == Proto::CMsgs::CounterChange::COUNTER_CHANGE_TYPE_ADD)
 		AddCounter(place, counter);
-	else // counterChange.type() == Core::Msg::CounterChange::COUNTER_CHANGE_TYPE_REMOVE
+	else // counterChange.type() == Proto::CMsgs::CounterChange::COUNTER_CHANGE_TYPE_REMOVE
 		RemoveCounter(place, counter);
 }
 else
 {
-	if(counterChange.type() == Core::Msg::CounterChange::COUNTER_CHANGE_TYPE_ADD)
+	if(counterChange.type() == Proto::CMsgs::CounterChange::COUNTER_CHANGE_TYPE_ADD)
 		RemoveCounter(place, counter);
-	else // counterChange.type() == Core::Msg::CounterChange::COUNTER_CHANGE_TYPE_REMOVE
+	else // counterChange.type() == Proto::CMsgs::CounterChange::COUNTER_CHANGE_TYPE_REMOVE
 		AddCounter(place, counter);
 }
 break;
 }
 
-case Core::Information::kDisableZones:
+case Proto::CMsg::Info::kDisableZones:
 {
 const auto& disableZones = info.disable_zones();
 const auto& places = disableZones.places();
@@ -328,7 +328,7 @@ else
 break;
 }
 
-case Core::Information::kLpChange:
+case Proto::CMsg::Info::kLpChange:
 {
 const auto& lpChange = info.lp_change();
 const auto player = lpChange.player();
@@ -336,8 +336,8 @@ const auto amount = lpChange.amount();
 if(advancing)
 {
 	auto type = lpChange.type();
-	if(type == Core::Msg::LpChange::LP_CHANGE_TYPE_DAMAGE ||
-	   type == Core::Msg::LpChange::LP_CHANGE_TYPE_PAY)
+	if(type == Proto::CMsgs::LpChange::LP_CHANGE_TYPE_DAMAGE ||
+	   type == Proto::CMsgs::LpChange::LP_CHANGE_TYPE_PAY)
 	{
 		auto deltaAmount = static_cast<int32_t>(playerLP[player]()) - amount;
 		if(deltaAmount < 0)
@@ -345,11 +345,11 @@ if(advancing)
 		else
 			playerLP[player].AddOrNext(realtime, deltaAmount);
 	}
-	else if(type == Core::Msg::LpChange::LP_CHANGE_TYPE_RECOVER)
+	else if(type == Proto::CMsgs::LpChange::LP_CHANGE_TYPE_RECOVER)
 	{
 		playerLP[player].AddOrNext(realtime, playerLP[player]() + amount);
 	}
-	else // (type == Core::Msg::LpChange::LP_CHANGE_TYPE_BECOME)
+	else // (type == Proto::CMsgs::LpChange::LP_CHANGE_TYPE_BECOME)
 	{
 		playerLP[player].AddOrNext(realtime, amount);
 	}
@@ -361,7 +361,7 @@ else
 break;
 }
 
-case Core::Information::kNewTurn:
+case Proto::CMsg::Info::kNewTurn:
 {
 auto& newTurn = info.new_turn();
 if(advancing)
@@ -377,7 +377,7 @@ else
 break;
 }
 
-case Core::Information::kNewPhase:
+case Proto::CMsg::Info::kNewPhase:
 {
 auto& newPhase = info.new_phase();
 if(advancing)

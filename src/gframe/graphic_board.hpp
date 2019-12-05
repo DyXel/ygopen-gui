@@ -7,13 +7,13 @@
 #include "../gui/element.hpp"
 #include "../drawing/types.hpp"
 
-#include "core_msg.pb.h"
-#include "core_msg_answer.pb.h"
+#include "cmsg.pb.h"
+#include "canswer.pb.h"
 
 namespace YGOpen
 {
 
-using AnswerCallback = std::function<void(const Core::Answer&)>;
+using AnswerCallback = std::function<void(const Proto::CAnswer&)>;
 
 struct GraphicBoardGfxData
 {
@@ -37,7 +37,7 @@ public:
 	virtual void SetAnswerSubmitter(AnswerCallback cb) = 0;
 	virtual void Resize(const SDL_Rect& parent, const SDL_Rect& rect) = 0;
 	
-	virtual void AddMsg(const Core::AnyMsg& msg) = 0;
+	virtual void AddMsg(const Proto::CMsg& msg) = 0;
 	virtual uint32_t GetState() const = 0;
 	virtual uint32_t GetStatesCount() const = 0;
 	virtual uint32_t GetTargetState() const = 0;

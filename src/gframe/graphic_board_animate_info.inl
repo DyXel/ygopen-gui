@@ -1,4 +1,4 @@
-case Core::Information::kUpdateCard:
+case Proto::CMsg::Info::kUpdateCard:
 {
 const auto& updateCard = info.update_card();
 const auto deckTop = updateCard.deck_top();
@@ -23,7 +23,7 @@ if(!advancing)
 break;
 }
 
-case Core::Information::kMoveCard:
+case Proto::CMsg::Info::kMoveCard:
 {
 const auto& moveCard = info.move_card();
 const auto previous = PlaceFromPbCard(moveCard.previous());
@@ -124,7 +124,7 @@ if(handNetChange[1] != 0)
 break;
 }
 
-case Core::Information::kAddCard:
+case Proto::CMsg::Info::kAddCard:
 {
 const auto& addCard = info.add_card();
 const auto& cardInfo = addCard.card();
@@ -168,7 +168,7 @@ else
 break;
 }
 
-case Core::Information::kRemoveCard:
+case Proto::CMsg::Info::kRemoveCard:
 {
 const auto& removeCard = info.remove_card();
 const auto place = PlaceFromPbCard(removeCard.card());
@@ -204,7 +204,7 @@ else
 break;
 }
 
-case Core::Information::kDraw:
+case Proto::CMsg::Info::kDraw:
 {
 const auto& draw = info.draw();
 const auto player = draw.player();
@@ -295,7 +295,7 @@ else
 break;
 }
 
-case Core::Information::kSwapCards:
+case Proto::CMsg::Info::kSwapCards:
 {
 const auto& swapCards = info.swap_cards();
 const auto card1Place = PlaceFromPbCard(swapCards.card1());
@@ -326,7 +326,7 @@ PushAnimation<Animation::MoveCards>(cam.vp, std::move(cards));
 break;
 }
 
-case Core::Information::kShuffleLocation:
+case Proto::CMsg::Info::kShuffleLocation:
 {
 const auto& shuffleLocation = info.shuffle_location();
 const auto player = shuffleLocation.player();

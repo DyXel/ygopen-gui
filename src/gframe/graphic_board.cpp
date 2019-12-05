@@ -176,15 +176,15 @@ public:
 		actBtn[csel]->SetCallback(std::bind(&CGraphicBoard::ActBtnSubmit, this, csel)); \
 		actBtn[csel]->visible = false; \
 	}while(0)
-		ACTBTN(Core::SELECTION_TYPE_ACTIVABLE, "TEMP/act_act.png");
-		ACTBTN(Core::SELECTION_TYPE_SUMMONABLE, "TEMP/act_ns.png");
-		ACTBTN(Core::SELECTION_TYPE_SPSUMMONABLE, "TEMP/act_ss.png");
-		ACTBTN(Core::SELECTION_TYPE_REPOSITIONABLE, "TEMP/act_ad.png");
-		ACTBTN(Core::SELECTION_TYPE_MSETABLE, "TEMP/act_mset.png");
-		ACTBTN(Core::SELECTION_TYPE_SSETABLE, "TEMP/act_sset.png");
-		ACTBTN(Core::SELECTION_TYPE_CAN_ATTACK, "TEMP/act_atk.png");
+		ACTBTN(Proto::CData::SELECTION_TYPE_ACTIVABLE, "TEMP/act_act.png");
+		ACTBTN(Proto::CData::SELECTION_TYPE_SUMMONABLE, "TEMP/act_ns.png");
+		ACTBTN(Proto::CData::SELECTION_TYPE_SPSUMMONABLE, "TEMP/act_ss.png");
+		ACTBTN(Proto::CData::SELECTION_TYPE_REPOSITIONABLE, "TEMP/act_ad.png");
+		ACTBTN(Proto::CData::SELECTION_TYPE_MSETABLE, "TEMP/act_mset.png");
+		ACTBTN(Proto::CData::SELECTION_TYPE_SSETABLE, "TEMP/act_sset.png");
+		ACTBTN(Proto::CData::SELECTION_TYPE_CAN_ATTACK, "TEMP/act_atk.png");
 #undef ACTBTN
-		for(int i = Core::SELECTION_TYPE_ACTIVABLE; i <= Core::SELECTION_TYPE_CAN_ATTACK; i++)
+		for(int i = Proto::CData::SELECTION_TYPE_ACTIVABLE; i <= Proto::CData::SELECTION_TYPE_CAN_ATTACK; i++)
 			env.Add(actBtn[i]);
 	}
 	
@@ -227,7 +227,7 @@ public:
 		const glm::mat4 ortho = glm::ortho<float>(0.0f, parent.w, parent.h, 0.0f);
 		
 		SDL_Rect bCanvas = {10, 10, 64, 64};
-		for(int i = Core::SELECTION_TYPE_ACTIVABLE; i <= Core::SELECTION_TYPE_CAN_ATTACK; i++)
+		for(int i = Proto::CData::SELECTION_TYPE_ACTIVABLE; i <= Proto::CData::SELECTION_TYPE_CAN_ATTACK; i++)
 		{
 			actBtn[i]->Resize(ortho, bCanvas);
 			bCanvas.y += 64 + 10;
@@ -236,7 +236,7 @@ public:
 		UpdateMatrices();
 	}
 	
-	void AddMsg(const Core::AnyMsg& msg) override
+	void AddMsg(const Proto::CMsg& msg) override
 	{
 		targetState += targetState == msgs.size();
 		DuelBoard<GraphicCard>::AppendMsg(msg);
@@ -316,7 +316,7 @@ private:
 	bool multiSelect;
 	std::vector<std::reference_wrapper<GraphicCard>> selectedCards;
 	std::map<Place, GraphicCard&> cardsWithAction;
-	GUI::ActBtn actBtn[Core::SelectionType_ARRAYSIZE];
+	GUI::ActBtn actBtn[Proto::CData::SelectionType_ARRAYSIZE];
 	// Zone selection
 	unsigned zoneSelectCount; // total number of zones needed to select
 	std::set<LitePlace> selectedZones;
@@ -324,9 +324,9 @@ private:
 	
 	AnswerCallback answerSubmitter;
 	
-	void ActBtnSubmit(Core::SelectionType csel)
+	void ActBtnSubmit(Proto::CData::SelectionType csel)
 	{
-		Core::Answer answer;
+		Proto::CAnswer answer;
 		auto sseq = answer.add_seqs();
 		sseq->set_type(csel);
 		GraphicCard& card = selectedCards.rbegin()->get();
@@ -389,7 +389,7 @@ private:
 	
 	inline void CancelRequestActions()
 	{
-		for(int i = Core::SELECTION_TYPE_ACTIVABLE; i <= Core::SELECTION_TYPE_CAN_ATTACK; i++)
+		for(int i = Proto::CData::SELECTION_TYPE_ACTIVABLE; i <= Proto::CData::SELECTION_TYPE_CAN_ATTACK; i++)
 			actBtn[i]->visible = false;
 		for(const auto& kv : cardsWithAction)
 			kv.second.action.reset(nullptr);
@@ -539,7 +539,7 @@ private:
 					selectedZones.insert(sZone);
 					if(selectedZones.size() == zoneSelectCount)
 					{
-						Core::Answer answer;
+						Proto::CAnswer answer;
 						for(const auto& zone : selectedZones)
 						{
 							auto place = answer.add_places();
@@ -577,7 +577,7 @@ private:
 		{
 		case SDL_SCANCODE_SPACE:
 		{
-		Core::Answer answer;
+		Proto::CAnswer answer;
 		answer.set_finish(true);
 		answerSubmitter(answer);
 		return true;
@@ -824,44 +824,38 @@ private:
 		return true;
 	}
 	
-	void AnimateMsg(const Core::AnyMsg& msg)
+	void AnimateMsg(const Proto::CMsg& msg)
 	{
-		if(msg.AnyMsg_case() == Core::AnyMsg::kSpecific)
+		if(msg.t_case() == Proto::CMsg::kInfo)
 		{
-			const auto& specific = msg.specific();
-			if((state != msgs.size() || !advancing) &&
-			   specific.Specific_case() == Core::Specific::kRequest)
-			{
-				// Skip request message if it can't be answered
-				return;
-			}
-			else if(specific.Specific_case() == Core::Specific::kInformation)
-			{
-				AnimateInfoMsg(specific.information());
-			}
-			else // (specific.Specific_case() == Core::Specific::kRequest)
-			{
-				AnimateRequestMsg(specific.request());
-			}
+			AnimateInfoMsg(msg.info());
 		}
-		else // (msg.AnyMsg_case() == Core::AnyMsg::kInformation)
+		else if(msg.t_case() == Proto::CMsg::kRequest)
 		{
-			AnimateInfoMsg(msg.information());
+			// Skip request message if it can't be answered
+			// TODO: split between updating cards and setting up answering mechanism
+			if(state != msgs.size() || !advancing)
+				return;
+			AnimateRequestMsg(msg.request());
+		}
+		else
+		{
+			// TODO
 		}
 	}
 	
-	void AnimateInfoMsg(const Core::Information& info)
+	void AnimateInfoMsg(const Proto::CMsg::Info& info)
 	{
-		switch(info.Information_case())
+		switch(info.t_case())
 		{
 #include "graphic_board_animate_info.inl"
 		default: break;
 		}
 	}
 	
-	void AnimateRequestMsg(const Core::Request& request)
+	void AnimateRequestMsg(const Proto::CMsg::Request& request)
 	{
-		switch(request.Request_case())
+		switch(request.t_case())
 		{
 #include "graphic_board_animate_request.inl"
 		default: break;
