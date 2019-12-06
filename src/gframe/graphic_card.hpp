@@ -11,7 +11,7 @@
 namespace YGOpen
 {
 
-struct GraphicCard : public Card
+struct GraphicCard : public ClientCard
 {
 	glm::vec3 loc{}; // Location
 	glm::vec3 rot{}; // Rotation

@@ -80,7 +80,7 @@ Drawing::Texture TextureFromPath(Drawing::Renderer ren, std::string_view path)
 
 // *********************************************************
 
-class CGraphicBoard final : public IGraphicBoard, public DuelBoard<GraphicCard>
+class CGraphicBoard final : public IGraphicBoard, public ClientBoard<GraphicCard>
 {
 public:
 	CGraphicBoard(GUI::Environment& env, int flags)
@@ -239,7 +239,7 @@ public:
 	void AddMsg(const Proto::CMsg& msg) override
 	{
 		targetState += targetState == msgs.size();
-		DuelBoard<GraphicCard>::AppendMsg(msg);
+		ClientBoard<GraphicCard>::AppendMsg(msg);
 	}
 	
 	uint32_t GetState() const override
@@ -267,7 +267,7 @@ public:
 	
 	void FillPile(uint32_t controller, uint32_t location, int num) override
 	{
-		DuelBoard<GraphicCard>::FillPile(controller, location, num);
+		ClientBoard<GraphicCard>::FillPile(controller, location, num);
 		auto& pile = GetPile(controller, location);
 		uint32_t seq = 0;
 		for(auto& card : pile)
@@ -808,7 +808,7 @@ private:
 	
 	bool Forward()
 	{
-		if(!DuelBoard<GraphicCard>::Forward())
+		if(!ClientBoard<GraphicCard>::Forward())
 			return false;
 		CancelRequestActions();
 		AnimateMsg(msgs[state - 1]);
@@ -817,7 +817,7 @@ private:
 	
 	bool Backward()
 	{
-		if(!DuelBoard<GraphicCard>::Backward())
+		if(!ClientBoard<GraphicCard>::Backward())
 			return false;
 		CancelRequestActions();
 		AnimateMsg(msgs[state]);
