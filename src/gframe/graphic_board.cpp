@@ -10,6 +10,7 @@
 // #undef DEBUG_HITBOXES
 // #undef DEBUG_MOUSE_POS
 
+#include <client/board.hpp>
 #include "animator.hpp"
 #include "card_texture_manager.hpp"
 #include "constants.hpp"
@@ -18,7 +19,6 @@
 #include "animations/move_card.hpp"
 #include "animations/set_card_image.hpp"
 #include "elements/action_btn.hpp"
-#include "../board.hpp"
 #include "../sdl_utility.hpp"
 #include "../drawing/renderer.hpp"
 #include "../drawing/primitive.hpp"

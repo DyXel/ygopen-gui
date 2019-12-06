@@ -3,7 +3,7 @@
 #include <glm/vec3.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/euler_angles.hpp>
-#include "../card.hpp"
+#include <client/card.hpp>
 #include "../drawing/types.hpp"
 
 #include "canswer.pb.h"
