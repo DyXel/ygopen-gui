@@ -2,23 +2,23 @@ case Proto::CMsg::Info::kUpdateCard:
 {
 const auto& updateCard = info.update_card();
 const auto deckTop = updateCard.deck_top();
-auto previous = PlaceFromPbCard(updateCard.previous());
+auto prev = PlaceFromPbCard(updateCard.previous());
 if(deckTop)
-	SEQ(previous) = GetPile(previous).size() - 1 - SEQ(previous);
-auto& card = GetCard(previous);
-const auto locVec = GetLocXYZ(previous);
-if(advancing)
+	SEQ(prev) = GetPile(CON(prev), LOC(prev)).size() - 1 - SEQ(prev);
+auto& card = GetCard(prev);
+const auto locVec = GetLocXYZ(prev);
+if(IsAdvancing())
 	PushAnimation<Animation::SetCardImage>(ctm, card);
 Animation::MoveCardData mcd =
 {
 	card,
 	locVec,
-	GetRotXYZ(previous, card.pos((advancing) ? -1 : 1)),
+	GetRotXYZ(prev, card.pos((IsAdvancing()) ? -1 : 1)),
 	locVec,
-	GetRotXYZ(previous, card.pos())
+	GetRotXYZ(prev, card.pos())
 };
 PushAnimation<Animation::MoveCard>(cam.vp, mcd);
-if(!advancing)
+if(!IsAdvancing())
 	PushAnimation<Animation::SetCardImage>(ctm, card);
 break;
 }
@@ -26,33 +26,34 @@ break;
 case Proto::CMsg::Info::kMoveCard:
 {
 const auto& moveCard = info.move_card();
-const auto previous = PlaceFromPbCard(moveCard.previous());
-const auto current = PlaceFromPbCard(moveCard.current());
+const auto prev = PlaceFromPbCard(moveCard.previous());
+const auto curr = PlaceFromPbCard(moveCard.current());
 Animation::MoveCards::Container cards;
 int handNetChange[2] = {0};
 // Calculate net change of hands
-if(LOC(previous) & LOCATION_HAND)
+if(LOC(prev) & LOCATION_HAND)
 {
-	if(advancing)
-		handNetChange[CON(previous)]--;
+	if(IsAdvancing())
+		handNetChange[CON(prev)]--;
 	else
-		handNetChange[CON(previous)]++;
+		handNetChange[CON(prev)]++;
 }
-if(LOC(current) & LOCATION_HAND)
+if(LOC(curr) & LOCATION_HAND)
 {
-	if(advancing)
-		handNetChange[CON(current)]++;
+	if(IsAdvancing())
+		handNetChange[CON(curr)]++;
 	else
-		handNetChange[CON(current)]--;
+		handNetChange[CON(curr)]--;
 }
 auto RefreshHand = [&](const uint8_t p)
 {
 	uint32_t i = 0u;
-	const auto& is = (advancing) ? current : previous;
-	const auto& was = (advancing) ? previous : current;
+	const auto& is = (IsAdvancing()) ? curr : prev;
+	const auto& was = (IsAdvancing()) ? prev : curr;
 	Place startP = {p, LOCATION_HAND, 0, -1};
 	Place endP = {p, LOCATION_HAND, 0, -1};
-	for(auto& card : hand[p])
+	auto& hand = GetPile(p, LOCATION_HAND);
+	for(auto& card : hand)
 	{
 		SEQ(startP) = SEQ(endP) = i;
 		// Make gap if card was moved from the hand
@@ -62,7 +63,7 @@ auto RefreshHand = [&](const uint8_t p)
 		Animation::MoveCardData mcd =
 		{
 			card,
-			GetHandLocXYZ(startP, hand[p].size() - handNetChange[p]),
+			GetHandLocXYZ(startP, hand.size() - handNetChange[p]),
 			GetRotXYZ(startP, card.pos()),
 			GetLocXYZ(endP),
 			GetRotXYZ(endP, card.pos())
@@ -83,20 +84,23 @@ auto GetFixedLoc = [&](const Place& place) -> glm::vec3
 {
 	const auto phdc = handNetChange[CON(place)];
 	if(LOC(place) & LOCATION_HAND && phdc != 0)
-		return GetHandLocXYZ(place, hand[CON(place)].size() - phdc);
+	{
+		const auto& hand = GetPile(CON(place), LOCATION_HAND);
+		return GetHandLocXYZ(place, hand.size() - phdc);
+	}
 	return GetLocXYZ(place);
 };
 // Animate actual moved card
-auto& card = GetCard((advancing) ? current : previous);
-if(advancing)
+auto& card = GetCard((IsAdvancing()) ? curr : prev);
+if(IsAdvancing())
 {
 	Animation::MoveCardData mcd =
 	{
 		card,
-		GetFixedLoc(previous),
-		GetRotXYZ(previous, card.pos(-1)),
-		GetLocXYZ(current),
-		GetRotXYZ(current, card.pos())
+		GetFixedLoc(prev),
+		GetRotXYZ(prev, card.pos(-1)),
+		GetLocXYZ(curr),
+		GetRotXYZ(curr, card.pos())
 	};
 	cards.push_back(mcd);
 }
@@ -105,14 +109,14 @@ else
 	Animation::MoveCardData mcd =
 	{
 		card,
-		GetFixedLoc(current),
-		GetRotXYZ(current, card.pos(1)),
-		GetLocXYZ(previous),
-		GetRotXYZ(previous, card.pos())
+		GetFixedLoc(curr),
+		GetRotXYZ(curr, card.pos(1)),
+		GetLocXYZ(prev),
+		GetRotXYZ(prev, card.pos())
 	};
 	cards.push_back(mcd);
 }
-// 	if(updateCard.core_reason() & 0x1 && advancing) // REASON_DESTROY
+// 	if(updateCard.core_reason() & 0x1 && IsAdvancing()) // REASON_DESTROY
 // 		ani.Push(/*destroy sound*/);
 PushAnimation<Animation::SetCardImage>(ctm, card);
 PushAnimation<Animation::MoveCards>(cam.vp, std::move(cards));
@@ -129,7 +133,7 @@ case Proto::CMsg::Info::kAddCard:
 const auto& addCard = info.add_card();
 const auto& cardInfo = addCard.card();
 const auto place = PlaceFromPbCard(cardInfo);
-if(realtime) // Set Card Data
+if(IsRealtime())
 {
 	auto& card = GetCard(place);
 	InitializeGraphicCard(card);
@@ -137,7 +141,7 @@ if(realtime) // Set Card Data
 static const glm::vec3 FAR_AWAY_LOCATION = {0.0f, 0.0f, 100.0f};
 static const glm::vec3 FAR_AWAY_ROTATION = {0.0f, 0.0f, 0.0f};
 // TODO: handle hand animation
-if(advancing)
+if(IsAdvancing())
 {
 	auto& card = GetCard(place);
 	Animation::MoveCardData mcd =
@@ -153,7 +157,7 @@ if(advancing)
 }
 else
 {
-	auto& card = tempCards[std::tuple_cat(place, std::tie(state))];
+	auto& card = GetLimboCard(std::tuple_cat(place, std::make_tuple(State())));
 	Animation::MoveCardData mcd =
 	{
 		card,
@@ -175,9 +179,9 @@ const auto place = PlaceFromPbCard(removeCard.card());
 static const glm::vec3 FAR_AWAY_LOCATION = {0.0f, 0.0f, 100.0f};
 static const glm::vec3 FAR_AWAY_ROTATION = {0.0f, 0.0f, 0.0f};
 // TODO: handle hand animation
-if(advancing)
+if(IsAdvancing())
 {
-	auto& card = tempCards[std::tuple_cat(place, std::tie(state))];
+	auto& card = GetLimboCard(std::tuple_cat(place, std::make_tuple(State())));
 	Animation::MoveCardData mcd =
 	{
 		card,
@@ -209,11 +213,11 @@ case Proto::CMsg::Info::kDraw:
 const auto& draw = info.draw();
 const auto player = draw.player();
 const auto drawCount = draw.cards().size();
-auto& pHand = hand[player];
-auto& pDeck = deck[player];
+auto& pHand = GetPile(player, LOCATION_HAND);
+auto& pDeck = GetPile(player, LOCATION_DECK);
 const auto handSz = pHand.size();
 const auto deckSz = pDeck.size();
-if(advancing)
+if(IsAdvancing())
 {
 	const int range = handSz - drawCount;
 	// Animate cards already in hand
@@ -338,7 +342,7 @@ if(shuffleLocation.location() == LOCATION_HAND)
 	Animation::MoveCards::Container cards1, cards2;
 	Animation::SetCardImages::Container cardsImg;
 	int i = 0;
-	for(auto& card : hand[player])
+	for(auto& card : GetPile(player, LOCATION_HAND))
 	{
 		const Place place = {player, LOCATION_HAND, i, -1};
 		const glm::vec3 loc = GetLocXYZ(place);

@@ -1,8 +1,6 @@
 # Add source files
 set(CSR ${CMAKE_CURRENT_SOURCE_DIR})
 target_sources(ygopen-gui PRIVATE
-	${CSR}/board_interpret_info.inl
-	${CSR}/board.hpp
 	${CSR}/configs.cpp
 	${CSR}/configs.hpp
 	${CSR}/game_data.cpp

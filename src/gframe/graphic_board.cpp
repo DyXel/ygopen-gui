@@ -238,18 +238,18 @@ public:
 	
 	void AddMsg(const Proto::CMsg& msg) override
 	{
-		targetState += targetState == msgs.size();
+		targetState += targetState == Msgs().size();
 		ClientBoard<GraphicCard>::AppendMsg(msg);
 	}
 	
 	uint32_t GetState() const override
 	{
-		return state;
+		return State();
 	}
 
 	uint32_t GetStatesCount() const override
 	{
-		return msgs.size();
+		return Msgs().size();
 	}
 
 	uint32_t GetTargetState() const override
@@ -259,7 +259,7 @@ public:
 
 	bool SetTargetState(uint32_t tState) override
 	{
-		if(tState > msgs.size())
+		if(tState > Msgs().size())
 			return false;
 		targetState = tState;
 		return true;
@@ -341,11 +341,14 @@ private:
 	{
 		for(uint8_t player = 0; player < 2; player++)
 		{
-#define X(name, enums) for(auto& card : name[player]) { Do(card); }
-			DUEL_PILES();
-#undef X
+			for(auto location : {LOCATION_DECK, LOCATION_HAND, LOCATION_GRAVE,
+			                     LOCATION_REMOVED, LOCATION_EXTRA})
+			{
+				for(auto& card : GetPile(player, location))
+					Do(card);
+			}
 		}
-		for(auto& kv : zoneCards)
+		for(auto& kv : ZoneCards())
 			Do(kv.second);
 	}
 	
@@ -419,10 +422,12 @@ private:
 #if defined(DEBUG_HITBOXES)
 		for(const auto& kv : zones)
 			kv.second.hitboxPrim->Draw();
-		for(const auto& pile : hand)
-			for(const auto& card : pile)
-				if(card.hitbox)
-					card.hitbox->prim->Draw();
+		for(const auto& card : GetPile(0, LOCATION_HAND))
+			if(card.hitbox)
+				card.hitbox->prim->Draw();
+		for(const auto& card : GetPile(1, LOCATION_HAND))
+			if(card.hitbox)
+				card.hitbox->prim->Draw();
 #endif // defined(DEBUG_HITBOXES)
 #if defined(DEBUG_MOUSE_POS)
 		mousePrim->Draw();
@@ -432,6 +437,7 @@ private:
 	void Tick() override
 	{
 		const float elapsed = env.GetTimeElapsed();
+		const auto state = State();
 		ani.Tick(elapsed);
 		if(!ani.IsAnimating() && targetState != state)
 		{
@@ -463,18 +469,26 @@ private:
 				selectedCard = nullptr;
 			}
 		}
-		for(auto& pile : hand)
+		
+		for(auto& card : GetPile(0, LOCATION_HAND))
 		{
-			for(auto& card : pile)
+			if(card.hitbox && PointInPoly(mPos, card.hitbox->vertices))
 			{
-				if(card.hitbox && PointInPoly(mPos, card.hitbox->vertices))
-				{
-					selectedCard = &card;
-					// TODO: card selection and/or hover animation
-					return true;
-				}
+				selectedCard = &card;
+				// TODO: card selection and/or hover animation
+				return true;
 			}
 		}
+		for(auto& card : GetPile(1, LOCATION_HAND))
+		{
+			if(card.hitbox && PointInPoly(mPos, card.hitbox->vertices))
+			{
+				selectedCard = &card;
+				// TODO: card selection and/or hover animation
+				return true;
+			}
+		}
+		
 		// Try checking for zones
 		if(selectedZone)
 		{
@@ -523,6 +537,7 @@ private:
 		};
 		if(selectedCard && selectedCard->action)
 		{
+			// TODO: hide previous buttons
 			for(const auto& kv : selectedCard->action->ts)
 				actBtn[kv.first]->visible = true;
 			SelectUnselectCard(*selectedCard);
@@ -559,13 +574,17 @@ private:
 			}
 			// Handle zone card selection
 			const auto t = std::tuple_cat(sZone, std::tuple<int32_t>(-1));
-			auto search = zoneCards.find(t);
-			if(search != zoneCards.cend() && search->second.action)
+			if(CardExists(t))
 			{
-				for(const auto& kv : search->second.action->ts)
-					actBtn[kv.first]->visible = true;
-				SelectUnselectCard(search->second);
-				return true;
+				auto& card = GetCard(t);
+				if(card.action)
+				{
+					// TODO: hide previous buttons
+					for(const auto& kv : card.action->ts)
+						actBtn[kv.first]->visible = true;
+					SelectUnselectCard(card);
+					return true;
+				}
 			}
 		}
 		return false;
@@ -648,7 +667,7 @@ private:
 		glm::vec3 loc = {0.0f, 0.0f, 0.0f};
 		if(LOC(p) & LOCATION_HAND)
 		{
-			loc = GetHandLocXYZ(p, hand[CON(p)].size());
+			loc = GetHandLocXYZ(p, GetPile(CON(p), LOC(p)).size());
 		}
 		else if(IsPile(p))
 		{
@@ -752,7 +771,7 @@ private:
 	void HandHitbox(uint8_t player)
 	{
 		const glm::mat4 vvp = CalcVpMatrix() * cam.vp;
-		for(auto& card : hand[player])
+		for(auto& card : GetPile(player, LOCATION_HAND))
 		{
 			if(!card.hitbox)
 				card.hitbox = std::make_unique<GraphicCard::HitboxData>();
@@ -794,7 +813,7 @@ private:
 			{
 				LOC(place) = location;
 				int i = 0;
-				for(auto& card : GetPile(CON(place), LOC(place)))
+				for(auto& card : GetPile(player, location))
 				{
 					SEQ(place) = i;
 					UpdatePos(place, card);
@@ -802,7 +821,7 @@ private:
 				}
 			}
 		}
-		for(auto& kv : zoneCards)
+		for(auto& kv : ZoneCards())
 			UpdatePos(kv.first, kv.second);
 	}
 	
@@ -811,7 +830,7 @@ private:
 		if(!ClientBoard<GraphicCard>::Forward())
 			return false;
 		CancelRequestActions();
-		AnimateMsg(msgs[state - 1]);
+		AnimateMsg(Msgs()[State() - 1u]);
 		return true;
 	}
 	
@@ -820,7 +839,7 @@ private:
 		if(!ClientBoard<GraphicCard>::Backward())
 			return false;
 		CancelRequestActions();
-		AnimateMsg(msgs[state]);
+		AnimateMsg(Msgs()[State()]);
 		return true;
 	}
 	
@@ -834,7 +853,7 @@ private:
 		{
 			// Skip request message if it can't be answered
 			// TODO: split between updating cards and setting up answering mechanism
-			if(state != msgs.size() || !advancing)
+			if(State() != Msgs().size() || !IsAdvancing())
 				return;
 			AnimateRequestMsg(msg.request());
 		}
