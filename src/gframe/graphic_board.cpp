@@ -10,7 +10,7 @@
 // #undef DEBUG_HITBOXES
 // #undef DEBUG_MOUSE_POS
 
-#include <client/board.hpp>
+#include <client/msg_interpreter.hpp>
 #include "animator.hpp"
 #include "card_texture_manager.hpp"
 #include "constants.hpp"
@@ -80,7 +80,7 @@ Drawing::Texture TextureFromPath(Drawing::Renderer ren, std::string_view path)
 
 // *********************************************************
 
-class CGraphicBoard final : public IGraphicBoard, public ClientBoard<GraphicCard>
+class CGraphicBoard final : public IGraphicBoard, public MsgInterpreter<GraphicCard>
 {
 public:
 	CGraphicBoard(GUI::Environment& env, int flags)
@@ -239,7 +239,7 @@ public:
 	void AddMsg(const Proto::CMsg& msg) override
 	{
 		targetState += targetState == Msgs().size();
-		ClientBoard<GraphicCard>::AppendMsg(msg);
+		MsgInterpreter<GraphicCard>::AppendMsg(msg);
 	}
 	
 	uint32_t GetState() const override
@@ -267,7 +267,7 @@ public:
 	
 	void FillPile(uint32_t controller, uint32_t location, int num) override
 	{
-		ClientBoard<GraphicCard>::FillPile(controller, location, num);
+		MsgInterpreter<GraphicCard>::FillPile(controller, location, num);
 		auto& pile = GetPile(controller, location);
 		uint32_t seq = 0;
 		for(auto& card : pile)
@@ -827,7 +827,7 @@ private:
 	
 	bool Forward()
 	{
-		if(!ClientBoard<GraphicCard>::Forward())
+		if(!MsgInterpreter<GraphicCard>::Forward())
 			return false;
 		CancelRequestActions();
 		AnimateMsg(Msgs()[State() - 1u]);
@@ -836,7 +836,7 @@ private:
 	
 	bool Backward()
 	{
-		if(!ClientBoard<GraphicCard>::Backward())
+		if(!MsgInterpreter<GraphicCard>::Backward())
 			return false;
 		CancelRequestActions();
 		AnimateMsg(Msgs()[State()]);
