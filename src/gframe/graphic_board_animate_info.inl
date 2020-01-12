@@ -136,7 +136,7 @@ const auto place = PlaceFromPbCard(cardInfo);
 if(IsRealtime())
 {
 	auto& card = GetCard(place);
-	InitializeGraphicCard(card);
+	LazyCardGraphic(card);
 }
 static const glm::vec3 FAR_AWAY_LOCATION = {0.0f, 0.0f, 100.0f};
 static const glm::vec3 FAR_AWAY_ROTATION = {0.0f, 0.0f, 0.0f};

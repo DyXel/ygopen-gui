@@ -52,6 +52,8 @@ target_sources(ygopen-gui PRIVATE
 	${CSR}/gframe/card_texture_manager.hpp
 	${CSR}/gframe/constants.hpp
 	${CSR}/gframe/graphic_board_animate_info.inl
+	${CSR}/gframe/graphic_board_base.cpp
+	${CSR}/gframe/graphic_board_base.hpp
 	${CSR}/gframe/graphic_board.cpp
 	${CSR}/gframe/graphic_board.hpp
 	${CSR}/gframe/graphic_card.hpp

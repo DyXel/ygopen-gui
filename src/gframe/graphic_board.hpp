@@ -32,14 +32,11 @@ public:
 	IGraphicBoard(GUI::Environment& env) : IElement(env)
 	{}
 	
-	virtual void SetCameraPosition(const glm::vec3& pos) = 0;
 	virtual void UpdateHitboxes() = 0;
 	virtual void SetAnswerSubmitter(AnswerCallback cb) = 0;
 	virtual void Resize(const SDL_Rect& parent, const SDL_Rect& rect) = 0;
 	
 	virtual void AddMsg(const Proto::CMsg& msg) = 0;
-	virtual uint32_t GetState() const = 0;
-	virtual uint32_t GetStatesCount() const = 0;
 	virtual uint32_t GetTargetState() const = 0;
 	virtual bool SetTargetState(uint32_t state) = 0;
 	virtual void FillPile(uint32_t controller, uint32_t location, int num) = 0;

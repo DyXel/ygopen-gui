@@ -2,19 +2,12 @@
 
 #include <SDL_image.h>
 
-#if defined(_DEBUG) || defined(DEBUG)
-#define DEBUG_HITBOXES
-#define DEBUG_MOUSE_POS
-#endif // defined(_DEBUG) || defined(DEBUG)
-
-// #undef DEBUG_HITBOXES
-// #undef DEBUG_MOUSE_POS
+#include <enums/phase.hpp>
 
 #include <client/msg_interpreter.hpp>
 #include "animator.hpp"
 #include "card_texture_manager.hpp"
-#include "constants.hpp"
-#include "graphic_card.hpp"
+#include "graphic_board_base.hpp"
 #include "animations/call.hpp"
 #include "animations/move_card.hpp"
 #include "animations/set_card_image.hpp"
@@ -28,42 +21,6 @@
 
 namespace YGOpen
 {
-
-struct Zone
-{
-	glm::mat4 model{1.0f};
-	glm::vec3 loc{}; // Location
-	glm::vec3 rot{}; // Rotation
-	Drawing::Primitive prim;
-	Drawing::Vertices hitbox;
-#if defined(DEBUG_HITBOXES)
-	Drawing::Primitive hitboxPrim;
-#endif // defined(DEBUG_HITBOXES)
-	
-	Zone() = default;
-	Zone(const Zone&) = delete;
-	Zone(Zone&&) = default;
-	Zone& operator=(const Zone&) = delete;
-	Zone& operator=(Zone&&) = default;
-};
-
-// TODO: ****************** ORGANIZE THIS ******************
-
-bool PointInPoly(const glm::vec3& p, const Drawing::Vertices& v)
-{
-	std::size_t count{};
-	for(std::size_t i = 0u; i < v.size() - 1u; i++)
-	{
-		if(((v[i].y <= p.y) && (v[i + 1u].y > p.y)) ||
-		   ((v[i].y > p.y) && (v[i + 1u].y <=  p.y)))
-		{
-			const float vt = (p.y - v[i].y) / (v[i + 1u].y - v[i].y);
-			if(p.x < v[i].x + vt * (v[i + 1u].x - v[i].x))
-				count++;
-		}
-	}
-	return count & 1u;
-}
 
 Drawing::Texture TextureFromPath(Drawing::Renderer ren, std::string_view path)
 {
@@ -80,93 +37,16 @@ Drawing::Texture TextureFromPath(Drawing::Renderer ren, std::string_view path)
 
 // *********************************************************
 
-class CGraphicBoard final : public IGraphicBoard, public MsgInterpreter<GraphicCard>
+class CGraphicBoard final : public IGraphicBoard, public GraphicBoardBase, public MsgInterpreter<GraphicCard>
 {
 public:
 	CGraphicBoard(GUI::Environment& env, int flags)
-		: IGraphicBoard(env), ctm(env.renderer)
+		: IGraphicBoard(env), GraphicBoardBase(env.renderer), ctm(env.renderer)
 	{
-#define LOCATION_ERASE(loc, seq) locations.erase({0, loc, seq})
-#define LOCATION_X(loc, seq, am) locations[{0, loc, seq}].x += am
-#define LOCATION_Y(loc, seq, am) locations[{0, loc, seq}].y += am
-		locations = BASE_LOCATIONS;
-		if(flags & DUEL_SPEED)
-		{
-			LOCATION_ERASE(LOCATION_MZONE, 0);
-			LOCATION_ERASE(LOCATION_MZONE, 4);
-			LOCATION_ERASE(LOCATION_SZONE, 0);
-			LOCATION_ERASE(LOCATION_SZONE, 4);
-			// Shift zone locations
-			LOCATION_X(LOCATION_SZONE  , 5,  0.4f);
-			LOCATION_X(LOCATION_PZONE  , 0,  0.4f);
-			LOCATION_X(LOCATION_PZONE  , 1, -0.4f);
-			LOCATION_X(LOCATION_DECK   , 0, -0.4f);
-			LOCATION_X(LOCATION_EXTRA  , 0,  0.4f);
-			LOCATION_X(LOCATION_GRAVE  , 0, -0.4f);
-			LOCATION_X(LOCATION_REMOVED, 0, -0.4f);
-		}
-		if(!(flags & DUEL_PZONE) || !(flags & DUEL_SEPARATE_PZONE))
-		{
-			LOCATION_ERASE(LOCATION_PZONE, 0);
-			LOCATION_ERASE(LOCATION_PZONE, 1);
-			// Shift zone locations
-			LOCATION_Y(LOCATION_SZONE  , 5, -0.4f);
-			LOCATION_Y(LOCATION_GRAVE  , 0, -0.4f);
-			LOCATION_X(LOCATION_REMOVED, 0, -0.4f);
-		}
-		// Mirror all locations for player 1
-		{
-			// 180 Degrees rotation on Z-axis matrix
-			static const glm::mat4 ROT_180_Z = glm::rotate(glm::radians(180.0f),
-			                                   glm::vec3(0.0f, 0.0f, 1.0f));
-			std::map<LitePlace, glm::vec3> p1locations;
-			for(const auto& kv : locations)
-			{
-				std::pair<LitePlace, glm::vec3> kvc = kv;
-				CON(kvc.first) = 1;
-				kvc.second = glm::vec3(ROT_180_Z * glm::vec4(kvc.second, 1.0f));
-				p1locations.emplace(std::move(kvc));
-			}
-			locations.insert(p1locations.begin(), p1locations.end());
-		}
-		// Insert Extra Monster Zones
-		// NOTE: they are only inserted once for player 0.
-		if(flags & DUEL_EMZONE)
-			locations.insert(EMZ_LOCATIONS.begin(), EMZ_LOCATIONS.end());
-#undef LOCATION_ERASE
-#undef LOCATION_X
-#undef LOCATION_Y
-		cover = TextureFromPath(env.renderer, "TEMP/cover.png");
-		// zones textures
-		auto zTex = TextureFromPath(env.renderer, "TEMP/zone.png");
-		for(const auto& kv : locations)
-		{
-			// Dont add hand locations
-			if(LOC(kv.first) == LOCATION_HAND)
-				continue;
-			Zone& zone = zones.emplace(kv.first, Zone{}).first->second;
-			zone.model = glm::translate(kv.second + glm::vec3(0.0f, 0.0f, -0.001f));
-			zone.prim = env.renderer->NewPrimitive();
-			zone.prim->depthTest = true;
-			zone.prim->SetDrawMode(Drawing::GetQuadDrawMode());
-			zone.prim->SetVertices(ZONE_VERTICES);
-			zone.prim->SetTexCoords(Drawing::GetQuadTexCoords());
-			zone.prim->SetTexture(zTex);
-			zone.hitbox.resize(ZONE_HITBOX_VERTICES.size());
-#if defined(DEBUG_HITBOXES)
-			zone.hitboxPrim = env.renderer->NewPrimitive();
-			zone.hitboxPrim->SetDrawMode(Drawing::PDM_LINE_LOOP);
-			const glm::vec4 RED = {1.0f, 0.0f, 0.0f, 1.0f};
-			zone.hitboxPrim->SetColors({RED, RED, RED, RED, RED});
-#endif // defined(DEBUG_HITBOXES)
-		}
-#if defined(DEBUG_MOUSE_POS)
-		mousePrim = env.renderer->NewPrimitive();
-		mousePrim->SetDrawMode(Drawing::PDM_LINE_LOOP);
-		mousePrim->SetVertices(MOUSE_POS_VERTICES);
-		const glm::vec4 BLUE = {0.0f, 1.0f, 0.0f, 0.5f};
-		mousePrim->SetColors({BLUE, BLUE, BLUE, BLUE});
-#endif // defined(DEBUG_MOUSE_POS)
+		SetCardsTextures(ctm.GetCardTextureByCode(0u),
+		                 TextureFromPath(env.renderer, "TEMP/cover.png"));
+		SetZonesTextures(TextureFromPath(env.renderer, "TEMP/zone.png"));
+		RebuildLocations(flags);
 
 #define ACTBTN(csel, string) \
 	do \
@@ -191,26 +71,8 @@ public:
 	virtual ~CGraphicBoard() = default;
 	
 	/******************** IGraphicBoard overrides ********************/
-	void SetCameraPosition(const glm::vec3& pos) override
-	{
-		cam.pos = pos;
-	}
-	
 	void UpdateHitboxes() override
 	{
-		const glm::mat4 vvp = CalcVpMatrix() * cam.vp;
-		for(auto& kv : zones)
-		{
-			const glm::mat4 mvp = vvp * kv.second.model;
-			for(size_t i = 0; i < ZONE_HITBOX_VERTICES.size(); i++)
-			{
-				const glm::vec4 v4 = mvp * glm::vec4(ZONE_HITBOX_VERTICES[i], 1.0f);
-				kv.second.hitbox[i] = glm::vec3(v4) / v4.w;
-			}
-#if defined(DEBUG_HITBOXES)
-			kv.second.hitboxPrim->SetVertices(kv.second.hitbox);
-#endif // defined(_DEBUG)
-		}
 		HandHitbox(0);
 		HandHitbox(1);
 	}
@@ -222,18 +84,14 @@ public:
 	
 	void Resize(const SDL_Rect& parent, const SDL_Rect& rect) override
 	{
-		cam.pCan = parent;
-		cam.can = rect;
+		GraphicBoardBase::Resize(parent, rect);
 		const glm::mat4 ortho = glm::ortho<float>(0.0f, parent.w, parent.h, 0.0f);
-		
 		SDL_Rect bCanvas = {10, 10, 64, 64};
 		for(int i = Proto::CData::SELECTION_TYPE_ACTIVABLE; i <= Proto::CData::SELECTION_TYPE_CAN_ATTACK; i++)
 		{
 			actBtn[i]->Resize(ortho, bCanvas);
 			bCanvas.y += 64 + 10;
 		}
-		
-		UpdateMatrices();
 	}
 	
 	void AddMsg(const Proto::CMsg& msg) override
@@ -242,16 +100,6 @@ public:
 		MsgInterpreter<GraphicCard>::AppendMsg(msg);
 	}
 	
-	uint32_t GetState() const override
-	{
-		return State();
-	}
-
-	uint32_t GetStatesCount() const override
-	{
-		return Msgs().size();
-	}
-
 	uint32_t GetTargetState() const override
 	{
 		return targetState;
@@ -273,7 +121,7 @@ public:
 		for(auto& card : pile)
 		{
 			const Place p = {controller, location, seq, -1};
-			InitializeGraphicCard(card);
+			LazyCardGraphic(card);
 			card.loc = GetLocXYZ(p);
 			card.rot = GetRotXYZ(p, card.pos());
 			seq++;
@@ -281,34 +129,9 @@ public:
 	}
 	/*****************************************************************/
 private:
-	// ************************
-	Drawing::Texture cover;
 	CardTextureManager ctm;
-	// ************************ TODO: Move to own structure (perhaps `gfx`)
-#if defined(DEBUG_MOUSE_POS)
-	Drawing::Primitive mousePrim;
-#endif // defined(DEBUG_MOUSE_POS)
-	
-	struct // Camera info
-	{
-		// Parent canvas, in pixels, represents the size of the drawable area.
-		SDL_Rect pCan{};
-		// Canvas, in pixels, where this graphic board is drawn.
-		SDL_Rect can{};
-		// Camera position on world coordinates
-		glm::vec3 pos{};
-		// View-Projection matrix.
-		// to be combined with Viewport and/or Model matrix for each object
-		glm::mat4 vp{1.0f};
-	}cam;
 	Animator ani;
-	
 	uint32_t targetState{};
-	std::map<LitePlace, glm::vec3> locations;
-	std::map<LitePlace, Zone> zones;
-	
-	LitePlace const* selectedZone{nullptr};
-	GraphicCard* selectedCard{nullptr};
 	
 	//*********************************
 	
@@ -336,58 +159,10 @@ private:
 	}
 	
 	/**********************************************************************/
-	template<typename DoFunc>
-	inline void ForAllCards(DoFunc Do)
-	{
-		for(uint8_t player = 0; player < 2; player++)
-		{
-			for(auto location : {LOCATION_DECK, LOCATION_HAND, LOCATION_GRAVE,
-			                     LOCATION_REMOVED, LOCATION_EXTRA})
-			{
-				for(auto& card : GetPile(player, location))
-					Do(card);
-			}
-		}
-		for(auto& kv : ZoneCards())
-			Do(kv.second);
-	}
-	
 	template<typename T, typename... Args>
 	inline void PushAnimation(Args&&... args)
 	{
 		ani.Push(std::make_shared<T>(std::forward<Args>(args)...));
-	}
-	
-	inline glm::mat4 CalcVpMatrix()
-	{
-		glm::vec3 sVec{};
-		// NOTE: this works as long as can is smaller than pCan
-		sVec.x = static_cast<float>(cam.can.w) / cam.pCan.w;
-		sVec.y = static_cast<float>(cam.can.h) / cam.pCan.h;
-		glm::vec3 tVec{};
-		const float canvasOriginX = cam.can.x + cam.can.w * 0.5f;
-		const float canvasOriginY = cam.can.y + cam.can.h * 0.5f;
-		tVec.x = canvasOriginX / (cam.pCan.w * 0.5f) - 1.0f;
-		tVec.y = canvasOriginY / (cam.pCan.h * 0.5f) - 1.0f;
-		return glm::scale(sVec) * glm::translate(tVec);
-	}
-	
-	inline void InitializeGraphicCard(GraphicCard& card)
-	{
-		// Front face (Card picture)
-		card.front = env.renderer->NewPrimitive();
-		card.front->depthTest = true;
-		card.front->SetDrawMode(Drawing::GetQuadDrawMode());
-		card.front->SetVertices(CARD_VERTICES);
-		card.front->SetTexCoords(Drawing::GetQuadTexCoords());
-		card.front->SetTexture(ctm.GetCardTextureByCode(0u));
-		// Back face (Cover image)
-		card.cover = env.renderer->NewPrimitive();
-		card.cover->depthTest = true;
-		card.cover->SetDrawMode(Drawing::GetQuadDrawMode());
-		card.cover->SetVertices(CARD_COVER_VERTICES);
-		card.cover->SetTexCoords({{1.0f, 0.0f}, {0.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f}});
-		card.cover->SetTexture(cover);
 	}
 	
 	inline void CancelRequestActions()
@@ -410,28 +185,7 @@ private:
 	
 	void Draw() override
 	{
-		env.renderer->SetViewport(cam.can.x, cam.can.y, cam.can.w, cam.can.h);
-		for(const auto& kv : zones)
-			kv.second.prim->Draw();
-		ForAllCards([](GraphicCard& card)
-		{
-			card.front->Draw();
-			card.cover->Draw();
-		});
-		env.renderer->SetViewport(cam.pCan.x, cam.pCan.y, cam.pCan.w, cam.pCan.h);
-#if defined(DEBUG_HITBOXES)
-		for(const auto& kv : zones)
-			kv.second.hitboxPrim->Draw();
-		for(const auto& card : GetPile(0, LOCATION_HAND))
-			if(card.hitbox)
-				card.hitbox->prim->Draw();
-		for(const auto& card : GetPile(1, LOCATION_HAND))
-			if(card.hitbox)
-				card.hitbox->prim->Draw();
-#endif // defined(DEBUG_HITBOXES)
-#if defined(DEBUG_MOUSE_POS)
-		mousePrim->Draw();
-#endif // defined(DEBUG_MOUSE_POS)
+		GraphicBoardBase::Draw();
 	}
 	
 	void Tick() override
@@ -447,71 +201,6 @@ private:
 				Backward();
 			ani.Tick(elapsed);
 		}
-	}
-	
-	bool OnMouseMotion(const SDL_MouseMotionEvent& motion)
-	{
-		glm::vec3 mPos = {motion.x / (cam.pCan.w * 0.5f) - 1.0f,
-		                 -(motion.y / (cam.pCan.h * 0.5f) - 1.0f), 0.0f};
-#if defined(DEBUG_MOUSE_POS)
-		mousePrim->SetMatrix(glm::translate(mPos));
-#endif // defined(DEBUG_MOUSE_POS)
-		// Try checking for cards
-		if(selectedCard)
-		{
-			if(PointInPoly(mPos, selectedCard->hitbox->vertices))
-			{
-				return true;
-			}
-			else
-			{
-				// TODO: card deselection animation
-				selectedCard = nullptr;
-			}
-		}
-		
-		for(auto& card : GetPile(0, LOCATION_HAND))
-		{
-			if(card.hitbox && PointInPoly(mPos, card.hitbox->vertices))
-			{
-				selectedCard = &card;
-				// TODO: card selection and/or hover animation
-				return true;
-			}
-		}
-		for(auto& card : GetPile(1, LOCATION_HAND))
-		{
-			if(card.hitbox && PointInPoly(mPos, card.hitbox->vertices))
-			{
-				selectedCard = &card;
-				// TODO: card selection and/or hover animation
-				return true;
-			}
-		}
-		
-		// Try checking for zones
-		if(selectedZone)
-		{
-			if(PointInPoly(mPos, zones[*selectedZone].hitbox))
-			{
-				return true;
-			}
-			else
-			{
-				// TODO: zone deselection animation
-				selectedZone = nullptr;
-			}
-		}
-		for(const auto& kv : zones)
-		{
-			if(PointInPoly(mPos, kv.second.hitbox))
-			{
-				selectedZone = &kv.first;
-				// TODO: zone selection animation
-				return true;
-			}
-		}
-		return false;
 	}
 	
 	bool OnMouseButtonDown([[maybe_unused]] const SDL_MouseButtonEvent& button)
@@ -535,17 +224,17 @@ private:
 			else
 				selectedCards.erase(search);
 		};
-		if(selectedCard && selectedCard->action)
+		if(SelectedCard() && SelectedCard()->action)
 		{
 			// TODO: hide previous buttons
-			for(const auto& kv : selectedCard->action->ts)
+			for(const auto& kv : SelectedCard()->action->ts)
 				actBtn[kv.first]->visible = true;
-			SelectUnselectCard(*selectedCard);
+			SelectUnselectCard(*SelectedCard());
 			return true;
 		}
-		if(selectedZone)
+		if(SelectedZone())
 		{
-			const auto& sZone = *selectedZone; // saves us few dereferences
+			const auto& sZone = *SelectedZone(); // saves us few dereferences
 			// Handle zone selection
 			if(selectableZones.find(sZone) != selectableZones.cend())
 			{
@@ -629,7 +318,7 @@ private:
 	
 	bool OnEvent(const SDL_Event& e) override
 	{
-		if(e.type == SDL_MOUSEMOTION && OnMouseMotion(e.motion))
+		if(GraphicBoardBase::OnEvent(e))
 		{
 			return true;
 		}
@@ -639,159 +328,17 @@ private:
 		}
 		else if(e.type == SDL_KEYDOWN && !e.key.repeat && OnKeyDownEvent(e.key))
 		{
-			
+			return true;
 		}
 		return false;
 	}
 	/************************************************************/
 	
-	const glm::vec3 GetHandLocXYZ(const Place& p, int count) const
-	{
-		glm::vec3 loc = {0.0f, 0.0f, 0.0f};
-		const float cardWidth = glm::abs(CARD_VERTICES[0].x) * 2.0f;
-		// Card centered sequence
-		const float cenSeq = SEQ(p) - glm::floor(count * 0.5f) +
-		                     (!(count & 1) * 0.5f);
-		// Translation vector, flipped if player is 1
-		const auto tVec = glm::vec3(cardWidth, 0.0f, 0.0f) *
-		                  ((CON(p)) ? -1.0f : 1.0f);
-		const glm::vec3 offset = tVec * cenSeq;
-		const auto search = locations.find({CON(p), LOCATION_HAND, 0});
-		if(search != locations.end())
-			loc = search->second + offset;
-		return loc;
-	}
-
-	const glm::vec3 GetLocXYZ(const Place& p) const
-	{
-		glm::vec3 loc = {0.0f, 0.0f, 0.0f};
-		if(LOC(p) & LOCATION_HAND)
-		{
-			loc = GetHandLocXYZ(p, GetPile(CON(p), LOC(p)).size());
-		}
-		else if(IsPile(p))
-		{
-			const auto offset = static_cast<float>(SEQ(p)) *
-			                    glm::vec3(0.0f, 0.0f, CARD_THICKNESS);
-			LitePlace lp = {CON(p), LOC(p), 0};
-			const auto search = locations.find(lp);
-			if(search != locations.end())
-				loc = search->second + offset;
-		}
-		else
-		{
-			LitePlace lp;
-			// Remove overlay for searching purposes
-			LOC(lp) = LOC(p) & (~LOCATION_OVERLAY);
-			// If its extra monster zone
-			if((LOC(p) & LOCATION_MZONE) && SEQ(p) > 4)
-			{
-				CON(lp) = 0;
-				// Flip sequence to get properly oriented zones
-				SEQ(lp) = (CON(p) == 1) ? 11 - SEQ(p) : SEQ(p);
-			}
-			else
-			{
-				CON(lp) = CON(p);
-				SEQ(lp) = SEQ(p);
-			}
-			const auto search = locations.find(lp);
-			if(search != locations.end())
-				loc = search->second;
-			if(LOC(p) & LOCATION_OVERLAY)
-			{
-				const auto offset = static_cast<float>(OSEQ(p)) *
-				                    OVERLAY_OFFSET;
-				if(CON(p) == 0)
-					loc += OVERLAY_OFFSET + offset;
-				else
-					loc -= OVERLAY_OFFSET + offset;
-			}
-		}
-		return loc;
-	}
-	
-	const glm::vec3 GetRotXYZ(const Place& p, uint32_t pos) const
-	{
-		glm::vec3 rot = {0.0f, 0.0f, 0.0f};
-		if(LOC(p) & LOCATION_HAND)
-		{
-			const LitePlace place = {CON(p), LOCATION_HAND, 0};
-			const glm::vec3 loc = locations.at(place);
-			if(pos & POS_FACEDOWN)
-			{
-				glm::mat4 lookAt = glm::lookAt({}, cam.pos - loc, UP);
-				glm::extractEulerAngleXYZ(lookAt, rot.x, rot.y, rot.z);
-			}
-			else
-			{
-				glm::mat4 lookAt = glm::lookAt(loc, cam.pos, UP);
-				glm::extractEulerAngleXYZ(lookAt, rot.x, rot.y, rot.z);
-				rot.y += glm::radians(-180.0f);
-			}
-		}
-		else if(IsPile(p))
-		{
-			if(CON(p) == 1)
-				rot.z = glm::radians(180.0f);
-			if(pos & POS_FACEDOWN)
-				rot.y = glm::radians(180.0f);
-		}
-		else
-		{
-			if(CON(p) == 1)
-				rot.z = glm::radians(180.0f);
-			if(!(LOC(p) & LOCATION_OVERLAY) && (pos & POS_FACEDOWN))
-				rot.y = glm::radians(180.0f);
-			if(pos & POS_DEFENSE && !(LOC(p) & LOCATION_SZONE))
-				rot.z -= glm::radians(90.0f); // NOTE: Substraction
-		}
-		return rot;
-	}
-	
-	void UpdateMatrices()
-	{
-		// Recalculate View-Projection matrix
-		const auto aspectRatio = static_cast<float>(cam.can.w) / cam.can.h;
-		const auto proj = glm::perspective(1.0f, aspectRatio, 0.1f, 10.0f);
-		const auto view = glm::lookAt(cam.pos, {0.0f, 0.0f, 0.0f}, UP);
-		cam.vp = proj * view;
-		// Apply matrix to all elements
-		for(auto& kv : zones)
-			kv.second.prim->SetMatrix(cam.vp * kv.second.model);
-		ForAllCards([this](GraphicCard& card)
-		{
-			const auto mvp = cam.vp * GetModel(card.loc, card.rot);
-			card.front->SetMatrix(mvp);
-			card.cover->SetMatrix(mvp);
-		});
-	}
-	
 	// Refreshes the hitboxes for the cards in hand.
 	void HandHitbox(uint8_t player)
 	{
-		const glm::mat4 vvp = CalcVpMatrix() * cam.vp;
 		for(auto& card : GetPile(player, LOCATION_HAND))
-		{
-			if(!card.hitbox)
-				card.hitbox = std::make_unique<GraphicCard::HitboxData>();
-			card.hitbox->vertices = CARD_HITBOX_VERTICES;
-#if defined(DEBUG_HITBOXES)
-			card.hitbox->prim = env.renderer->NewPrimitive();
-			card.hitbox->prim->SetDrawMode(Drawing::PDM_LINE_LOOP);
-			const glm::vec4 BLU = {0.0f, 0.0f, 1.0f, 1.0f};
-			card.hitbox->prim->SetColors({BLU, BLU, BLU, BLU, BLU});
-#endif // defined(DEBUG_HITBOXES)
-			const glm::mat4 mvp = vvp * GetModel(card.loc, card.rot);
-			for(size_t i = 0; i < CARD_HITBOX_VERTICES.size(); i++)
-			{
-				const glm::vec4 v4 = mvp * glm::vec4(CARD_HITBOX_VERTICES[i], 1.0f);
-				card.hitbox->vertices[i] = glm::vec3(v4) / v4.w;
-			}
-#if defined(DEBUG_HITBOXES)
-			card.hitbox->prim->SetVertices(card.hitbox->vertices);
-#endif // defined(DEBUG_HITBOXES)
-		}
+			LazyCardHitbox(card);
 	}
 
 	void UpdateAllCards()
