@@ -2,6 +2,9 @@
 
 #include <SDL_image.h>
 
+#include "duel.hpp"
+
+#include "../game_instance.hpp"
 #include "../game_data.hpp"
 #include "../sdl_utility.hpp"
 
@@ -33,6 +36,11 @@ Menu::Menu(GameInstance& gi, GameData& data, Drawing::Renderer renderer) :
 	duelBtn->SetText(u8"Duel"); // TODO(dyxel): move to i18n config file
 	exitBtn = GUI::CButton::New(env);
 	exitBtn->SetText(u8"Exit"); // TODO(dyxel): move to i18n config file
+	
+	duelBtn->SetCallback([&, renderer]()
+	{
+		gi.SetState(std::make_shared<State::Duel>(gi, data, renderer));
+	});
 	
 	env.Add(duelBtn);
 	env.Add(exitBtn);
