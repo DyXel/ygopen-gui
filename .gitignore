@@ -1,7 +1,4 @@
 [Bb]uild*/
-lib/fmt/
-lib/glm/
-lib/json/
 
 # CLion or similar
 .idea/
