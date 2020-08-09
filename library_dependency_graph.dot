@@ -1,4 +1,5 @@
-digraph YGOpenDependencyGraph {
+digraph YGOpenLibraryDependencyGraph
+{
 	"YGOpen GUI" -> "Ego"
 	"YGOpen GUI" -> "sdl2"
 	"YGOpen GUI" -> "SDL2_image"
