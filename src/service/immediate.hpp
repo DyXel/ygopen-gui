@@ -1,5 +1,6 @@
 #ifndef YGOPEN_SERVICE_IMMEDIATE_HPP
 #define YGOPEN_SERVICE_IMMEDIATE_HPP
+#include <ego/ego_fwd.hpp>
 
 namespace YGOpen::Service
 {
@@ -13,6 +14,7 @@ public:
 	bool exiting; // Flag that is checked each tick to exit the program.
 	float elapsed; // Time elapsed since last draw call in seconds.
 	int width, height; // This instance's window width and height.
+	Ego::SRenderer renderer; // This instance's window Ego renderer.
 };
 
 } // namespace YGOpen::Service

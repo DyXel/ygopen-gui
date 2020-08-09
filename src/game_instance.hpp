@@ -32,6 +32,7 @@ private:
 	unsigned now{0u}, then{0u};
 	
 	void ConstructWindowAndGLCtx();
+	void ConstructEgoRenderer();
 	
 	void OnEvent(const SDL_Event& e);
 	void Tick();

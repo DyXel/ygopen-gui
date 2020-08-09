@@ -3,6 +3,8 @@
 #include <stdexcept>
 #include <utility>
 
+#include <ego/renderer.hpp>
+
 #define USE_GL_CORE
 
 namespace YGOpen
@@ -27,33 +29,49 @@ GameInstance::GameInstance() :
 	svc({cfg, imm})
 {
 	ConstructWindowAndGLCtx();
-	// Sets window to 80% size of the display it is currently in.
-#ifndef __ANDROID__
-	auto SetWindowSize = [&]() -> bool
+	ConstructEgoRenderer();
+	[this]() // LoadCustomConfig
 	{
-		int displayIndex;
-		SDL_Rect r;
-		if(!GetDisplayIndexFromWindow(sdlWindow, displayIndex))
-			return false;
-		if(SDL_GetDisplayUsableBounds(displayIndex, &r) < 0)
-		{
-			SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
-			            "Unable to get display usable bounds: %s",
-			            SDL_GetError());
-			return false;
-		}
-		int& width = svc.imm.width;
-		int& height = svc.imm.height;
-		width  = (r.w - r.x) * 4 / 5;
-		height = (r.h - r.y) * 4 / 5;
-		SDL_Log("Setting window size to (%i, %i)", width, height);
-		SDL_SetWindowSize(sdlWindow, width, height);
-		return true;
+		// TODO
 	};
-	if(!SetWindowSize())
-		SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Unable to set window size.");
+	[this]() // ApplyCustomConfig
+	{
+		// TODO
+		// Sets window to 80% size of the display it is currently in.
+#ifndef __ANDROID__
+		auto SetWindowSize = [&]() -> bool
+		{
+			int displayIndex;
+			SDL_Rect r;
+			if(!GetDisplayIndexFromWindow(sdlWindow, displayIndex))
+				return false;
+			if(SDL_GetDisplayUsableBounds(displayIndex, &r) < 0)
+			{
+				SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
+							"Unable to get display usable bounds: %s",
+							SDL_GetError());
+				return false;
+			}
+			int& width = svc.imm.width;
+			int& height = svc.imm.height;
+			width  = (r.w - r.x) * 4 / 5;
+			height = (r.h - r.y) * 4 / 5;
+			SDL_Log("Setting window size to (%i, %i)", width, height);
+			SDL_SetWindowSize(sdlWindow, width, height);
+			return true;
+		};
+		if(!SetWindowSize())
+			SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Unable to set window size.");
 #endif // #ifndef __ANDROID__
+	}();
+	// Its better to show the window as soon as possible to let the user
+	// know that the program is doing something.
+	SDL_GL_SwapWindow(sdlWindow); // Clears up artifacts.
 	SDL_ShowWindow(sdlWindow);
+	[this]() // ReloadAssets
+	{
+		// TODO
+	}();
 	now = then = static_cast<unsigned>(SDL_GetTicks());
 }
 
@@ -71,6 +89,8 @@ void GameInstance::Run()
 		while(SDL_PollEvent(&e) != 0)
 			OnEvent(e);
 		Tick();
+		svc.imm.renderer->DrawAllScenes();
+		SDL_GL_SwapWindow(sdlWindow);
 	}
 }
 
@@ -93,7 +113,7 @@ void GameInstance::ConstructWindowAndGLCtx()
 #endif // USE_GL_CORE
 	// Create window.
 	sdlWindow = SDL_CreateWindow("YGOpen",
-		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 400, 400,
+		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 0, 0,
 		SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN);
 	if(sdlWindow == nullptr)
 	{
@@ -129,13 +149,28 @@ void GameInstance::ConstructWindowAndGLCtx()
 	}
 }
 
+void GameInstance::ConstructEgoRenderer()
+{
+#ifdef USE_GL_CORE
+#define MAKE_RENDERER MakeGLCoreRenderer
+#else
+#define MAKE_RENDERER MakeGLESRenderer
+#endif // USE_GL_CORE
+	svc.imm.renderer = Ego::MAKE_RENDERER([](const char* procName)
+	{
+		return SDL_GL_GetProcAddress(procName);
+	});
+#undef MAKE_RENDERER
+	// FIXME: Check if the renderer is valid?
+}
+
 void GameInstance::OnEvent(const SDL_Event& e)
 {
 	if(e.type == SDL_QUIT)
 		svc.imm.exiting = true;
 	
-	// If the event is a window size change event update the viewport/extent
-	// to match the new size, also, save the new size.
+	// Save new window size.
+	// Scene owners are responsible for resizing their scene's viewport.
 	if(e.type == SDL_WINDOWEVENT && e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
 		SDL_GL_GetDrawableSize(sdlWindow, &svc.imm.width, &svc.imm.height);
 }
