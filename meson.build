@@ -11,7 +11,6 @@ ygopen_gui_deps = [
 ]
 
 ygopen_gui_src = files([
-	'src/configs.cpp',
 	'src/game_instance.cpp',
 	'src/main.cpp'
 ])
