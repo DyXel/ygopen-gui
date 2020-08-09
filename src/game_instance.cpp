@@ -3,19 +3,17 @@
 #include <stdexcept>
 #include <utility>
 
-#include "configs.hpp"
-
 #define USE_GL_CORE
 
 namespace YGOpen
 {
 
-static bool GetDisplayIndexFromWindow(SDL_Window* window, int* displayIndex)
+static bool GetDisplayIndexFromWindow(SDL_Window* window, int& displayIndex)
 {
 	// NOTE: not checking number of displays because its assumed a display
 	// exist if window creation succeeded.
-	*displayIndex = SDL_GetWindowDisplayIndex(window);
-	if(*displayIndex < 0)
+	displayIndex = SDL_GetWindowDisplayIndex(window);
+	if(displayIndex < 0)
 	{
 		SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
 		            "Unable to get display for current window: %s",
@@ -26,36 +24,16 @@ static bool GetDisplayIndexFromWindow(SDL_Window* window, int* displayIndex)
 }
 
 GameInstance::GameInstance() :
-	width(DEFAULT_WINDOW_WIDTH),
-	height(DEFAULT_WINDOW_HEIGHT),
-	dpi(DEFAULT_DPI)
+	svc({cfg, imm})
 {
 	ConstructWindowAndGLCtx();
-	// Try to set DPI
-	auto SetDPI = [&]() -> bool
-	{
-		int displayIndex;
-		if(!GetDisplayIndexFromWindow(sdlWindow, &displayIndex))
-			return false;
-		if(SDL_GetDisplayDPI(displayIndex, &dpi, nullptr, nullptr) < 0)
-		{
-			SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION,
-			            "Unable to get display DPI: %s",
-			            SDL_GetError());
-			return false;
-		}
-		return true;
-	};
-	if(!SetDPI())
-		SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Unable to set display DPI");
-	SDL_Log("Current DPI: %.2f", static_cast<double>(dpi));
 	// Sets window to 80% size of the display it is currently in.
 #ifndef __ANDROID__
 	auto SetWindowSize = [&]() -> bool
 	{
 		int displayIndex;
 		SDL_Rect r;
-		if(!GetDisplayIndexFromWindow(sdlWindow, &displayIndex))
+		if(!GetDisplayIndexFromWindow(sdlWindow, displayIndex))
 			return false;
 		if(SDL_GetDisplayUsableBounds(displayIndex, &r) < 0)
 		{
@@ -64,6 +42,8 @@ GameInstance::GameInstance() :
 			            SDL_GetError());
 			return false;
 		}
+		int& width = svc.imm.width;
+		int& height = svc.imm.height;
 		width  = (r.w - r.x) * 4 / 5;
 		height = (r.h - r.y) * 4 / 5;
 		SDL_Log("Setting window size to (%i, %i)", width, height);
@@ -86,7 +66,7 @@ GameInstance::~GameInstance()
 void GameInstance::Run()
 {
 	SDL_Event e;
-	while(!exiting)
+	while(!svc.imm.exiting)
 	{
 		while(SDL_PollEvent(&e) != 0)
 			OnEvent(e);
@@ -111,9 +91,9 @@ void GameInstance::ConstructWindowAndGLCtx()
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
 #endif // USE_GL_CORE
-	// Create window
+	// Create window.
 	sdlWindow = SDL_CreateWindow("YGOpen",
-		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height,
+		SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 400, 400,
 		SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN);
 	if(sdlWindow == nullptr)
 	{
@@ -121,7 +101,7 @@ void GameInstance::ConstructWindowAndGLCtx()
 		errStr += SDL_GetError();
 		throw std::runtime_error(errStr);
 	}
-	// Create GL context
+	// Create GL context.
 	sdlGLCtx = SDL_GL_CreateContext(sdlWindow);
 	if(sdlGLCtx == nullptr)
 	{
@@ -130,7 +110,7 @@ void GameInstance::ConstructWindowAndGLCtx()
 		SDL_DestroyWindow(sdlWindow);
 		throw std::runtime_error(errStr);
 	}
-	// Log GL info
+	// Log GL info.
 	{
 		// Look mom! No headers!
 		using GLGetStringType = unsigned const char*(*)(unsigned int);
@@ -151,30 +131,19 @@ void GameInstance::ConstructWindowAndGLCtx()
 
 void GameInstance::OnEvent(const SDL_Event& e)
 {
-	const auto eType = e.type;
-	if(eType == SDL_QUIT)
-		exiting = true;
+	if(e.type == SDL_QUIT)
+		svc.imm.exiting = true;
 	
 	// If the event is a window size change event update the viewport/extent
 	// to match the new size, also, save the new size.
-	if(eType == SDL_WINDOWEVENT &&
-	   e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
-	{
-		SDL_GL_GetDrawableSize(sdlWindow, &width, &height);
-	}
-	
-// 	if(eType != SDL_SYSWMEVENT)
-// 		state->OnEvent(e);
+	if(e.type == SDL_WINDOWEVENT && e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
+		SDL_GL_GetDrawableSize(sdlWindow, &svc.imm.width, &svc.imm.height);
 }
 
 void GameInstance::Tick()
 {
-	if(recording != 0u)
-		now += 1000u / recording;
-	else
-		now = static_cast<unsigned>(SDL_GetTicks());
-// 	data.elapsed = static_cast<float>(now - then) * 0.001f;
-// 	state->Tick();
+	now = static_cast<unsigned>(SDL_GetTicks());
+	svc.imm.elapsed = static_cast<float>(now - then) * 0.001f;
 	then = now;
 }
 

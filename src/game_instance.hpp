@@ -3,6 +3,10 @@
 #include <memory>
 #include <SDL.h>
 
+#include "service_locator.hpp"
+#include "service/config.hpp"
+#include "service/immediate.hpp"
+
 namespace YGOpen
 {
 
@@ -19,14 +23,13 @@ public:
 	
 	void Run();
 private:
-	int width, height;
-	float dpi;
+	Service::Config cfg;
+	Service::Immediate imm;
+	ServiceLocator svc;
+	
 	SDL_Window* sdlWindow;
 	SDL_GLContext sdlGLCtx;
-	bool exiting{false};
-	
 	unsigned now{0u}, then{0u};
-	unsigned recording{0u}; // if non 0. Framerate being recorded at.
 	
 	void ConstructWindowAndGLCtx();
 	
@@ -34,6 +37,6 @@ private:
 	void Tick();
 };
 
-} // YGOpen
+} // namespace YGOpen
 
 #endif // GAME_INSTANCE_HPP
