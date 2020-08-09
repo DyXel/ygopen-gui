@@ -1,18 +1,15 @@
-#include "game_instance.hpp"
-#include <memory>
+#include <optional>
 #include <SDL.h>
 #include <SDL_image.h>
+#include <SDL_ttf.h>
 
-#if defined(__ANDROID__)
-static constexpr Drawing::Backend DEFAULT_BACKEND = Drawing::OPENGL_ES;
-#else
-static constexpr Drawing::Backend DEFAULT_BACKEND = Drawing::OPENGL_CORE;
-#endif
+#include "game_instance.hpp"
 
 extern "C" int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 {
 	int exitCode = 0;
-	std::unique_ptr<YGOpen::GameInstance> gi;
+	std::optional<YGOpen::GameInstance> gi;
+	// TODO: initialize SDL2_mixer
 	if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
 	{
 		SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION,
@@ -42,7 +39,7 @@ extern "C" int main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[])
 	}
 	try
 	{
-		gi = std::make_unique<YGOpen::GameInstance>(DEFAULT_BACKEND);
+		gi.emplace();
 	}
 	catch(const std::exception& e)
 	{

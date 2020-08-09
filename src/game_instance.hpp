@@ -2,21 +2,14 @@
 #define GAME_INSTANCE_HPP
 #include <memory>
 #include <SDL.h>
-#include "game_data.hpp"
-#include "drawing/sdlwindow.hpp"
 
 namespace YGOpen
 {
 
-namespace State
-{
-class IState;
-} // State
-
-class GameInstance : public Drawing::SDLWindow
+class GameInstance final
 {
 public:
-	GameInstance(const Drawing::Backend backend);
+	GameInstance();
 	~GameInstance();
 	
 	GameInstance(const GameInstance&) = delete;
@@ -25,22 +18,20 @@ public:
 	GameInstance& operator=(GameInstance&&) = delete;
 	
 	void Run();
-	
-	void Exit();
-	void SetState(std::shared_ptr<State::IState> newState);
 private:
-	GameData data;
+	int width, height;
+	float dpi;
+	SDL_Window* sdlWindow;
+	SDL_GLContext sdlGLCtx;
 	bool exiting{false};
-	std::shared_ptr<State::IState> state;
 	
 	unsigned now{0u}, then{0u};
 	unsigned recording{0u}; // if non 0. Framerate being recorded at.
 	
+	void ConstructWindowAndGLCtx();
+	
 	void OnEvent(const SDL_Event& e);
 	void Tick();
-	void Draw() const;
-	
-	inline void UpdateCanvas();
 };
 
 } // YGOpen
