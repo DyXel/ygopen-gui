@@ -3,7 +3,7 @@
 #include <memory>
 #include <SDL.h>
 
-#include "service_locator.hpp"
+#include "service.hpp"
 #include "service/config.hpp"
 #include "service/immediate.hpp"
 
@@ -25,7 +25,7 @@ public:
 private:
 	Service::Config cfg;
 	Service::Immediate imm;
-	ServiceLocator svc;
+	Service svc;
 	
 	SDL_Window* sdlWindow;
 	SDL_GLContext sdlGLCtx;

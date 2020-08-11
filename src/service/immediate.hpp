@@ -2,13 +2,13 @@
 #define YGOPEN_SERVICE_IMMEDIATE_HPP
 #include <ego/ego_fwd.hpp>
 
-namespace YGOpen::Service
+namespace YGOpen
 {
 
 // Information which is shared across an Instance and its states, and that
 // is not worth saving (entirely calculated at runtime) or
 // changes too quickly to be considered a configuration.
-class Immediate
+class Service::Immediate final
 {
 public:
 	bool exiting; // Flag that is checked each tick to exit the program.

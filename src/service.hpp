@@ -4,18 +4,12 @@
 namespace YGOpen
 {
 
-namespace Service
+struct Service
 {
-
-class Config;
-class Immediate;
-
-} // namespace Service
-
-struct ServiceLocator
-{
-	Service::Config& cfg;
-	Service::Immediate& imm;
+#define SERVICE(klass, member) class klass; klass& member;
+	SERVICE(Config, cfg)
+	SERVICE(Immediate, imm)
+#undef SERVICE
 };
 
 } // namespace YGOpen
