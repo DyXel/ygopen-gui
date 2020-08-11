@@ -1,21 +1,18 @@
-#ifndef GAME_STATE_HPP
-#define GAME_STATE_HPP
-#include <SDL.h>
+#ifndef YGOPEN_INSTANCE_STATE_HPP
+#define YGOPEN_INSTANCE_STATE_HPP
+#include <SDL_events.h>
 
 namespace YGOpen
 {
-namespace State
-{
 
-class IState
+struct Service;
+
+class StateConcept
 {
-public:
-	virtual void OnEvent(const SDL_Event& e) = 0;
-	virtual void Tick() = 0;
-	virtual void Draw() = 0;
+	void OnEvent(const SDL_Event& e);
+	void Tick();
 };
 
-} // State
 } // YGOpen
 
-#endif // GAME_STATE_HPP
+#endif // YGOPEN_INSTANCE_STATE_HPP

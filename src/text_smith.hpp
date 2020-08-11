@@ -7,7 +7,7 @@
 namespace YGOpen
 {
 
-class TextSmith
+class TextSmith final
 {
 public:
 	TextSmith() = default;

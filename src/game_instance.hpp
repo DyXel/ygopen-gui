@@ -6,6 +6,7 @@
 #include "service.hpp"
 #include "service/config.hpp"
 #include "service/immediate.hpp"
+#include "state/menu.hpp"
 
 namespace YGOpen
 {
@@ -24,15 +25,12 @@ public:
 	void Run();
 private:
 	Service::Config cfg;
-	Service::Immediate imm;
-	Service svc;
-	
 	SDL_Window* sdlWindow;
 	SDL_GLContext sdlGLCtx;
-	unsigned now{0u}, then{0u};
-	
-	void ConstructWindowAndGLCtx();
-	void ConstructEgoRenderer();
+	Service::Immediate imm;
+	Service svc;
+	unsigned now, then;
+	State::Menu state;
 	
 	void OnEvent(const SDL_Event& e);
 	void Tick();

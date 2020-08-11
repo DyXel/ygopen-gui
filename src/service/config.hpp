@@ -1,5 +1,6 @@
 #ifndef YGOPEN_SERVICE_CONFIG_HPP
 #define YGOPEN_SERVICE_CONFIG_HPP
+#include "../service.hpp"
 
 namespace YGOpen
 {

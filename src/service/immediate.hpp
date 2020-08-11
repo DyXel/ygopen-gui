@@ -2,6 +2,8 @@
 #define YGOPEN_SERVICE_IMMEDIATE_HPP
 #include <ego/ego_fwd.hpp>
 
+#include "../service.hpp"
+
 namespace YGOpen
 {
 
@@ -11,6 +13,8 @@ namespace YGOpen
 class Service::Immediate final
 {
 public:
+	Immediate();
+	
 	bool exiting; // Flag that is checked each tick to exit the program.
 	float elapsed; // Time elapsed since last draw call in seconds.
 	int width, height; // This instance's window width and height.

@@ -12,7 +12,9 @@ ygopen_gui_deps = [
 
 ygopen_gui_src = files([
 	'src/game_instance.cpp',
-	'src/main.cpp'
+	'src/main.cpp',
+	'src/service/immediate.cpp',
+	'src/state/menu.cpp'
 ])
 
 ygopen_gui_exe = executable('ygopen_gui', ygopen_gui_src, dependencies : ygopen_gui_deps, gui_app : true)
