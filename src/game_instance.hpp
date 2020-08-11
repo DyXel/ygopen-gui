@@ -6,7 +6,7 @@
 #include "service.hpp"
 #include "service/config.hpp"
 #include "service/immediate.hpp"
-#include "state/menu.hpp"
+#include "state/test.hpp"
 
 namespace YGOpen
 {
@@ -30,7 +30,7 @@ private:
 	Service::Immediate imm;
 	Service svc;
 	unsigned now, then;
-	State::Menu state;
+	State::Test state;
 	
 	void OnEvent(const SDL_Event& e);
 	void Tick();
